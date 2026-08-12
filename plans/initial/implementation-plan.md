@@ -235,6 +235,24 @@ Alternative approaches:
 
 Pause if matching maftools would require a broad reimplementation, direct reliance on unstable slots, or a semantic compromise visible in the acceptance example.
 
+Implementation re-evaluation (2026-08-12):
+
+- The exported accessors plus a compact adaptation of `createOncoMatrix()` were
+  sufficient; no MAF slot access or non-exported maftools call is needed.
+- The normalized model is five ordinary data frames (`genes`, `samples`,
+  `cells`, `top_bars`, and `right_bars`) plus title statistics and the ordered
+  mutation color mapping. The full cell grid is intentional because Step 5
+  needs explicit empty-cell backgrounds as well as altered cells.
+- Against maftools 2.26.0, the LAML character matrix matches the complete
+  10-by-193 oncoplot oracle exactly, including gene order, sample order, and
+  `Multi_Hit` assignments. The summaries reproduce 141 altered samples out of
+  193 and the reference percentages.
+- Clinical rows remain deferred to Step 6. Adding them now would leave unused
+  fields in the Step 5 reference spec and would weaken the KISS boundary.
+- Step 5's composition approach remains viable: the explicit indices and
+  ordered rows mean GenomeSpy only needs to render and align the panels, not
+  reproduce biological ordering transforms.
+
 ## Step 5 — Assemble the reference-equivalent oncoplot specification
 
 Build a complete GenomeSpy specification in R from the tested data model. Follow the cleaner composition style in `upsetr-mutations.json`, using shared top-level data and transforms where helpful and small panel-local filters/layers.

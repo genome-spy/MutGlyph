@@ -296,7 +296,7 @@ Re-evaluation outcome:
   clinical and sample-label tracks retain their independent fixed heights; and
 - no separate clinical-row-height argument or layout abstraction is needed.
 
-## Step 2 — Support custom mutation colors
+## Step 2 — Support custom mutation colors (completed)
 
 Add `colors = NULL` using the maftools contract: a named character vector that
 maps variant classifications to CSS colors.
@@ -329,8 +329,14 @@ Tentative commit:
 feat: support custom oncoplot mutation colors
 ```
 
-Re-evaluate whether accepting arbitrary CSS color syntax is sufficient. Do not
-add a color parser unless GenomeSpy rejects a real user input that R accepted.
+Re-evaluation outcome:
+
+- named CSS color values can pass through to GenomeSpy unchanged; a separate
+  R color parser would reject useful browser syntax and is not needed;
+- merging overrides before selecting observed classes allows palettes to be
+  reused across cohorts without changing default fallback assignment; and
+- the existing shared color encoding applies the merged palette consistently
+  to mutation, CNV, top-bar, and right-bar marks and their collected legend.
 
 ## Step 3 — Add gene selection, explicit ordering, and sample filtering
 

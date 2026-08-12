@@ -166,6 +166,33 @@ test_that("custom title text replaces the generated summary", {
   expect_identical(spec$datasets$title$label, "AML cohort")
 })
 
+test_that("custom mutation colors are shared by every event view", {
+  custom <- c(Missense_Mutation = "#123456", Multi_Hit = "hotpink")
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    colors = custom
+  )$x$spec
+  body <- spec$vconcat[[2]]
+  encodings <- list(
+    body$concat[[2]]$encoding$color,
+    body$concat[[6]]$layer[[2]]$encoding$color,
+    body$concat[[6]]$layer[[3]]$encoding$color,
+    body$concat[[8]]$encoding$color
+  )
+
+  expect_true(all(vapply(
+    encodings,
+    function(encoding) identical(encoding, encodings[[1]]),
+    logical(1)
+  )))
+  color_map <- setNames(
+    encodings[[1]]$scale$range,
+    encodings[[1]]$scale$domain
+  )
+  expect_identical(unname(color_map[names(custom)]), unname(custom))
+})
+
 test_that("basic display arguments validate scalar values", {
   for (argument in c(
     "drawRowBar", "drawColBar", "showPct", "showTitle"

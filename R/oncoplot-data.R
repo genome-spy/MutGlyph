@@ -3,6 +3,7 @@
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to select when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display.
+#' @param colors Optional named character vector of mutation-class colors.
 #' @param clinicalFeatures Optional categorical clinical fields.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars.
@@ -12,6 +13,7 @@
 oncoplot_data <- function(maf,
                           top = 20,
                           genes = NULL,
+                          colors = NULL,
                           clinicalFeatures = NULL,
                           includeColBarCN = TRUE) {
   if (!inherits(maf, "MAF")) {
@@ -72,7 +74,7 @@ oncoplot_data <- function(maf,
       altered_percent = 100 * altered_samples / total_samples
     ),
     mutation_classes = mutation_classes,
-    mutation_colors = oncoplot_mutation_colors(mutation_classes)
+    mutation_colors = oncoplot_mutation_colors(mutation_classes, colors)
   )
 }
 
@@ -416,10 +418,10 @@ oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
   data
 }
 
-oncoplot_mutation_colors <- function(mutation_classes) {
+oncoplot_mutation_colors <- function(mutation_classes, colors = NULL) {
   # Adapted from maftools R/oncomatrix.R (get_vcColors). Values are embedded
   # here to avoid adding RColorBrewer as a direct MutGlyph dependency.
-  colors <- c(
+  palette <- c(
     Nonstop_Mutation = "#A6CEE3FF",
     Frame_Shift_Del = "#1F78B4FF",
     IGR = "#B2DF8AFF",
@@ -439,15 +441,39 @@ oncoplot_mutation_colors <- function(mutation_classes) {
     Del = "#4169E1FF",
     Complex_Event = "#7B7060FF"
   )
+  fallback_palette <- palette
 
-  missing <- mutation_classes[!mutation_classes %in% names(colors)]
+  if (!is.null(colors)) {
+    if (
+      !is.character(colors) ||
+        length(colors) == 0L ||
+        is.null(names(colors)) ||
+        anyNA(names(colors)) ||
+        any(!nzchar(names(colors))) ||
+        anyDuplicated(names(colors)) > 0L ||
+        anyNA(colors) ||
+        any(!nzchar(colors))
+    ) {
+      stop(
+        "`colors` must be a named character vector with unique, non-empty names and values.",
+        call. = FALSE
+      )
+    }
+    # Merge before subsetting so one reusable palette may include mutation
+    # classes that are absent from the current cohort.
+    palette[names(colors)] <- unname(colors)
+  }
+
+  missing <- mutation_classes[!mutation_classes %in% names(palette)]
   if (length(missing) > 0L) {
-    available <- unname(colors[!names(colors) %in% mutation_classes])
+    available <- unname(
+      fallback_palette[!names(fallback_palette) %in% mutation_classes]
+    )
     fallback <- rep("#808080FF", length(missing))
     fallback_count <- min(length(available), length(missing))
     fallback[seq_len(fallback_count)] <- available[seq_len(fallback_count)]
     names(fallback) <- missing
-    colors <- c(colors, fallback)
+    palette <- c(palette, fallback)
   }
-  colors[mutation_classes]
+  palette[mutation_classes]
 }

@@ -8,6 +8,7 @@ mutglyph_oncoplot(
   maf,
   top = 20,
   genes = NULL,
+  colors = NULL,
   clinicalFeatures = NULL,
   includeColBarCN = TRUE,
   showTumorSampleBarcodes = FALSE,
@@ -28,6 +29,8 @@ mutglyph_oncoplot(
 \item{top}{Number of genes to display when \code{genes} is \code{NULL}.}
 
 \item{genes}{Optional gene symbols to display instead of selecting top genes.}
+
+\item{colors}{Optional named character vector of mutation-class colors.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields to display.}
 

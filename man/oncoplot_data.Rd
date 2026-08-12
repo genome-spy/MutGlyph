@@ -8,6 +8,7 @@ oncoplot_data(
   maf,
   top = 20,
   genes = NULL,
+  colors = NULL,
   clinicalFeatures = NULL,
   includeColBarCN = TRUE
 )
@@ -18,6 +19,8 @@ oncoplot_data(
 \item{top}{Number of genes to select when \code{genes} is \code{NULL}.}
 
 \item{genes}{Optional gene symbols to display.}
+
+\item{colors}{Optional named character vector of mutation-class colors.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields.}
 

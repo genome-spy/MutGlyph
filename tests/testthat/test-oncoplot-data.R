@@ -127,6 +127,53 @@ test_that("GISTIC copy-number calls match maftools top-bar behavior", {
   )
 })
 
+test_that("custom mutation colors merge over defaults", {
+  custom <- c(
+    Missense_Mutation = "#123456",
+    Multi_Hit = "black",
+    Amp = "hotpink",
+    Del = "navy",
+    Absent_Class = "var(--absent-color)"
+  )
+  data <- oncoplot_data(laml_gistic_maf(), top = 10, colors = custom)
+
+  expect_identical(
+    unname(data$mutation_colors[c(
+      "Missense_Mutation", "Multi_Hit", "Del"
+    )]),
+    unname(custom[c("Missense_Mutation", "Multi_Hit", "Del")])
+  )
+  expect_identical(
+    unname(oncoplot_mutation_colors(c("Amp", "Del"), custom)),
+    unname(custom[c("Amp", "Del")])
+  )
+  expect_false("Absent_Class" %in% names(data$mutation_colors))
+  expect_identical(
+    unname(data$mutation_colors[["Nonsense_Mutation"]]),
+    "#E31A1CFF"
+  )
+})
+
+test_that("custom mutation colors validate their mapping", {
+  invalid_palettes <- list(
+    c("red", "blue"),
+    structure(c("red", "blue"), names = c("A", "A")),
+    structure("red", names = NA_character_),
+    structure("red", names = ""),
+    c(A = NA_character_),
+    c(A = ""),
+    character(),
+    c(A = 1)
+  )
+
+  for (colors in invalid_palettes) {
+    expect_error(
+      oncoplot_data(laml_maf(), top = 10, colors = colors),
+      "named character vector"
+    )
+  }
+})
+
 test_that("oncoplot data validates its small input surface", {
   maf <- laml_maf()
 

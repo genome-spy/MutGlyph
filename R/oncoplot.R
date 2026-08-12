@@ -8,6 +8,7 @@
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to display when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display instead of selecting top genes.
+#' @param colors Optional named character vector of mutation-class colors.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars, matching `maftools::oncoplot()`.
@@ -49,6 +50,7 @@
 mutglyph_oncoplot <- function(maf,
                               top = 20,
                               genes = NULL,
+                              colors = NULL,
                               clinicalFeatures = NULL,
                               includeColBarCN = TRUE,
                               showTumorSampleBarcodes = FALSE,
@@ -89,6 +91,7 @@ mutglyph_oncoplot <- function(maf,
     maf,
     top = top,
     genes = genes,
+    colors = colors,
     clinicalFeatures = clinicalFeatures,
     includeColBarCN = includeColBarCN
   )

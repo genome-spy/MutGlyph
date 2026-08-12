@@ -46,6 +46,7 @@ writeLines(
   as_json(mutglyph_oncoplot(
     laml,
     top = 10,
+    colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60"),
     clinicalFeatures = "FAB_classification",
     showTumorSampleBarcodes = TRUE
   )),

@@ -456,6 +456,33 @@ Final re-evaluation:
 - Is any deferred work accidentally presented as already supported?
 - Is the codebase ready for lollipop and rainfall work without abstractions created solely in anticipation of them?
 
+Implementation re-evaluation (2026-08-12):
+
+- The complete initial workflow is covered by 69 deterministic R tests. Three
+  representative R-generated specifications also pass the JSON schema bundled
+  with the pinned GenomeSpy 0.84.0 development dependency.
+- A compact README and runnable `interactive()` help example use maftools'
+  bundled LAML files. A vignette toolchain would add dependencies without
+  improving this single example, so it was deliberately not introduced.
+- The source tarball contains the committed browser bundle but excludes npm,
+  Vite, schema, generated validation, source-JavaScript, and planning files. An
+  installation made from that tarball ran the exact LAML `top = 10` acceptance
+  workflow and reproduced the `141 / 193` cohort summary without Node.js.
+- Adapted maftools code is identified at its source locations and covered by
+  the installed `NOTICE`. A generated `JS-LICENSES` file carries package-level
+  notices for all 58 entries in the production JavaScript dependency tree.
+- The final non-CRAN `R CMD check` result is clean: zero errors, warnings, or
+  notes. The `--as-cran` variant adds only the environment's inability to
+  verify the current time; it reports no package error or warning.
+- The manual browser comparison, synchronized zoom, tooltip, ranged-label,
+  collected-legend, and SVG-export checks performed in Steps 5–7 cover the
+  acceptance surface. No screenshot harness, public argument, general plot
+  abstraction, or additional runtime dependency was justified.
+- Step 8 is one coherent documentation/packaging commit. The only additional
+  test asserts that both third-party notice files are actually installed, so a
+  separate test-only commit would add ceremony without an independently useful
+  increment.
+
 ## Tentative commit sequence
 
 ```text

@@ -13,7 +13,30 @@
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
+#' @details
+#' The sample axis supports wheel or trackpad zooming and panning. Hover over
+#' mutation cells and summary bars for details, or use the widget's **Save as
+#' SVG** button to export the currently visible composition.
+#'
+#' Clinical annotations are categorical in the initial release. Sample labels
+#' use ranged text and appear only when their bands are wide enough; zooming in
+#' reveals labels that are hidden in a dense overview.
+#'
 #' @return A MutGlyph htmlwidget.
+#' @seealso [as_json()] to retrieve the rendered GenomeSpy specification.
+#'
+#' @examples
+#' if (interactive()) {
+#'   laml <- maftools::read.maf(
+#'     maf = system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
+#'     clinicalData = system.file(
+#'       "extdata",
+#'       "tcga_laml_annot.tsv",
+#'       package = "maftools"
+#'     )
+#'   )
+#'   mutglyph_oncoplot(laml, top = 10)
+#' }
 #' @export
 mutglyph_oncoplot <- function(maf,
                               top = 20,

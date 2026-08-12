@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "licenses": "node tools/generate-js-licenses.mjs",
     "validate:specs": "node tools/validate-specs.mjs"
   },
   "dependencies": {

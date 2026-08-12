@@ -262,8 +262,13 @@ test_that("Ti/Tv adds one aligned row and an independent color scale", {
 
   expect_true("titv" %in% names(spec$datasets))
   expect_identical(titv_view$name, "transition-transversion")
-  expect_identical(titv_view$height, 28)
+  expect_identical(titv_view$height, 40)
   expect_identical(titv_view$resolve$scale$color, "excluded")
+  expect_identical(titv_view$resolve$legend$default, "excluded")
+  legend <- titv_view$layer[[2]]$encoding$color$legend
+  expect_identical(legend$orient, "right")
+  expect_identical(legend$direction, "vertical")
+  expect_identical(legend$columns, 2)
   expect_identical(
     titv_view$layer[[1]]$data$sequence$stop,
     nrow(spec$datasets$samples) + 1
@@ -272,6 +277,15 @@ test_that("Ti/Tv adds one aligned row and an independent color scale", {
     vapply(titv_view$layer[[2]]$transform, `[[`, character(1), "type"),
     c("lookup", "stack")
   )
+  aligned_views <- body$concat[c(2, 6, 10, 14, 18)]
+  expect_true(all(vapply(
+    aligned_views,
+    function(view) identical(
+      view$overhang,
+      list(left = FALSE, right = FALSE)
+    ),
+    logical(1)
+  )))
   expect_identical(body$concat[[18]]$name, "sample-labels")
 })
 

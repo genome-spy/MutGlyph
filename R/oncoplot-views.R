@@ -37,13 +37,20 @@ oncoplot_grid_row <- function(has_left_bar,
   row
 }
 
+oncoplot_track_overhang <- function() {
+  # Sample-aligned tracks have explicit neighboring grid columns. Their axes,
+  # titles, labels, and local legends may remain visible without contributing
+  # additional horizontal space that would make track widths diverge.
+  list(left = FALSE, right = FALSE)
+}
+
 oncoplot_top_bar_view <- function(color_encoding, matrix_width) {
   list(
     name = "sample-mutation-burden",
     width = matrix_width,
     height = 90,
     resolve = list(scale = list(y = "excluded")),
-    overhang = list(left = FALSE),
+    overhang = oncoplot_track_overhang(),
     data = list(name = "topBars"),
     transform = list(
       oncoplot_sample_index_lookup(),
@@ -86,7 +93,7 @@ oncoplot_custom_top_bar_view <- function(bar, matrix_width) {
     width = matrix_width,
     height = 90,
     resolve = list(scale = list(y = "excluded")),
-    overhang = list(left = FALSE),
+    overhang = oncoplot_track_overhang(),
     data = list(name = "customTopBar"),
     transform = list(oncoplot_sample_index_lookup()),
     mark = list(
@@ -150,6 +157,7 @@ oncoplot_matrix_view <- function(color_encoding,
     name = "mutation-matrix",
     width = matrix_width,
     height = matrix_height,
+    overhang = oncoplot_track_overhang(),
     layer = list(
       list(
         name = "empty-cells",
@@ -401,6 +409,7 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
         name = paste0("clinical-annotation-", index),
         width = matrix_width,
         height = 18,
+        overhang = oncoplot_track_overhang(),
         resolve = list(scale = list(y = "excluded", color = "excluded")),
         layer = list(
           list(
@@ -432,6 +441,7 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
           name = paste0("clinical-annotation-", index),
           width = matrix_width,
           height = 18,
+          overhang = oncoplot_track_overhang(),
           resolve = list(scale = list(y = "excluded", color = "excluded"))
         ),
         annotation_layer
@@ -479,6 +489,7 @@ oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
       name = "sample-labels",
       width = matrix_width,
       height = 80,
+      overhang = oncoplot_track_overhang(),
       data = list(name = "samples"),
       resolve = list(scale = list(y = "excluded")),
       mark = list(
@@ -517,13 +528,24 @@ oncoplot_titv_views <- function(data, matrix_width, has_left_bar) {
       domain = unname(names(data$titv$colors)),
       range = unname(data$titv$colors)
     ),
-    legend = list(title = "Ti/Tv")
+    legend = list(
+      title = "Ti/Tv",
+      orient = "right",
+      direction = "vertical",
+      columns = 2
+    )
   )
   track <- list(
     name = "transition-transversion",
     width = matrix_width,
-    height = 28,
-    resolve = list(scale = list(y = "excluded", color = "excluded")),
+    height = 40,
+    overhang = oncoplot_track_overhang(),
+    resolve = list(
+      scale = list(y = "excluded", color = "excluded"),
+      # Keep this legend beside the compact spectrum track instead of adding
+      # it to the root-level collection used by mutation and clinical colors.
+      legend = list(default = "excluded")
+    ),
     layer = list(
       list(
         data = list(sequence = list(

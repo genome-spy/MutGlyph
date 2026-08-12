@@ -456,8 +456,9 @@ remain the bottom-most track. Use the existing shared zoomable x scale.
 Render a gray background for every displayed sample, then overlay the six
 fractions. Samples absent from the `titv()` output therefore remain visibly
 gray, matching maftools' missing-sample behavior. Add tooltips for sample,
-substitution class, and percentage. Give the track an independent color scale
-and allow the existing collected legend region to collect its legend.
+substitution class, and percentage. Give the track an independent color scale.
+Keep its legend local to the track and place it on the right so it does not add
+another row to the root legend collection.
 
 The local `plans/initial/example-spec/oncoprint.json` mutation-spectrum track is
 the primary GenomeSpy composition reference. Avoid copying its repeated color
@@ -481,10 +482,12 @@ feat: add transition transversion oncoplot track
 
 Re-evaluation outcome:
 
-- the 28-pixel track remains legible at the ordinary widget size and leaves
+- the 40-pixel track remains legible at the ordinary widget size and leaves
   sample labels as the bottom-most row;
-- the mutation, clinical, and Ti/Tv legends remain understandable in the
-  collected two-row legend region;
+- mutation and clinical legends remain collected at the root, while Ti/Tv uses
+  a compact two-column legend on the right of its own track;
+- sample-aligned tracks disable left/right overhang reservation so their axes,
+  labels, and local legends cannot change the shared grid footprint;
 - the sparse track uses the shared sample lookup instead of serializing sample
   indices, consistent with Step 0.5; and
 - no public legend-placement control or wider label column is needed.
@@ -774,7 +777,8 @@ Final answers:
 - Yes. Ti/Tv values come from exported `maftools::titv()` results and are only
   normalized to the final sample order.
 - Yes. Mutation, Ti/Tv, categorical, and numeric tracks exclude their color
-  scales from one another while legends are collected at the root.
+  scales from one another; mutation and clinical legends are collected at the
+  root while Ti/Tv keeps its legend locally on the right.
 - Yes. The samples dimension table contains the one final sample order, and
   every sample-aligned sparse dataset reaches it through the same lookup.
 - Yes. Title and percentage denominators remain based on the full cohort,

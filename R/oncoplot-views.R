@@ -28,13 +28,16 @@ oncoplot_top_bar_view <- function(color_encoding, matrix_width) {
     resolve = list(scale = list(y = "excluded")),
     overhang = list(left = FALSE),
     data = list(name = "topBars"),
-    transform = list(list(
-      type = "stack",
-      field = "count",
-      groupby = list("sample_index"),
-      sort = list(field = "mutation_class_index", order = "ascending"),
-      as = list("count_start", "count_end")
-    )),
+    transform = list(
+      oncoplot_sample_index_lookup(),
+      list(
+        type = "stack",
+        field = "count",
+        groupby = list("sample_index"),
+        sort = list(field = "mutation_class_index", order = "ascending"),
+        as = list("count_start", "count_end")
+      )
+    ),
     mark = list(
       type = "rect",
       strokeWidth = 0
@@ -86,15 +89,31 @@ oncoplot_gene_labels_view <- function(matrix_height) {
 
 oncoplot_matrix_view <- function(color_encoding,
                                  matrix_width,
-                                 matrix_height) {
+                                 matrix_height,
+                                 sample_count,
+                                 gene_count) {
   list(
     name = "mutation-matrix",
     width = matrix_width,
     height = matrix_height,
-    data = list(name = "cells"),
     layer = list(
       list(
         name = "empty-cells",
+        # Generate the dense sample-by-gene background in the browser instead
+        # of embedding one JSON object per empty matrix cell.
+        data = list(sequence = list(
+          start = 1,
+          stop = sample_count + 1,
+          as = "sample_index"
+        )),
+        transform = list(list(
+          type = "cross",
+          from = list(data = list(sequence = list(
+            start = 1,
+            stop = gene_count + 1,
+            as = "gene_index"
+          )))
+        )),
         mark = list(
           type = "rect",
           color = "#ECF0F1",
@@ -108,7 +127,11 @@ oncoplot_matrix_view <- function(color_encoding,
       list(
         name = "mutation-events",
         data = list(name = "events"),
-        transform = list(list(type = "filter", expr = "!datum.copy_number")),
+        transform = list(
+          list(type = "filter", expr = "!datum.copy_number"),
+          oncoplot_sample_index_lookup(),
+          oncoplot_gene_index_lookup()
+        ),
         mark = oncoplot_event_mark(),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -120,7 +143,11 @@ oncoplot_matrix_view <- function(color_encoding,
       list(
         name = "copy-number-events",
         data = list(name = "events"),
-        transform = list(list(type = "filter", expr = "datum.copy_number")),
+        transform = list(
+          list(type = "filter", expr = "datum.copy_number"),
+          oncoplot_sample_index_lookup(),
+          oncoplot_gene_index_lookup()
+        ),
         mark = oncoplot_event_mark(),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -185,13 +212,16 @@ oncoplot_right_bar_view <- function(color_encoding, matrix_height) {
     data = list(name = "rightBars"),
     resolve = list(scale = list(x = "excluded")),
     overhang = list(top = FALSE),
-    transform = list(list(
-      type = "stack",
-      field = "count",
-      groupby = list("gene_index"),
-      sort = list(field = "mutation_class_index", order = "ascending"),
-      as = list("count_start", "count_end")
-    )),
+    transform = list(
+      oncoplot_gene_index_lookup(),
+      list(
+        type = "stack",
+        field = "count",
+        groupby = list("gene_index"),
+        sort = list(field = "mutation_class_index", order = "ascending"),
+        as = list("count_start", "count_end")
+      )
+    ),
     mark = list(
       type = "rect",
       strokeWidth = 0
@@ -264,6 +294,7 @@ oncoplot_clinical_views <- function(data, clinical_labels, matrix_width) {
       width = matrix_width,
       height = clinical_height,
       data = list(name = "clinical"),
+      transform = list(oncoplot_sample_index_lookup()),
       resolve = list(
         scale = list(y = "excluded", color = "excluded")
       ),
@@ -342,6 +373,29 @@ oncoplot_color_encoding <- function(data) {
       domain = unname(data$mutation_classes),
       range = unname(data$mutation_colors)
     )
+  )
+}
+
+oncoplot_sample_index_lookup <- function() {
+  # Sparse sample-aligned datasets retain readable sample IDs. This lookup is
+  # the single bridge to the final display order in the samples dataset.
+  list(
+    type = "lookup",
+    from = list(name = "samples"),
+    fields = "sample",
+    key = "sample",
+    values = list("sample_index")
+  )
+}
+
+oncoplot_gene_index_lookup <- function() {
+  # Gene facts use symbols as stable keys; row order lives only in `genes`.
+  list(
+    type = "lookup",
+    from = list(name = "genes"),
+    fields = "gene",
+    key = "gene",
+    values = list("gene_index")
   )
 }
 

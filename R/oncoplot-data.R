@@ -47,8 +47,7 @@ oncoplot_data <- function(maf,
     sample_order = samples_data$sample,
     clinicalFeatures = clinicalFeatures
   )
-  cells <- oncoplot_cell_data(oncomatrix)
-  events <- oncoplot_event_data(cells, matrix_data$cnv_classes)
+  events <- oncoplot_event_data(oncomatrix, matrix_data$cnv_classes)
   mutation_classes <- matrix_data$mutation_classes
   top_bars <- oncoplot_top_bars(
     maf,
@@ -64,7 +63,6 @@ oncoplot_data <- function(maf,
     samples = samples_data,
     clinical = clinical$data,
     clinical_colors = clinical$colors,
-    cells = cells,
     events = events,
     top_bars = top_bars,
     right_bars = right_bars,
@@ -82,7 +80,6 @@ oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
   empty <- list(
     data = data.frame(
       sample = character(),
-      sample_index = integer(),
       feature = character(),
       feature_index = integer(),
       value = character(),
@@ -139,7 +136,6 @@ oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
     values[is.na(values)] <- "NA"
     data.frame(
       sample = sample_order,
-      sample_index = seq_along(sample_order),
       feature = feature,
       feature_index = feature_index,
       value = values,
@@ -299,36 +295,33 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
   )
 }
 
-oncoplot_cell_data <- function(oncomatrix) {
-  cells <- expand.grid(
-    sample = colnames(oncomatrix),
-    gene = rownames(oncomatrix),
-    KEEP.OUT.ATTRS = FALSE,
-    stringsAsFactors = FALSE
-  )
-  cells$sample_index <- match(cells$sample, colnames(oncomatrix))
-  cells$gene_index <- match(cells$gene, rownames(oncomatrix))
-  cells$variant_classification <- oncomatrix[cbind(
-    cells$gene_index,
-    cells$sample_index
-  )]
-  cells$altered <- cells$variant_classification != ""
-  cells
-}
-
-oncoplot_event_data <- function(cells, cnv_classes) {
-  altered <- cells[cells$altered, , drop = FALSE]
-  if (nrow(altered) == 0L) {
+oncoplot_event_data <- function(oncomatrix, cnv_classes) {
+  # Only altered cells cross the R-to-browser boundary. GenomeSpy generates the
+  # dense background grid, and lookup transforms attach the final row/column
+  # indices from the gene and sample dimension tables.
+  altered_indices <- which(oncomatrix != "", arr.ind = TRUE)
+  if (nrow(altered_indices) == 0L) {
     return(data.frame(
       sample = character(),
       gene = character(),
-      sample_index = integer(),
-      gene_index = integer(),
       variant_classification = character(),
       copy_number = logical(),
       stringsAsFactors = FALSE
     ))
   }
+
+  # Match the former dense-grid order: samples vary within each gene.
+  altered_indices <- altered_indices[
+    order(altered_indices[, "row"], altered_indices[, "col"]),
+    ,
+    drop = FALSE
+  ]
+  altered <- data.frame(
+    sample = colnames(oncomatrix)[altered_indices[, "col"]],
+    gene = rownames(oncomatrix)[altered_indices[, "row"]],
+    variant_classification = oncomatrix[altered_indices],
+    stringsAsFactors = FALSE
+  )
 
   classes <- strsplit(
     altered$variant_classification,
@@ -336,9 +329,7 @@ oncoplot_event_data <- function(cells, cnv_classes) {
     fixed = TRUE
   )
   row_indices <- rep(seq_len(nrow(altered)), lengths(classes))
-  events <- altered[row_indices, c(
-    "sample", "gene", "sample_index", "gene_index"
-  )]
+  events <- altered[row_indices, c("sample", "gene")]
   events$variant_classification <- unlist(classes, use.names = FALSE)
   events$copy_number <- events$variant_classification %in% cnv_classes
   rownames(events) <- NULL
@@ -378,7 +369,6 @@ oncoplot_top_bars <- function(maf,
     values[is.na(values)] <- 0
     data.frame(
       sample = sample_order,
-      sample_index = seq_along(sample_order),
       variant_classification = classification,
       mutation_class_index = match(classification, mutation_classes),
       count = as.numeric(values),
@@ -388,14 +378,18 @@ oncoplot_top_bars <- function(maf,
   if (length(rows) == 0L) {
     return(data.frame(
       sample = character(),
-      sample_index = integer(),
       variant_classification = character(),
       mutation_class_index = integer(),
       count = numeric(),
       stringsAsFactors = FALSE
     ))
   }
-  do.call(rbind, rows)
+  data <- do.call(rbind, rows)
+  # A missing stack segment is equivalent to a zero-height segment. Omitting
+  # zeros keeps the top-bar dataset sparse without changing the rendered bar.
+  data <- data[data$count != 0, , drop = FALSE]
+  rownames(data) <- NULL
+  data
 }
 
 oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
@@ -408,14 +402,18 @@ oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
     }, integer(1))
     data.frame(
       gene = gene_order,
-      gene_index = seq_along(gene_order),
       variant_classification = classification,
       mutation_class_index = match(classification, mutation_classes),
       count = counts,
       stringsAsFactors = FALSE
     )
   })
-  do.call(rbind, rows)
+  data <- do.call(rbind, rows)
+  # Keep only visible stack segments. The shared gene scale still reserves a
+  # row for genes without events.
+  data <- data[data$count != 0, , drop = FALSE]
+  rownames(data) <- NULL
+  data
 }
 
 oncoplot_mutation_colors <- function(mutation_classes) {

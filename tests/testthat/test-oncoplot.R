@@ -10,9 +10,10 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
   )
   expect_named(
     spec$datasets,
-    c("genes", "cells", "events", "topBars", "rightBars", "title")
+    c("genes", "samples", "events", "topBars", "rightBars", "title")
   )
-  expect_equal(nrow(spec$datasets$cells), 1930)
+  expect_equal(nrow(spec$datasets$samples), 193)
+  expect_equal(nrow(spec$datasets$events), 247)
   body <- spec$vconcat[[2]]
   expect_true(body$scales$x$zoom)
   expect_identical(
@@ -29,7 +30,18 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
     c("Sample", "Gene", "Variant classification")
   )
   matrix_layers <- body$concat[[6]]$layer
+  background <- matrix_layers[[1]]
+  expect_identical(background$data$sequence$stop, 194)
+  expect_identical(
+    background$transform[[1]]$from$data$sequence$stop,
+    11
+  )
+  expect_identical(background$transform[[1]]$type, "cross")
   expect_identical(matrix_layers[[2]]$name, "mutation-events")
+  expect_identical(
+    vapply(matrix_layers[[2]]$transform, `[[`, character(1), "type"),
+    c("filter", "lookup", "lookup")
+  )
   expect_null(matrix_layers[[2]]$encoding$y$band)
   expect_null(matrix_layers[[2]]$encoding$y2)
   expect_identical(matrix_layers[[3]]$name, "copy-number-events")
@@ -48,18 +60,17 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
   )
 })
 
-test_that("oncoplot JSON contains row-record datasets", {
+test_that("oncoplot JSON contains sparse row-record datasets", {
   json <- as_json(mutglyph_oncoplot(laml_maf(), top = 10), pretty = FALSE)
   decoded <- jsonlite::fromJSON(json, simplifyVector = FALSE)
 
-  expect_length(decoded$datasets$cells, 1930)
+  expect_length(decoded$datasets$events, 247)
   expect_named(
-    decoded$datasets$cells[[1]],
-    c(
-      "sample", "gene", "sample_index", "gene_index",
-      "variant_classification", "altered"
-    )
+    decoded$datasets$events[[1]],
+    c("sample", "gene", "variant_classification", "copy_number")
   )
+  expect_length(decoded$datasets$topBars, 489)
+  expect_length(decoded$datasets$rightBars, 35)
 })
 
 test_that("optional clinical tracks and sample labels extend the shared grid", {
@@ -87,7 +98,7 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   expect_equal(nrow(spec$datasets$clinical), 193)
   expect_identical(
     spec$datasets$samples$sample,
-    unique(spec$datasets$cells$sample)
+    oncoplot_data(laml_maf(), top = 10)$samples$sample
   )
   sample_view <- body$concat[[14]]
   expect_identical(sample_view$encoding$x$band, 0)
@@ -96,6 +107,7 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
     vapply(body$concat[[10]]$encoding$tooltip, `[[`, character(1), "title"),
     c("Sample", "Clinical feature", "Value")
   )
+  expect_identical(body$concat[[10]]$transform[[1]]$type, "lookup")
 })
 
 test_that("sample label flag is scalar logical", {

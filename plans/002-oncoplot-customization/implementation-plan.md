@@ -199,6 +199,48 @@ Re-evaluation outcome:
 - a generalized layout helper is still unjustified until custom side bars add
   a concrete fifth column.
 
+## Step 0.5 — Use sparse oncoplot datasets (completed)
+
+Reduce standalone HTML and widget payload sizes before adding more tracks:
+
+- generate the dense matrix background from two GenomeSpy sequence sources
+  and a `cross` transform;
+- serialize mutation/CNV events and bar segments only when they are nonzero;
+- keep samples and genes as dimension tables containing the display indices;
+  and
+- attach those indices to sparse event, bar, and clinical facts using GenomeSpy
+  `lookup` transforms.
+
+The R code retains the dense oncomatrix because maftools-compatible gene and
+sample ordering depends on it, but the dense cells no longer cross the
+R-to-browser boundary. Explanatory comments document this division of work and
+why absent zero-height stack segments are equivalent to explicit zeros.
+
+Verification completed:
+
+- all nonzero facts, summaries, titles, and orderings match the previous
+  implementation for default, clinical, and GISTIC inputs;
+- generated default, optional-track, and GISTIC specs pass the pinned
+  GenomeSpy schema;
+- a browser smoke test confirms that generated cells and looked-up indices
+  align across the matrix, bars, clinical track, and sample labels; and
+- the 10-gene reference JSON decreased from 444,899 to 96,339 bytes, while the
+  20-gene JSON decreased from 695,372 to 107,557 bytes.
+
+Tentative commit:
+
+```text
+refactor: use sparse oncoplot datasets
+```
+
+Re-evaluation outcome:
+
+- lookup transforms provide one source of truth for sample/gene ordering and
+  should also be used by Ti/Tv and custom-bar datasets;
+- generated backgrounds reduce transfer size but intentionally retain the same
+  number of browser-rendered rectangles; and
+- shortening field names or introducing compressed encodings is unnecessary.
+
 ## Step 1 — Add row height and basic display controls
 
 Add the MutGlyph-specific `rowHeight` argument and the inexpensive maftools-like
@@ -647,6 +689,7 @@ Before declaring the milestone complete, answer:
 
 ```text
 refactor: split oncoplot specification builders
+refactor: use sparse oncoplot datasets
 feat: add basic oncoplot display controls
 feat: support custom oncoplot mutation colors
 feat: add oncoplot selection ordering and filtering

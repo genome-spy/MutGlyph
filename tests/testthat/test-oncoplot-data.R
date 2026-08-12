@@ -48,26 +48,33 @@ test_that("LAML oncoplot data contains the reference summaries", {
   )
 })
 
-test_that("normalized cells and bars retain mutation-class counts", {
+test_that("sparse events and bars retain mutation-class counts", {
   data <- oncoplot_data(laml_maf(), top = 10)
 
-  expect_equal(nrow(data$cells), 10 * 193)
+  expect_false("cells" %in% names(data))
   expect_true(any(
-    data$cells$gene == "DNMT3A" &
-      data$cells$sample == "TCGA-AB-2934" &
-      data$cells$variant_classification == "Multi_Hit"
+    data$events$gene == "DNMT3A" &
+      data$events$sample == "TCGA-AB-2934" &
+      data$events$variant_classification == "Multi_Hit"
   ))
-  cell_table <- table(data$cells$gene, data$cells$variant_classification)
-  expect_equal(
-    unname(rowSums(cell_table[data$genes$gene, -1, drop = FALSE])),
-    data$genes$altered_samples
-  )
+  altered_pairs <- unique(data$events[c("gene", "sample")])
+  altered_counts <- table(factor(
+    altered_pairs$gene,
+    levels = data$genes$gene
+  ))
+  expect_equal(as.integer(altered_counts), data$genes$altered_samples)
   expect_equal(
     as.numeric(tapply(data$right_bars$count, data$right_bars$gene, sum)[data$genes$gene]),
     data$genes$altered_samples
   )
+  expect_true(all(data$top_bars$count > 0))
+  expect_true(all(data$right_bars$count > 0))
+  expect_false("sample_index" %in% names(data$top_bars))
+  expect_false("gene_index" %in% names(data$right_bars))
 
-  sample_totals <- tapply(data$top_bars$count, data$top_bars$sample, sum)
+  sample_totals <- setNames(numeric(nrow(data$samples)), data$samples$sample)
+  sparse_totals <- tapply(data$top_bars$count, data$top_bars$sample, sum)
+  sample_totals[names(sparse_totals)] <- sparse_totals
   expect_equal(
     as.numeric(sample_totals[data$samples$sample]),
     data$samples$total_mutations
@@ -79,17 +86,13 @@ test_that("normalized cells and bars retain mutation-class counts", {
 })
 
 test_that("compound copy-number and mutation cells become layered events", {
-  cells <- data.frame(
-    sample = c("sample-1", "sample-2", "sample-3"),
-    gene = rep("TP53", 3),
-    sample_index = 1:3,
-    gene_index = rep(1L, 3),
-    variant_classification = c("Amp;Missense_Mutation", "Del", ""),
-    altered = c(TRUE, TRUE, FALSE),
-    stringsAsFactors = FALSE
+  oncomatrix <- matrix(
+    c("Amp;Missense_Mutation", "Del", ""),
+    nrow = 1,
+    dimnames = list("TP53", c("sample-1", "sample-2", "sample-3"))
   )
 
-  events <- oncoplot_event_data(cells, cnv_classes = c("Amp", "Del"))
+  events <- oncoplot_event_data(oncomatrix, cnv_classes = c("Amp", "Del"))
 
   expect_identical(
     events$variant_classification,

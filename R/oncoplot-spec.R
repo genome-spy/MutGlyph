@@ -19,8 +19,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     background = "white",
     datasets = oncoplot_datasets(
       data,
-      clinical_labels = clinical_labels,
-      showTumorSampleBarcodes = showTumorSampleBarcodes
+      clinical_labels = clinical_labels
     ),
     spacing = 4,
     vconcat = list(oncoplot_title_view(), body),
@@ -61,16 +60,20 @@ oncoplot_body <- function(data,
       oncoplot_empty_view(),
       oncoplot_empty_view(),
       oncoplot_gene_labels_view(matrix_height),
-      oncoplot_matrix_view(color_encoding, matrix_width, matrix_height),
+      oncoplot_matrix_view(
+        color_encoding,
+        matrix_width,
+        matrix_height,
+        sample_count = nrow(data$samples),
+        gene_count = nrow(data$genes)
+      ),
       oncoplot_percentages_view(matrix_height),
       oncoplot_right_bar_view(color_encoding, matrix_height)
     ), clinical_views, sample_label_views)
   )
 }
 
-oncoplot_datasets <- function(data,
-                              clinical_labels,
-                              showTumorSampleBarcodes) {
+oncoplot_datasets <- function(data, clinical_labels) {
   title_text <- sprintf(
     "Altered in %d (%.2f%%) of %d samples",
     data$title$altered_samples,
@@ -79,7 +82,9 @@ oncoplot_datasets <- function(data,
   )
   datasets <- list(
     genes = data$genes,
-    cells = data$cells,
+    # Samples and genes are dimension tables. Sparse facts carry stable IDs,
+    # and GenomeSpy lookup transforms attach their display indices.
+    samples = data$samples[c("sample", "sample_index")],
     events = data$events,
     topBars = data$top_bars,
     rightBars = data$right_bars,
@@ -90,10 +95,6 @@ oncoplot_datasets <- function(data,
     datasets$clinical <- data$clinical
     datasets$clinicalFeatures <- clinical_labels
   }
-  if (showTumorSampleBarcodes) {
-    datasets$samples <- data$samples
-  }
-
   datasets
 }
 

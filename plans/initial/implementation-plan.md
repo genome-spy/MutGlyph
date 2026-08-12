@@ -153,9 +153,15 @@ Make the widget payload the single source of truth:
 
 - store the complete specification in the widget's `x` payload;
 - implement `as_json()` for MutGlyph widgets;
-- choose stable JSON serialization settings;
+- attach a stable widget JSON serializer that emits R data frames as row
+  records (`dataframe = "rows"`), as required by GenomeSpy inline `values`;
 - test that inline data, arrays, `NULL`, booleans, and scalar values survive serialization as intended; and
 - add small structural assertions to the ordinary R tests.
+
+The Step 2 browser smoke test confirmed that htmlwidgets' default column-wise
+data-frame encoding is not suitable for GenomeSpy inline data. Fix this once in
+the R-side serializer; do not add recursive data conversion to the JavaScript
+bridge.
 
 Prefer an ordinary htmlwidget class and a small class check over a new object hierarchy. Do not expose spec mutation helpers or grammar-building functions.
 

@@ -1,0 +1,14 @@
+{
+  "name": "mutglyph",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@genome-spy/core": "0.84.0"
+  },
+  "devDependencies": {
+    "vite": "8.1.5"
+  }
+}

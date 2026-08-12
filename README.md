@@ -79,7 +79,9 @@ mutglyph_oncoplot(
 
 Categorical and numeric clinical annotations have independent color scales.
 Samples can be sorted by the selected annotations, with optional categorical
-level priorities:
+level priorities. Categorical tracks use GenomeSpy's `tableau10` default; pass
+another Vega scheme name or a named value-to-color vector in `annotationColor`
+when desired:
 
 ```r
 mutglyph_oncoplot(
@@ -87,7 +89,7 @@ mutglyph_oncoplot(
   top = 10,
   clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
   annotationColor = list(
-    FAB_classification = c(M4 = "#1B9E77", M5 = "#D95F02"),
+    FAB_classification = "tableau10",
     days_to_last_followup = "Blues"
   ),
   sortByAnnotation = TRUE,

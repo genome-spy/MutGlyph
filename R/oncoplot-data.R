@@ -12,7 +12,7 @@
 #' @param removeNonMutated Remove samples without displayed events.
 #' @param clinicalFeatures Optional categorical or numeric clinical fields.
 #' @param annotationColor Optional named list of per-feature color mappings or
-#'   numeric color schemes.
+#'   GenomeSpy color-scheme names.
 #' @param sortByAnnotation Sort samples by selected clinical features.
 #' @param annotationOrder Optional named list of categorical level orders.
 #' @param topBarData Optional two-column sample metric data or clinical field.
@@ -265,18 +265,15 @@ oncoplot_clinical_data <- function(maf,
     values <- as.character(values)
     values[is.na(values)] <- "NA"
     observed <- sort(unique(values[values != "NA"]))
-    colors <- if (length(observed) > 0L) {
-      stats::setNames(
-        grDevices::hcl.colors(max(3L, length(observed)), palette = "Dark 3")[
-          seq_along(observed)
-        ],
-        observed
-      )
-    } else {
-      character()
-    }
+    colors <- NULL
+    scheme <- NULL
+    missing_color <- "#BDBDBD"
     if (!is.null(supplied)) {
-      if (
+      is_scheme <- is.character(supplied) && length(supplied) == 1L &&
+        is.null(names(supplied)) && !is.na(supplied) && nzchar(supplied)
+      if (is_scheme) {
+        scheme <- tolower(supplied)
+      } else if (
         !is.character(supplied) || length(supplied) == 0L ||
           is.null(names(supplied)) || anyNA(names(supplied)) ||
           any(!nzchar(names(supplied))) || anyDuplicated(names(supplied)) > 0L ||
@@ -284,18 +281,25 @@ oncoplot_clinical_data <- function(maf,
       ) {
         stop(
           sprintf(
-            "Categorical annotation colors for `%s` must be a named character vector.",
+            paste0(
+              "Categorical annotation colors for `%s` must be one scheme ",
+              "name or a named character vector."
+            ),
             feature
           ),
           call. = FALSE
         )
+      } else {
+        # A partial exact mapping retains the same Tableau 10 assignments that
+        # GenomeSpy uses by default, then replaces only the supplied levels.
+        colors <- oncoplot_tableau10_colors(observed)
+        colors[names(supplied)] <- unname(supplied)
+        if ("NA" %in% names(supplied)) {
+          missing_color <- unname(supplied[["NA"]])
+        }
+        colors <- colors[observed]
       }
-      colors[names(supplied)] <- unname(supplied)
     }
-    if (any(values == "NA")) {
-      colors["NA"] <- "#BDBDBD"
-    }
-    ordered_values <- c(observed, if (any(values == "NA")) "NA")
     list(
       feature = feature,
       feature_index = feature_index,
@@ -307,11 +311,27 @@ oncoplot_clinical_data <- function(maf,
         missing = values == "NA",
         stringsAsFactors = FALSE
       ),
-      colors = colors[ordered_values]
+      levels = observed,
+      colors = colors,
+      scheme = scheme,
+      missing_color = missing_color
     )
   })
   names(tracks) <- clinicalFeatures
   tracks
+}
+
+oncoplot_tableau10_colors <- function(levels) {
+  # Vega's Tableau 10 range. This is needed only when merging a partial exact
+  # mapping; ordinary categorical annotations leave their range to GenomeSpy.
+  palette <- c(
+    "#4C78A8", "#F58518", "#E45756", "#72B7B2", "#54A24B",
+    "#EECA3B", "#B279A2", "#FF9DA6", "#9D755D", "#BAB0AC"
+  )
+  stats::setNames(
+    rep(palette, length.out = length(levels)),
+    levels
+  )
 }
 
 validate_annotation_order <- function(annotationOrder, clinical) {

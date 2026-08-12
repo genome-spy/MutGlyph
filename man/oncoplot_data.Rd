@@ -54,7 +54,7 @@ oncoplot_data(
 \item{clinicalFeatures}{Optional categorical or numeric clinical fields.}
 
 \item{annotationColor}{Optional named list of per-feature color mappings or
-numeric color schemes.}
+GenomeSpy color-scheme names.}
 
 \item{sortByAnnotation}{Sort samples by selected clinical features.}
 

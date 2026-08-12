@@ -541,6 +541,11 @@ Re-evaluation outcome:
   public API limited to `clinicalFeatures` and `annotationColor`;
 - case-normalized GenomeSpy/Vega scheme names such as `"Blues"` work without
   a runtime palette dependency; and
+- categorical tracks keep a deterministic domain but leave their range to
+  GenomeSpy's varied-luminance `tableau10` default; explicit categorical
+  schemes and named exact mappings remain available through `annotationColor`;
+- missing categorical values use a separate gray layer and do not consume a
+  categorical palette slot; and
 - independent per-feature scales prevent categorical level collisions, so no
   clinical-track class hierarchy is needed.
 

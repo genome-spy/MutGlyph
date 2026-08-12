@@ -381,13 +381,19 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
         legend = list(title = track$feature, tickCount = 3)
       )
     } else {
+      scale <- list(domain = unname(track$levels))
+      if (!is.null(track$colors)) {
+        scale$range <- unname(track$colors)
+      } else if (!is.null(track$scheme)) {
+        scale$scheme <- track$scheme
+      }
       list(
         field = "value",
         type = "nominal",
-        scale = list(
-          domain = unname(names(track$colors)),
-          range = unname(track$colors)
-        ),
+        # With no explicit range or scheme, GenomeSpy uses its nominal default
+        # (Tableau 10). The explicit domain keeps assignment and legend order
+        # deterministic across sample filtering and annotation sorting.
+        scale = scale,
         legend = list(title = track$feature)
       )
     }
@@ -404,49 +410,41 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
         )
       )
     )
-    annotation_view <- if (track$type == "quantitative") {
-      list(
-        name = paste0("clinical-annotation-", index),
-        width = matrix_width,
-        height = 18,
-        overhang = oncoplot_track_overhang(),
-        resolve = list(scale = list(y = "excluded", color = "excluded")),
-        layer = list(
-          list(
-            data = list(name = paste0("clinical", index)),
-            transform = list(
-              oncoplot_sample_index_lookup(),
-              list(type = "filter", expr = "datum.missing")
-            ),
-            mark = list(type = "rect", color = "#BDBDBD", style = "outline"),
-            encoding = list(
-              x = list(field = "sample_index", type = "index", axis = NULL),
-              tooltip = list(
-                list(field = "sample", title = "Sample"),
-                list(field = "value_label", title = track$feature)
-              )
-            )
-          ),
-          within(annotation_layer, {
-            transform <- c(
-              transform,
-              list(list(type = "filter", expr = "!datum.missing"))
-            )
-          })
-        )
-      )
+    missing_color <- if (track$type == "nominal") {
+      track$missing_color
     } else {
-      c(
-        list(
-          name = paste0("clinical-annotation-", index),
-          width = matrix_width,
-          height = 18,
-          overhang = oncoplot_track_overhang(),
-          resolve = list(scale = list(y = "excluded", color = "excluded"))
-        ),
-        annotation_layer
-      )
+      "#BDBDBD"
     }
+    annotation_view <- list(
+      name = paste0("clinical-annotation-", index),
+      width = matrix_width,
+      height = 18,
+      overhang = oncoplot_track_overhang(),
+      resolve = list(scale = list(y = "excluded", color = "excluded")),
+      layer = list(
+        list(
+          data = list(name = paste0("clinical", index)),
+          transform = list(
+            oncoplot_sample_index_lookup(),
+            list(type = "filter", expr = "datum.missing")
+          ),
+          mark = list(type = "rect", color = missing_color, style = "outline"),
+          encoding = list(
+            x = list(field = "sample_index", type = "index", axis = NULL),
+            tooltip = list(
+              list(field = "sample", title = "Sample"),
+              list(field = "value_label", title = track$feature)
+            )
+          )
+        ),
+        within(annotation_layer, {
+          transform <- c(
+            transform,
+            list(list(type = "filter", expr = "!datum.missing"))
+          )
+        })
+      )
+    )
 
     oncoplot_grid_row(
       has_left_bar,

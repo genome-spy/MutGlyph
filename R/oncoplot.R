@@ -17,7 +17,7 @@
 #' @param removeNonMutated Remove samples without events in the displayed genes.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
 #' @param annotationColor Optional named list of per-feature categorical color
-#'   mappings or numeric GenomeSpy color-scheme names.
+#'   mappings or GenomeSpy color-scheme names.
 #' @param sortByAnnotation Sort samples by the selected clinical features.
 #' @param annotationOrder Optional named list of partial categorical level orders.
 #' @param topBarData Optional two-column sample metric data or one clinical field.

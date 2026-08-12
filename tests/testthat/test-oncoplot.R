@@ -101,13 +101,19 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
     oncoplot_data(laml_maf(), top = 10)$samples$sample
   )
   sample_view <- body$concat[[14]]
+  clinical_layer <- body$concat[[10]]$layer[[2]]
   expect_identical(sample_view$encoding$x$band, 0)
   expect_identical(sample_view$encoding$x2$band, 1)
   expect_identical(
-    vapply(body$concat[[10]]$encoding$tooltip, `[[`, character(1), "title"),
+    vapply(clinical_layer$encoding$tooltip, `[[`, character(1), "title"),
     c("Sample", "FAB_classification")
   )
-  expect_identical(body$concat[[10]]$transform[[1]]$type, "lookup")
+  expect_identical(
+    vapply(clinical_layer$transform, `[[`, character(1), "type"),
+    c("lookup", "filter")
+  )
+  expect_null(clinical_layer$encoding$color$scale$range)
+  expect_null(clinical_layer$encoding$color$scale$scheme)
 })
 
 test_that("mixed clinical tracks use independent typed scales", {
@@ -121,7 +127,8 @@ test_that("mixed clinical tracks use independent typed scales", {
   categorical <- body$concat[[10]]
   numeric <- body$concat[[14]]
 
-  expect_identical(categorical$encoding$color$type, "nominal")
+  expect_identical(categorical$layer[[2]]$encoding$color$type, "nominal")
+  expect_null(categorical$layer[[2]]$encoding$color$scale$range)
   expect_identical(categorical$resolve$scale$color, "excluded")
   expect_identical(numeric$layer[[2]]$encoding$color$type, "quantitative")
   expect_identical(numeric$layer[[2]]$encoding$color$scale$scheme, "blues")
@@ -131,6 +138,20 @@ test_that("mixed clinical tracks use independent typed scales", {
     "genes", "samples", "events", "topBars", "rightBars", "title",
     "clinical1", "clinical2"
   ))
+})
+
+test_that("categorical clinical schemes pass through to GenomeSpy", {
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    annotationColor = list(FAB_classification = "set2")
+  )$x$spec
+  clinical <- spec$vconcat[[2]]$concat[[10]]
+  scale <- clinical$layer[[2]]$encoding$color$scale
+
+  expect_identical(scale$scheme, "set2")
+  expect_null(scale$range)
 })
 
 test_that("row height aligns every gene-oriented view", {

@@ -303,15 +303,13 @@ test_that("categorical clinical rows follow the ordered samples", {
   expect_identical(track$feature, "FAB_classification")
   expect_identical(track$type, "nominal")
   expect_identical(track$data$sample, data$samples$sample)
-  expect_true(all(track$data$value %in% names(track$colors)))
-  expect_identical(
-    track$colors,
-    oncoplot_data(
-      laml_maf(),
-      top = 10,
-      clinicalFeatures = "FAB_classification"
-    )$clinical[["FAB_classification"]]$colors
-  )
+  expect_true(all(track$data$value[!track$data$missing] %in% track$levels))
+  expect_identical(track$levels, sort(unique(
+    track$data$value[!track$data$missing]
+  )))
+  expect_null(track$colors)
+  expect_null(track$scheme)
+  expect_identical(track$missing_color, "#BDBDBD")
 })
 
 test_that("numeric and categorical clinical tracks retain their types", {
@@ -338,6 +336,19 @@ test_that("numeric and categorical clinical tracks retain their types", {
   )
 })
 
+test_that("categorical clinical tracks accept GenomeSpy schemes", {
+  data <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    annotationColor = list(FAB_classification = "Category10")
+  )
+  track <- data$clinical[["FAB_classification"]]
+
+  expect_identical(track$scheme, "category10")
+  expect_null(track$colors)
+})
+
 test_that("clinical feature validation is explicit", {
   maf <- laml_maf()
 
@@ -362,6 +373,15 @@ test_that("clinical feature validation is explicit", {
       annotationColor = c(FAB_classification = "red")
     ),
     "named list"
+  )
+  expect_error(
+    oncoplot_data(
+      maf,
+      top = 10,
+      clinicalFeatures = "FAB_classification",
+      annotationColor = list(FAB_classification = c("red", "blue"))
+    ),
+    "scheme name or a named character vector"
   )
 })
 

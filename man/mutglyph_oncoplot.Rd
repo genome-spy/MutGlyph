@@ -64,7 +64,7 @@ mutglyph_oncoplot(
 \item{clinicalFeatures}{Optional categorical clinical fields to display.}
 
 \item{annotationColor}{Optional named list of per-feature categorical color
-mappings or numeric GenomeSpy color-scheme names.}
+mappings or GenomeSpy color-scheme names.}
 
 \item{sortByAnnotation}{Sort samples by the selected clinical features.}
 

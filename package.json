@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "validate:specs": "node tools/validate-specs.mjs"
   },
   "dependencies": {
     "@genome-spy/core": "0.84.0"
   },
   "devDependencies": {
+    "ajv": "8.20.0",
     "vite": "8.1.5"
   }
 }

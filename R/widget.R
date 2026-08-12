@@ -12,7 +12,7 @@ mutglyph_widget <- function(spec,
                             elementId = NULL) {
   stopifnot(is.list(spec))
 
-  htmlwidgets::createWidget(
+  widget <- htmlwidgets::createWidget(
     name = "mutglyph",
     x = list(spec = spec),
     width = width,
@@ -26,4 +26,7 @@ mutglyph_widget <- function(spec,
       defaultHeight = 500
     )
   )
+
+  attr(widget$x, "TOJSON_FUNC") <- mutglyph_to_json
+  widget
 }

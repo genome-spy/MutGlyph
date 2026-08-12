@@ -10,7 +10,9 @@
 #' @param keepGeneOrder Preserve the selected gene order.
 #' @param sampleOrder Optional sample barcodes to select and order.
 #' @param removeNonMutated Remove samples without displayed events.
-#' @param clinicalFeatures Optional categorical clinical fields.
+#' @param clinicalFeatures Optional categorical or numeric clinical fields.
+#' @param annotationColor Optional named list of per-feature color mappings or
+#'   numeric color schemes.
 #' @param draw_titv Derive transition/transversion contribution data.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -29,6 +31,7 @@ oncoplot_data <- function(maf,
                           sampleOrder = NULL,
                           removeNonMutated = FALSE,
                           clinicalFeatures = NULL,
+                          annotationColor = NULL,
                           draw_titv = FALSE,
                           titv_col = NULL,
                           includeColBarCN = TRUE) {
@@ -76,7 +79,8 @@ oncoplot_data <- function(maf,
   clinical <- oncoplot_clinical_data(
     maf,
     sample_order = samples_data$sample,
-    clinicalFeatures = clinicalFeatures
+    clinicalFeatures = clinicalFeatures,
+    annotationColor = annotationColor
   )
   titv <- if (draw_titv) {
     oncoplot_titv_data(maf, samples_data$sample, titv_col)
@@ -97,8 +101,7 @@ oncoplot_data <- function(maf,
   result <- list(
     genes = genes_data,
     samples = samples_data,
-    clinical = clinical$data,
-    clinical_colors = clinical$colors,
+    clinical = clinical,
     events = events,
     top_bars = top_bars,
     right_bars = right_bars,
@@ -116,19 +119,12 @@ oncoplot_data <- function(maf,
   result
 }
 
-oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
-  empty <- list(
-    data = data.frame(
-      sample = character(),
-      feature = character(),
-      feature_index = integer(),
-      value = character(),
-      stringsAsFactors = FALSE
-    ),
-    colors = character()
-  )
+oncoplot_clinical_data <- function(maf,
+                                   sample_order,
+                                   clinicalFeatures,
+                                   annotationColor = NULL) {
   if (is.null(clinicalFeatures)) {
-    return(empty)
+    return(list())
   }
 
   clinicalFeatures <- unique(as.character(clinicalFeatures))
@@ -136,7 +132,20 @@ oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
     !is.na(clinicalFeatures) & nzchar(clinicalFeatures)
   ]
   if (length(clinicalFeatures) == 0L) {
-    return(empty)
+    return(list())
+  }
+
+  if (!is.null(annotationColor)) {
+    if (
+      !is.list(annotationColor) || is.null(names(annotationColor)) ||
+        anyNA(names(annotationColor)) || any(!nzchar(names(annotationColor))) ||
+        anyDuplicated(names(annotationColor)) > 0L
+    ) {
+      stop(
+        "`annotationColor` must be a named list with unique, non-empty feature names.",
+        call. = FALSE
+      )
+    }
   }
 
   clinical <- as.data.frame(maftools::getClinicalData(maf))
@@ -153,58 +162,94 @@ oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
     stop("None of the requested clinical fields are present in the MAF.", call. = FALSE)
   }
 
-  numeric_features <- clinicalFeatures[vapply(
-    clinical[clinicalFeatures],
-    is.numeric,
-    logical(1)
-  )]
-  if (length(numeric_features) > 0L) {
-    stop(
-      "Only categorical clinical fields are supported; numeric fields: ",
-      paste(numeric_features, collapse = ", "),
-      call. = FALSE
-    )
-  }
-
   sample_rows <- match(
     sample_order,
     as.character(clinical[["Tumor_Sample_Barcode"]])
   )
-  rows <- lapply(seq_along(clinicalFeatures), function(feature_index) {
+  tracks <- lapply(seq_along(clinicalFeatures), function(feature_index) {
     feature <- clinicalFeatures[feature_index]
-    values <- as.character(clinical[[feature]][sample_rows])
+    values <- clinical[[feature]][sample_rows]
+    supplied <- if (is.null(annotationColor)) NULL else annotationColor[[feature]]
+
+    if (is.numeric(values)) {
+      if (!is.null(supplied) && (
+        !is.character(supplied) || length(supplied) != 1L ||
+          is.na(supplied) || !nzchar(supplied)
+      )) {
+        stop(
+          sprintf(
+            "Numeric annotation color for `%s` must be one scheme name.",
+            feature
+          ),
+          call. = FALSE
+        )
+      }
+      data <- data.frame(
+        sample = sample_order,
+        value = as.numeric(values),
+        value_label = ifelse(is.na(values), "NA", as.character(values)),
+        missing = is.na(values),
+        stringsAsFactors = FALSE
+      )
+      return(list(
+        feature = feature,
+        feature_index = feature_index,
+        type = "quantitative",
+        data = data,
+        scheme = tolower(if (is.null(supplied)) "blues" else supplied)
+      ))
+    }
+
+    values <- as.character(values)
     values[is.na(values)] <- "NA"
-    data.frame(
-      sample = sample_order,
+    observed <- sort(unique(values[values != "NA"]))
+    colors <- if (length(observed) > 0L) {
+      stats::setNames(
+        grDevices::hcl.colors(max(3L, length(observed)), palette = "Dark 3")[
+          seq_along(observed)
+        ],
+        observed
+      )
+    } else {
+      character()
+    }
+    if (!is.null(supplied)) {
+      if (
+        !is.character(supplied) || length(supplied) == 0L ||
+          is.null(names(supplied)) || anyNA(names(supplied)) ||
+          any(!nzchar(names(supplied))) || anyDuplicated(names(supplied)) > 0L ||
+          anyNA(supplied) || any(!nzchar(supplied))
+      ) {
+        stop(
+          sprintf(
+            "Categorical annotation colors for `%s` must be a named character vector.",
+            feature
+          ),
+          call. = FALSE
+        )
+      }
+      colors[names(supplied)] <- unname(supplied)
+    }
+    if (any(values == "NA")) {
+      colors["NA"] <- "#BDBDBD"
+    }
+    ordered_values <- c(observed, if (any(values == "NA")) "NA")
+    list(
       feature = feature,
       feature_index = feature_index,
-      value = values,
-      stringsAsFactors = FALSE
+      type = "nominal",
+      data = data.frame(
+        sample = sample_order,
+        value = values,
+        value_label = values,
+        missing = values == "NA",
+        stringsAsFactors = FALSE
+      ),
+      colors = colors[ordered_values]
     )
   })
-  data <- do.call(rbind, rows)
-
-  ordered_values <- unique(unlist(lapply(clinicalFeatures, function(feature) {
-    sort(unique(data$value[data$feature == feature]))
-  }), use.names = FALSE))
-  missing_values <- intersect(ordered_values, "NA")
-  colored_values <- setdiff(ordered_values, missing_values)
-  color_count <- length(colored_values)
-  colors <- if (color_count > 0L) {
-    grDevices::hcl.colors(max(3L, color_count), palette = "Dark 3")[
-      seq_len(color_count)
-    ]
-  } else {
-    character()
-  }
-  names(colors) <- colored_values
-  if (length(missing_values) > 0L) {
-    missing_colors <- rep("#BDBDBD", length(missing_values))
-    names(missing_colors) <- missing_values
-    colors <- c(colors, missing_colors)
-  }
-
-  list(data = data, colors = colors[ordered_values])
+  names(tracks) <- clinicalFeatures
+  tracks
 }
 
 select_oncoplot_genes <- function(maf,

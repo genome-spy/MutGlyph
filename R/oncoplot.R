@@ -16,6 +16,8 @@
 #' @param sampleOrder Optional sample barcodes to select and order.
 #' @param removeNonMutated Remove samples without events in the displayed genes.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
+#' @param annotationColor Optional named list of per-feature categorical color
+#'   mappings or numeric GenomeSpy color-scheme names.
 #' @param draw_titv Show a transition/transversion contribution track.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -66,6 +68,7 @@ mutglyph_oncoplot <- function(maf,
                               sampleOrder = NULL,
                               removeNonMutated = FALSE,
                               clinicalFeatures = NULL,
+                              annotationColor = NULL,
                               draw_titv = FALSE,
                               titv_col = NULL,
                               includeColBarCN = TRUE,
@@ -119,6 +122,7 @@ mutglyph_oncoplot <- function(maf,
     sampleOrder = sampleOrder,
     removeNonMutated = removeNonMutated,
     clinicalFeatures = clinicalFeatures,
+    annotationColor = annotationColor,
     draw_titv = draw_titv,
     titv_col = titv_col,
     includeColBarCN = includeColBarCN

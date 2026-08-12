@@ -16,6 +16,7 @@ mutglyph_oncoplot(
   sampleOrder = NULL,
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
+  annotationColor = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE,
@@ -53,6 +54,9 @@ mutglyph_oncoplot(
 \item{removeNonMutated}{Remove samples without events in the displayed genes.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields to display.}
+
+\item{annotationColor}{Optional named list of per-feature categorical color
+mappings or numeric GenomeSpy color-scheme names.}
 
 \item{draw_titv}{Show a transition/transversion contribution track.}
 

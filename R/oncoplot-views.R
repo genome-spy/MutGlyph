@@ -253,76 +253,113 @@ oncoplot_right_bar_view <- function(color_encoding, matrix_height) {
   )
 }
 
-oncoplot_clinical_labels <- function(data) {
-  if (nrow(data$clinical) == 0L) {
-    return(NULL)
-  }
-
-  unique(data$clinical[c("feature", "feature_index")])
-}
-
-oncoplot_clinical_views <- function(data, clinical_labels, matrix_width) {
-  if (is.null(clinical_labels)) {
+oncoplot_clinical_views <- function(data, matrix_width) {
+  if (length(data$clinical) == 0L) {
     return(list())
   }
 
-  clinical_height <- 18 * nrow(clinical_labels)
-  list(
-    list(
-      name = "clinical-feature-labels",
-      width = 120,
-      height = clinical_height,
-      data = list(name = "clinicalFeatures"),
-      resolve = list(scale = list(x = "excluded", y = "excluded")),
-      mark = list(
-        type = "text",
-        align = "right",
-        baseline = "middle",
-        size = 11,
-        dx = -3,
-        clip = "never"
-      ),
-      encoding = list(
-        x = list(value = 1),
-        y = list(field = "feature_index", type = "index", axis = NULL),
-        text = list(field = "feature"),
-        color = list(value = "#333333")
+  unlist(lapply(seq_along(data$clinical), function(index) {
+    track <- data$clinical[[index]]
+    color_encoding <- if (track$type == "quantitative") {
+      list(
+        field = "value",
+        type = "quantitative",
+        scale = list(scheme = track$scheme),
+        legend = list(title = track$feature)
       )
-    ),
-    list(
-      name = "clinical-annotations",
-      width = matrix_width,
-      height = clinical_height,
-      data = list(name = "clinical"),
+    } else {
+      list(
+        field = "value",
+        type = "nominal",
+        scale = list(
+          domain = unname(names(track$colors)),
+          range = unname(track$colors)
+        ),
+        legend = list(title = track$feature)
+      )
+    }
+    annotation_layer <- list(
+      data = list(name = paste0("clinical", index)),
       transform = list(oncoplot_sample_index_lookup()),
-      resolve = list(
-        scale = list(y = "excluded", color = "excluded")
-      ),
-      mark = list(
-        type = "rect",
-        style = "outline"
-      ),
+      mark = list(type = "rect", style = "outline"),
       encoding = list(
         x = list(field = "sample_index", type = "index", axis = NULL),
-        y = list(field = "feature_index", type = "index", axis = NULL),
-        color = list(
-          field = "value",
-          type = "nominal",
-          scale = list(
-            domain = unname(names(data$clinical_colors)),
-            range = unname(data$clinical_colors)
-          )
-        ),
+        color = color_encoding,
         tooltip = list(
           list(field = "sample", title = "Sample"),
-          list(field = "feature", title = "Clinical feature"),
-          list(field = "value", title = "Value")
+          list(field = "value_label", title = track$feature)
         )
       )
-    ),
-    oncoplot_empty_view(),
-    oncoplot_empty_view()
-  )
+    )
+    annotation_view <- if (track$type == "quantitative") {
+      list(
+        name = paste0("clinical-annotation-", index),
+        width = matrix_width,
+        height = 18,
+        resolve = list(scale = list(y = "excluded", color = "excluded")),
+        layer = list(
+          list(
+            data = list(name = paste0("clinical", index)),
+            transform = list(
+              oncoplot_sample_index_lookup(),
+              list(type = "filter", expr = "datum.missing")
+            ),
+            mark = list(type = "rect", color = "#BDBDBD", style = "outline"),
+            encoding = list(
+              x = list(field = "sample_index", type = "index", axis = NULL),
+              tooltip = list(
+                list(field = "sample", title = "Sample"),
+                list(field = "value_label", title = track$feature)
+              )
+            )
+          ),
+          within(annotation_layer, {
+            transform <- c(
+              transform,
+              list(list(type = "filter", expr = "!datum.missing"))
+            )
+          })
+        )
+      )
+    } else {
+      c(
+        list(
+          name = paste0("clinical-annotation-", index),
+          width = matrix_width,
+          height = 18,
+          resolve = list(scale = list(y = "excluded", color = "excluded"))
+        ),
+        annotation_layer
+      )
+    }
+
+    list(
+      list(
+        name = paste0("clinical-feature-label-", index),
+        width = 120,
+        height = 18,
+        data = list(values = data.frame(label = track$feature)),
+        resolve = list(scale = list(x = "excluded", y = "excluded")),
+        mark = list(
+          type = "text",
+          align = "right",
+          baseline = "middle",
+          size = 11,
+          dx = -3,
+          clip = "never"
+        ),
+        encoding = list(
+          x = list(value = 1),
+          y = list(value = 0.5),
+          text = list(field = "label"),
+          color = list(value = "#333333")
+        )
+      ),
+      annotation_view,
+      oncoplot_empty_view(),
+      oncoplot_empty_view()
+    )
+  }), recursive = FALSE)
 }
 
 oncoplot_sample_label_views <- function(showTumorSampleBarcodes,

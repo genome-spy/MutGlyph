@@ -91,11 +91,11 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   expect_length(body$concat, 16)
   expect_identical(body$resolve$legend$color, "collected")
   expect_true(all(c(
-    "clinical-feature-labels",
-    "clinical-annotations",
+    "clinical-feature-label-1",
+    "clinical-annotation-1",
     "sample-labels"
   ) %in% view_names))
-  expect_equal(nrow(spec$datasets$clinical), 193)
+  expect_equal(nrow(spec$datasets$clinical1), 193)
   expect_identical(
     spec$datasets$samples$sample,
     oncoplot_data(laml_maf(), top = 10)$samples$sample
@@ -105,9 +105,31 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   expect_identical(sample_view$encoding$x2$band, 1)
   expect_identical(
     vapply(body$concat[[10]]$encoding$tooltip, `[[`, character(1), "title"),
-    c("Sample", "Clinical feature", "Value")
+    c("Sample", "FAB_classification")
   )
   expect_identical(body$concat[[10]]$transform[[1]]$type, "lookup")
+})
+
+test_that("mixed clinical tracks use independent typed scales", {
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+    annotationColor = list(days_to_last_followup = "Blues")
+  )$x$spec
+  body <- spec$vconcat[[2]]
+  categorical <- body$concat[[10]]
+  numeric <- body$concat[[14]]
+
+  expect_identical(categorical$encoding$color$type, "nominal")
+  expect_identical(categorical$resolve$scale$color, "excluded")
+  expect_identical(numeric$layer[[2]]$encoding$color$type, "quantitative")
+  expect_identical(numeric$layer[[2]]$encoding$color$scale$scheme, "blues")
+  expect_identical(numeric$resolve$scale$color, "excluded")
+  expect_named(spec$datasets, c(
+    "genes", "samples", "events", "topBars", "rightBars", "title",
+    "clinical1", "clinical2"
+  ))
 })
 
 test_that("row height aligns every gene-oriented view", {

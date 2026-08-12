@@ -47,7 +47,8 @@ writeLines(
     laml,
     top = 10,
     colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60"),
-    clinicalFeatures = "FAB_classification",
+    clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+    annotationColor = list(days_to_last_followup = "Blues"),
     draw_titv = TRUE,
     titv_col = c(`C>T` = "#D81B60"),
     showTumorSampleBarcodes = TRUE

@@ -16,6 +16,7 @@ oncoplot_data(
   sampleOrder = NULL,
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
+  annotationColor = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE
@@ -42,7 +43,10 @@ oncoplot_data(
 
 \item{removeNonMutated}{Remove samples without displayed events.}
 
-\item{clinicalFeatures}{Optional categorical clinical fields.}
+\item{clinicalFeatures}{Optional categorical or numeric clinical fields.}
+
+\item{annotationColor}{Optional named list of per-feature color mappings or
+numeric color schemes.}
 
 \item{draw_titv}{Derive transition/transversion contribution data.}
 

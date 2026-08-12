@@ -9,11 +9,9 @@ oncoplot_spec <- function(data,
   matrix_width <- "container"
   matrix_height <- list(step = rowHeight)
   color_encoding <- oncoplot_color_encoding(data)
-  clinical_labels <- oncoplot_clinical_labels(data)
 
   body <- oncoplot_body(
     data,
-    clinical_labels = clinical_labels,
     color_encoding = color_encoding,
     matrix_width = matrix_width,
     matrix_height = matrix_height,
@@ -34,7 +32,6 @@ oncoplot_spec <- function(data,
     background = "white",
     datasets = oncoplot_datasets(
       data,
-      clinical_labels = clinical_labels,
       showTitle = showTitle,
       titleText = titleText
     ),
@@ -45,7 +42,6 @@ oncoplot_spec <- function(data,
 }
 
 oncoplot_body <- function(data,
-                          clinical_labels,
                           color_encoding,
                           matrix_width,
                           matrix_height,
@@ -55,7 +51,6 @@ oncoplot_body <- function(data,
                           showPct) {
   clinical_views <- oncoplot_clinical_views(
     data,
-    clinical_labels = clinical_labels,
     matrix_width = matrix_width
   )
   sample_label_views <- oncoplot_sample_label_views(
@@ -110,7 +105,7 @@ oncoplot_body <- function(data,
   )
 }
 
-oncoplot_datasets <- function(data, clinical_labels, showTitle, titleText) {
+oncoplot_datasets <- function(data, showTitle, titleText) {
   datasets <- list(
     genes = data$genes,
     # Samples and genes are dimension tables. Sparse facts carry stable IDs,
@@ -134,9 +129,10 @@ oncoplot_datasets <- function(data, clinical_labels, showTitle, titleText) {
     }
     datasets$title <- data.frame(label = title_text)
   }
-  if (nrow(data$clinical) > 0L) {
-    datasets$clinical <- data$clinical
-    datasets$clinicalFeatures <- clinical_labels
+  if (length(data$clinical) > 0L) {
+    for (index in seq_along(data$clinical)) {
+      datasets[[paste0("clinical", index)]] <- data$clinical[[index]]$data
+    }
   }
   if (!is.null(data$titv)) {
     datasets$titv <- data$titv$data

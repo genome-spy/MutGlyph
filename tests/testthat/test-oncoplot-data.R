@@ -234,7 +234,7 @@ test_that("sample filtering retains cohort denominator semantics", {
   )
 
   expect_identical(subset$samples$sample, requested[c(1, 3)])
-  expect_identical(unique(subset$clinical$sample), requested[c(1, 3)])
+  expect_identical(subset$clinical[[1]]$data$sample, requested[c(1, 3)])
   expect_true(all(subset$events$sample %in% subset$samples$sample))
   expect_true(all(subset$top_bars$sample %in% subset$samples$sample))
   expect_identical(subset$title, baseline$title)
@@ -298,17 +298,43 @@ test_that("categorical clinical rows follow the ordered samples", {
     clinicalFeatures = "FAB_classification"
   )
 
-  expect_equal(nrow(data$clinical), 193)
-  expect_identical(unique(data$clinical$feature), "FAB_classification")
-  expect_identical(data$clinical$sample, data$samples$sample)
-  expect_true(all(data$clinical$value %in% names(data$clinical_colors)))
+  track <- data$clinical[["FAB_classification"]]
+  expect_equal(nrow(track$data), 193)
+  expect_identical(track$feature, "FAB_classification")
+  expect_identical(track$type, "nominal")
+  expect_identical(track$data$sample, data$samples$sample)
+  expect_true(all(track$data$value %in% names(track$colors)))
   expect_identical(
-    data$clinical_colors,
+    track$colors,
     oncoplot_data(
       laml_maf(),
       top = 10,
       clinicalFeatures = "FAB_classification"
-    )$clinical_colors
+    )$clinical[["FAB_classification"]]$colors
+  )
+})
+
+test_that("numeric and categorical clinical tracks retain their types", {
+  data <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+    annotationColor = list(
+      FAB_classification = c(M0 = "black", M1 = "white"),
+      days_to_last_followup = "Blues"
+    )
+  )
+  categorical <- data$clinical[["FAB_classification"]]
+  numeric <- data$clinical[["days_to_last_followup"]]
+
+  expect_identical(categorical$type, "nominal")
+  expect_identical(unname(categorical$colors[c("M0", "M1")]), c("black", "white"))
+  expect_identical(numeric$type, "quantitative")
+  expect_true(is.numeric(numeric$data$value))
+  expect_identical(numeric$scheme, "blues")
+  expect_identical(
+    numeric$data$value_label,
+    as.character(numeric$data$value)
   )
 })
 
@@ -323,13 +349,18 @@ test_that("clinical feature validation is explicit", {
     ),
     "Ignoring missing clinical fields"
   )
-  expect_identical(unique(data$clinical$feature), "FAB_classification")
+  expect_identical(names(data$clinical), "FAB_classification")
   expect_error(
     suppressWarnings(oncoplot_data(maf, top = 10, clinicalFeatures = "not_a_field")),
     "None of the requested"
   )
   expect_error(
-    oncoplot_data(maf, top = 10, clinicalFeatures = "days_to_last_followup"),
-    "Only categorical"
+    oncoplot_data(
+      maf,
+      top = 10,
+      clinicalFeatures = "FAB_classification",
+      annotationColor = c(FAB_classification = "red")
+    ),
+    "named list"
   )
 })

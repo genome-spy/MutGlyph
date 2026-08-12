@@ -489,7 +489,7 @@ Re-evaluation outcome:
   indices, consistent with Step 0.5; and
 - no public legend-placement control or wider label column is needed.
 
-## Step 5 — Add feature-specific and numeric clinical annotations
+## Step 5 — Add feature-specific and numeric clinical annotations (completed)
 
 Remove the categorical-only limitation and add `annotationColor = NULL` using
 the maftools-compatible list contract:
@@ -530,9 +530,16 @@ Tentative commit:
 feat: support clinical annotation palettes and numeric tracks
 ```
 
-Re-evaluate whether one row per feature is still KISS after browser inspection.
-Do not introduce a clinical-track object hierarchy merely to shorten the spec
-builder.
+Re-evaluation outcome:
+
+- one explicit 18-pixel row per feature remains simple and readable in the
+  mixed LAML example;
+- typed internal feature records preserve numeric values while keeping the
+  public API limited to `clinicalFeatures` and `annotationColor`;
+- case-normalized GenomeSpy/Vega scheme names such as `"Blues"` work without
+  a runtime palette dependency; and
+- independent per-feature scales prevent categorical level collisions, so no
+  clinical-track class hierarchy is needed.
 
 ## Step 6 — Sort samples by clinical annotations
 

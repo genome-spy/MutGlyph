@@ -1,6 +1,8 @@
 source("R/as-json.R")
 source("R/widget.R")
 source("R/oncoplot-data.R")
+source("R/oncoplot-views.R")
+source("R/oncoplot-spec.R")
 source("R/oncoplot.R")
 
 spec <- list(

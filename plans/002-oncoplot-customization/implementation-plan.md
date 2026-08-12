@@ -165,6 +165,40 @@ mutglyph_oncoplot(
 Do not add `...`. It would obscure unsupported options and weaken input
 validation.
 
+## Step 0 — Split the oncoplot specification builders (completed)
+
+Before adding customization arguments, split the original `oncoplot_spec()`
+monolith into three responsibilities:
+
+- `oncoplot.R` contains the documented public constructor;
+- `oncoplot-spec.R` assembles datasets, layout, and root configuration; and
+- `oncoplot-views.R` contains one internal builder per semantic panel.
+
+Keep `oncoplot-data.R` unchanged because its data preparation is already
+divided into focused helpers. Do not introduce a configuration object, generic
+view factory, or layout DSL.
+
+Verification completed:
+
+- the complete R test suite passes;
+- default, clinical/sample-label, and GISTIC specification objects are
+  identical to those produced before the extraction; and
+- a built source package passes `R CMD check`.
+
+Tentative commit:
+
+```text
+refactor: split oncoplot specification builders
+```
+
+Re-evaluation outcome:
+
+- panel-level builders are sufficient for the planned controls and Ti/Tv
+  track;
+- the existing four-column composition remains explicit; and
+- a generalized layout helper is still unjustified until custom side bars add
+  a concrete fifth column.
+
 ## Step 1 — Add row height and basic display controls
 
 Add the MutGlyph-specific `rowHeight` argument and the inexpensive maftools-like
@@ -612,6 +646,7 @@ Before declaring the milestone complete, answer:
 ## Tentative commit sequence
 
 ```text
+refactor: split oncoplot specification builders
 feat: add basic oncoplot display controls
 feat: support custom oncoplot mutation colors
 feat: add oncoplot selection ordering and filtering

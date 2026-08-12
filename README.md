@@ -1,16 +1,49 @@
 # MutGlyph
 
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+<!-- badges: end -->
+
 MutGlyph creates interactive cancer-genomics plots from
-[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects using
-[GenomeSpy](https://genomespy.app/) for browser rendering.
+[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects. It uses
+[GenomeSpy](https://genomespy.app/) for linked exploration, tooltips, and
+publication-quality SVG export.
 
-The initial release implements one deliberately focused plot:
-`mutglyph_oncoplot()`. Its default output follows the anatomy and ordering of
-the maftools LAML oncoplot example: cohort summary, sample mutation-burden bars,
-gene-by-sample mutation matrix, altered-sample percentages, per-gene summary
-bars, and mutation-class legend.
+![An interactive MutGlyph oncoplot of the maftools LAML example data](man/figures/oncoplot.png)
 
-## Example
+## Almost a drop-in replacement
+
+`mutglyph_oncoplot()` deliberately imitates `maftools::oncoplot()`. It accepts
+the same MAF objects, preserves familiar argument names and behavior where
+practical, and reproduces the standard oncoplot composition. For common calls,
+switching to interactive GenomeSpy output is often just a function-name change:
+
+```r
+# Static maftools plot
+maftools::oncoplot(maf = laml, top = 10)
+
+# Interactive MutGlyph plot
+mutglyph_oncoplot(maf = laml, top = 10)
+```
+
+MutGlyph is not a complete clone of every maftools option. Its focused API
+covers the common oncoplot workflow while adding linked navigation, tooltips,
+clinical tracks, and SVG export.
+
+## Installation
+
+MutGlyph is under development and is not yet on CRAN or Bioconductor. Install
+it from GitHub with [pak](https://pak.r-lib.org/):
+
+```r
+install.packages("pak")
+pak::pak("HautaniemiLab/MutGlyph")
+```
+
+## Basic usage
+
+The maftools package includes a small TCGA acute myeloid leukemia data set:
 
 ```r
 library(MutGlyph)
@@ -24,157 +57,43 @@ laml <- maftools::read.maf(
   )
 )
 
-plot <- mutglyph_oncoplot(laml, top = 10)
-plot
+mutglyph_oncoplot(laml, top = 10)
 ```
 
-Wheel or trackpad gestures zoom and pan the shared sample axis. Hovering shows
-biological details, and **Save as SVG** exports the visible composition.
+Scroll or pinch over the plot to zoom and pan the shared sample axis. Hovering
+shows biological details, and **Save as SVG** exports the visible composition.
 
-## Common customizations
+## What can be customized?
 
-Use `rowHeight` to control matrix density. The inexpensive display switches
-hide individual parts without changing the underlying cohort summaries:
+- Gene and sample selection, ordering, and filtering
+- Mutation-class colors and GenomeSpy/Vega categorical schemes
+- Categorical and numeric clinical annotation tracks
+- GISTIC amplification and deletion calls
+- Transition/transversion contributions
+- Row height, labels, title, percentages, and summary-track visibility
+- Custom sample- and gene-level summary bars
 
-```r
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  rowHeight = 18,
-  drawRowBar = FALSE,
-  showPct = FALSE,
-  titleText = "TCGA acute myeloid leukemia"
-)
-```
-
-Mutation colors are partial named overrides; unspecified classes keep the
-default palette:
-
-```r
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60")
-)
-```
-
-Gene thresholds, ignored genes, explicit gene order, and sample filtering use
-maftools-like arguments:
-
-```r
-mutglyph_oncoplot(
-  laml,
-  minMut = 0.05,
-  genesToIgnore = "TTN",
-  removeNonMutated = TRUE
-)
-
-mutglyph_oncoplot(
-  laml,
-  genes = c("NPM1", "FLT3", "DNMT3A"),
-  keepGeneOrder = TRUE,
-  sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965")
-)
-```
-
-Categorical and numeric clinical annotations have independent color scales.
-Samples can be sorted by the selected annotations, with optional categorical
-level priorities. Categorical tracks use GenomeSpy's `tableau10` default; pass
-another Vega scheme name or a named value-to-color vector in `annotationColor`
-when desired:
-
-```r
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
-  annotationColor = list(
-    FAB_classification = "tableau10",
-    days_to_last_followup = "Blues"
-  ),
-  sortByAnnotation = TRUE,
-  annotationOrder = list(FAB_classification = c("M5", "M4")),
-  showTumorSampleBarcodes = TRUE
-)
-```
-
-Sample names use ranged text: they appear when the sample bands are wide enough
-and otherwise stay hidden instead of overlapping. Zoom in to inspect them. Add
-the transition/transversion contribution track with:
-
-```r
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  draw_titv = TRUE,
-  titv_col = c(`C>T` = "#D81B60")
-)
-```
-
-Custom summary bars use a deliberately small two-column contract. The first
-column contains a sample barcode for `topBarData` or a gene symbol for side
-bars; the numeric second column supplies both values and the axis title. A
-numeric clinical field name is also accepted as `topBarData`.
-
-```r
-genes <- as.character(maftools::getGeneSummary(laml)$Hugo_Symbol[1:10])
-variants <- maftools::subsetMaf(
-  laml,
-  genes = genes,
-  fields = c("Hugo_Symbol", "i_TumorVAF_WU"),
-  mafObj = FALSE,
-  includeSyn = FALSE
-)
-mean_vaf <- aggregate(i_TumorVAF_WU ~ Hugo_Symbol, variants, mean)
-names(mean_vaf) <- c("gene", "Mean VAF (%)")
-
-# Replace this illustrative metric with results from your significance tool.
-mutsig <- data.frame(gene = genes, `-log10(q)` = seq(2, 20, length.out = 10))
-
-mutglyph_oncoplot(
-  laml,
-  genes = genes,
-  keepGeneOrder = TRUE,
-  topBarData = "days_to_last_followup",
-  leftBarData = mean_vaf,
-  leftBarLims = c(0, 100),
-  rightBarData = mutsig,
-  rightBarLims = c(0, 20)
-)
-```
-
-Custom top and right data replace their default stacked summaries; a custom
-left bar adds a gene-aligned column before the gene labels. Missing displayed
-keys are shown as zero with a warning.
-
-## Copy-number data
-
-MAF objects read with GISTIC results are supported directly. As in maftools,
-gene-level `Amp` and `Del` calls are included in the top sample bars by default:
-
-```r
-mutglyph_oncoplot(laml_gistic, top = 10)
-```
-
-Use `includeColBarCN = FALSE` when the top bars should contain sequence
-mutations only.
+See the [getting-started
+article](https://genomespy.app/MutGlyph/articles/MutGlyph.html) for
+runnable examples, or browse the [function
+reference](https://genomespy.app/MutGlyph/reference/index.html).
 
 ## GenomeSpy specification
 
-The returned object is an ordinary htmlwidget whose payload contains the exact
-GenomeSpy specification being rendered. Retrieve a portable JSON copy with:
+The returned object is an htmlwidget containing the complete GenomeSpy
+specification. Retrieve a portable JSON representation for inspection or
+experimentation in the GenomeSpy Playground:
 
 ```r
+plot <- mutglyph_oncoplot(laml, top = 10)
 json <- as_json(plot)
 ```
-
-The JSON can be inspected, versioned, or pasted into the GenomeSpy Playground.
 
 ## Development
 
 The committed browser bundle is the only JavaScript needed at package runtime.
 Installing and checking the R package does not require Node.js or network
-access. When changing the R specification builder or upgrading GenomeSpy, run:
+access. When changing the specification builder or upgrading GenomeSpy, run:
 
 ```sh
 npm install
@@ -182,9 +101,17 @@ npm run build
 npm run validate:specs
 ```
 
-The validation command checks R-generated reference specifications against the
-JSON schema shipped by the pinned GenomeSpy development dependency. That schema
-is not included in the released R package.
+Specification validation uses the JSON schema bundled with the pinned
+GenomeSpy development dependency. The schema is not included in the released R
+package.
 
 See the installed `NOTICE` and `JS-LICENSES` files for attribution of bundled
 and adapted work.
+
+## AI-assisted development
+
+OpenAI Codex was used extensively during the development of MutGlyph, including
+for code implementation and refactoring, tests, documentation, and examples.
+The package authors reviewed and accepted the AI-assisted contributions and
+remain responsible for the package's content, correctness, licensing, and
+maintenance.

@@ -1,8 +1,10 @@
 #' MutGlyph: Interactive Cancer Genomics Plots
 #'
 #' MutGlyph creates opinionated interactive cancer genomics plots from
-#' `maftools` mutation data. GenomeSpy owns rendering and interaction in the
-#' browser.
+#' `maftools` mutation data. [mutglyph_oncoplot()] deliberately imitates the
+#' familiar `maftools::oncoplot()` API and composition, making it an almost
+#' drop-in interactive replacement for common workflows. GenomeSpy owns
+#' rendering and interaction in the browser.
 #'
 #' @keywords internal
 #' @importFrom htmlwidgets createWidget sizingPolicy

@@ -107,10 +107,11 @@ in the top sample summary bars, matching \code{maftools::oncoplot()}.}
 A MutGlyph htmlwidget.
 }
 \description{
-Creates a GenomeSpy oncoplot from a \code{maftools} MAF object. The initial
-implementation follows the default layout and ordering of
-\code{maftools::oncoplot()} while retaining the complete GenomeSpy specification
-in the returned widget.
+Creates a GenomeSpy oncoplot from a \code{maftools} MAF object.
+\code{mutglyph_oncoplot()} deliberately imitates the layout, ordering rules, and
+commonly used argument names of \code{maftools::oncoplot()}, making it an almost
+drop-in interactive replacement for common workflows. It is not intended to
+provide complete API compatibility with every maftools option.
 }
 \details{
 The sample axis supports wheel or trackpad zooming and panning. Hover over

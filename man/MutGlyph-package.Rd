@@ -7,8 +7,19 @@
 \title{MutGlyph: Interactive Cancer Genomics Plots}
 \description{
 MutGlyph creates opinionated interactive cancer genomics plots from
-\code{maftools} mutation data. GenomeSpy owns rendering and interaction in the
-browser.
+\code{maftools} mutation data. \code{\link[=mutglyph_oncoplot]{mutglyph_oncoplot()}} deliberately imitates the
+familiar \code{maftools::oncoplot()} API and composition, making it an almost
+drop-in interactive replacement for common workflows. GenomeSpy owns
+rendering and interaction in the browser.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/HautaniemiLab/MutGlyph}
+  \item \url{https://genomespy.app/MutGlyph/}
+  \item Report bugs at \url{https://github.com/HautaniemiLab/MutGlyph/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Kari Lavikka \email{kari@karilavikka.fi} [copyright holder]

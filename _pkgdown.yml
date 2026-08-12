@@ -1,0 +1,18 @@
+url: https://genomespy.app/MutGlyph/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Plotting
+  contents:
+  - mutglyph_oncoplot
+- title: GenomeSpy specification
+  contents:
+  - as_json
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - MutGlyph

@@ -1,9 +1,10 @@
 #' Draw an interactive oncoplot
 #'
-#' Creates a GenomeSpy oncoplot from a `maftools` MAF object. The initial
-#' implementation follows the default layout and ordering of
-#' `maftools::oncoplot()` while retaining the complete GenomeSpy specification
-#' in the returned widget.
+#' Creates a GenomeSpy oncoplot from a `maftools` MAF object.
+#' `mutglyph_oncoplot()` deliberately imitates the layout, ordering rules, and
+#' commonly used argument names of `maftools::oncoplot()`, making it an almost
+#' drop-in interactive replacement for common workflows. It is not intended to
+#' provide complete API compatibility with every maftools option.
 #'
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to display when `genes` is `NULL`.

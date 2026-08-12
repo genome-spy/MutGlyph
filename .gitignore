@@ -7,3 +7,4 @@ tmp/
 *.tar.gz
 node_modules/
 inst/doc/
+docs/

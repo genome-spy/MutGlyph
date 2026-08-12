@@ -3,6 +3,8 @@
 ^\.playwright-cli$
 ^\.gitignore$
 ^\.github$
+^_pkgdown\.yml$
+^docs$
 ^LICENSE\.md$
 ^plans$
 ^tmp$

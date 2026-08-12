@@ -3,10 +3,14 @@
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to select when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display.
+#' @param clinicalFeatures Optional categorical clinical fields.
 #'
 #' @return A named list of data frames, vectors, and title statistics.
 #' @keywords internal
-oncoplot_data <- function(maf, top = 20, genes = NULL) {
+oncoplot_data <- function(maf,
+                          top = 20,
+                          genes = NULL,
+                          clinicalFeatures = NULL) {
   if (!inherits(maf, "MAF")) {
     stop("`maf` must be a maftools MAF object.", call. = FALSE)
   }
@@ -35,6 +39,11 @@ oncoplot_data <- function(maf, top = 20, genes = NULL) {
   )
 
   samples_data <- oncoplot_sample_data(maf, colnames(oncomatrix))
+  clinical <- oncoplot_clinical_data(
+    maf,
+    sample_order = samples_data$sample,
+    clinicalFeatures = clinicalFeatures
+  )
   cells <- oncoplot_cell_data(oncomatrix)
   mutation_classes <- matrix_data$mutation_classes
   top_bars <- oncoplot_top_bars(maf, samples_data$sample, mutation_classes)
@@ -44,6 +53,8 @@ oncoplot_data <- function(maf, top = 20, genes = NULL) {
   list(
     genes = genes_data,
     samples = samples_data,
+    clinical = clinical$data,
+    clinical_colors = clinical$colors,
     cells = cells,
     top_bars = top_bars,
     right_bars = right_bars,
@@ -55,6 +66,99 @@ oncoplot_data <- function(maf, top = 20, genes = NULL) {
     mutation_classes = mutation_classes,
     mutation_colors = oncoplot_mutation_colors(mutation_classes)
   )
+}
+
+oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
+  empty <- list(
+    data = data.frame(
+      sample = character(),
+      sample_index = integer(),
+      feature = character(),
+      feature_index = integer(),
+      value = character(),
+      stringsAsFactors = FALSE
+    ),
+    colors = character()
+  )
+  if (is.null(clinicalFeatures)) {
+    return(empty)
+  }
+
+  clinicalFeatures <- unique(as.character(clinicalFeatures))
+  clinicalFeatures <- clinicalFeatures[
+    !is.na(clinicalFeatures) & nzchar(clinicalFeatures)
+  ]
+  if (length(clinicalFeatures) == 0L) {
+    return(empty)
+  }
+
+  clinical <- as.data.frame(maftools::getClinicalData(maf))
+  missing_features <- setdiff(clinicalFeatures, names(clinical))
+  if (length(missing_features) > 0L) {
+    warning(
+      "Ignoring missing clinical fields: ",
+      paste(missing_features, collapse = ", "),
+      call. = FALSE
+    )
+    clinicalFeatures <- setdiff(clinicalFeatures, missing_features)
+  }
+  if (length(clinicalFeatures) == 0L) {
+    stop("None of the requested clinical fields are present in the MAF.", call. = FALSE)
+  }
+
+  numeric_features <- clinicalFeatures[vapply(
+    clinical[clinicalFeatures],
+    is.numeric,
+    logical(1)
+  )]
+  if (length(numeric_features) > 0L) {
+    stop(
+      "Only categorical clinical fields are supported; numeric fields: ",
+      paste(numeric_features, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  sample_rows <- match(
+    sample_order,
+    as.character(clinical[["Tumor_Sample_Barcode"]])
+  )
+  rows <- lapply(seq_along(clinicalFeatures), function(feature_index) {
+    feature <- clinicalFeatures[feature_index]
+    values <- as.character(clinical[[feature]][sample_rows])
+    values[is.na(values)] <- "NA"
+    data.frame(
+      sample = sample_order,
+      sample_index = seq_along(sample_order),
+      feature = feature,
+      feature_index = feature_index,
+      value = values,
+      stringsAsFactors = FALSE
+    )
+  })
+  data <- do.call(rbind, rows)
+
+  ordered_values <- unique(unlist(lapply(clinicalFeatures, function(feature) {
+    sort(unique(data$value[data$feature == feature]))
+  }), use.names = FALSE))
+  missing_values <- intersect(ordered_values, "NA")
+  colored_values <- setdiff(ordered_values, missing_values)
+  color_count <- length(colored_values)
+  colors <- if (color_count > 0L) {
+    grDevices::hcl.colors(max(3L, color_count), palette = "Dark 3")[
+      seq_len(color_count)
+    ]
+  } else {
+    character()
+  }
+  names(colors) <- colored_values
+  if (length(missing_values) > 0L) {
+    missing_colors <- rep("#BDBDBD", length(missing_values))
+    names(missing_colors) <- missing_values
+    colors <- c(colors, missing_colors)
+  }
+
+  list(data = data, colors = colors[ordered_values])
 }
 
 select_oncoplot_genes <- function(maf, top, genes) {

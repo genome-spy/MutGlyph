@@ -4,7 +4,7 @@
 \alias{oncoplot_data}
 \title{Derive the data needed by an oncoplot}
 \usage{
-oncoplot_data(maf, top = 20, genes = NULL)
+oncoplot_data(maf, top = 20, genes = NULL, clinicalFeatures = NULL)
 }
 \arguments{
 \item{maf}{A maftools \code{MAF} object.}
@@ -12,6 +12,8 @@ oncoplot_data(maf, top = 20, genes = NULL)
 \item{top}{Number of genes to select when \code{genes} is \code{NULL}.}
 
 \item{genes}{Optional gene symbols to display.}
+
+\item{clinicalFeatures}{Optional categorical clinical fields.}
 }
 \value{
 A named list of data frames, vectors, and title statistics.

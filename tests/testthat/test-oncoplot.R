@@ -37,3 +37,42 @@ test_that("oncoplot JSON contains row-record datasets", {
     )
   )
 })
+
+test_that("optional clinical tracks and sample labels extend the shared grid", {
+  plot <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    showTumorSampleBarcodes = TRUE
+  )
+  spec <- plot$x$spec
+  body <- spec$vconcat[[2]]
+  view_names <- vapply(
+    body$concat,
+    function(view) if (is.null(view$name)) "" else view$name,
+    character(1)
+  )
+
+  expect_length(body$concat, 16)
+  expect_identical(body$resolve$legend$color, "collected")
+  expect_true(all(c(
+    "clinical-feature-labels",
+    "clinical-annotations",
+    "sample-labels"
+  ) %in% view_names))
+  expect_equal(nrow(spec$datasets$clinical), 193)
+  expect_identical(
+    spec$datasets$samples$sample,
+    unique(spec$datasets$cells$sample)
+  )
+  sample_view <- body$concat[[14]]
+  expect_identical(sample_view$encoding$x$band, 0)
+  expect_identical(sample_view$encoding$x2$band, 1)
+})
+
+test_that("sample label flag is scalar logical", {
+  expect_error(
+    mutglyph_oncoplot(laml_maf(), showTumorSampleBarcodes = 1),
+    "TRUE or FALSE"
+  )
+})

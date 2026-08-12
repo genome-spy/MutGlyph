@@ -8,6 +8,8 @@
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to display when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display instead of selecting top genes.
+#' @param clinicalFeatures Optional categorical clinical fields to display.
+#' @param showTumorSampleBarcodes Show rotated sample names below the matrix.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
@@ -16,19 +18,34 @@
 mutglyph_oncoplot <- function(maf,
                               top = 20,
                               genes = NULL,
+                              clinicalFeatures = NULL,
+                              showTumorSampleBarcodes = FALSE,
                               width = NULL,
                               height = NULL,
                               elementId = NULL) {
-  data <- oncoplot_data(maf, top = top, genes = genes)
+  if (
+    length(showTumorSampleBarcodes) != 1L ||
+      is.na(showTumorSampleBarcodes) ||
+      !is.logical(showTumorSampleBarcodes)
+  ) {
+    stop("`showTumorSampleBarcodes` must be TRUE or FALSE.", call. = FALSE)
+  }
+
+  data <- oncoplot_data(
+    maf,
+    top = top,
+    genes = genes,
+    clinicalFeatures = clinicalFeatures
+  )
   mutglyph_widget(
-    oncoplot_spec(data),
+    oncoplot_spec(data, showTumorSampleBarcodes = showTumorSampleBarcodes),
     width = width,
     height = height,
     elementId = elementId
   )
 }
 
-oncoplot_spec <- function(data) {
+oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
   color_encoding <- oncoplot_color_encoding(data)
   matrix_width <- "container"
   matrix_height <- list(step = 24)
@@ -186,23 +203,113 @@ oncoplot_spec <- function(data) {
     )
   )
 
+  clinical_views <- list()
+  if (nrow(data$clinical) > 0L) {
+    clinical_labels <- unique(data$clinical[c("feature", "feature_index")])
+    clinical_height <- 18 * nrow(clinical_labels)
+    clinical_views <- list(
+      list(
+        name = "clinical-feature-labels",
+        width = 120,
+        height = clinical_height,
+        data = list(name = "clinicalFeatures"),
+        resolve = list(scale = list(x = "excluded", y = "excluded")),
+        mark = list(
+          type = "text",
+          align = "right",
+          baseline = "middle",
+          size = 11,
+          dx = -3,
+          clip = "never"
+        ),
+        encoding = list(
+          x = list(value = 1),
+          y = list(field = "feature_index", type = "index", axis = NULL),
+          text = list(field = "feature"),
+          color = list(value = "#333333")
+        )
+      ),
+      list(
+        name = "clinical-annotations",
+        width = matrix_width,
+        height = clinical_height,
+        data = list(name = "clinical"),
+        resolve = list(
+          scale = list(y = "excluded", color = "excluded")
+        ),
+        mark = list(
+          type = "rect",
+          stroke = "white",
+          strokeWidth = 0.5
+        ),
+        encoding = list(
+          x = list(field = "sample_index", type = "index", axis = NULL),
+          y = list(field = "feature_index", type = "index", axis = NULL),
+          color = list(
+            field = "value",
+            type = "nominal",
+            scale = list(
+              domain = unname(names(data$clinical_colors)),
+              range = unname(data$clinical_colors)
+            )
+          )
+        )
+      ),
+      oncoplot_empty_view(width = 40, height = clinical_height),
+      oncoplot_empty_view(width = 120, height = clinical_height)
+    )
+  } else {
+    clinical_labels <- NULL
+  }
+
+  sample_label_views <- list()
+  if (showTumorSampleBarcodes) {
+    sample_label_views <- list(
+      oncoplot_empty_view(width = 70, height = 80),
+      list(
+        name = "sample-labels",
+        width = matrix_width,
+        height = 80,
+        data = list(name = "samples"),
+        resolve = list(scale = list(y = "excluded")),
+        mark = list(
+          type = "text",
+          angle = 90,
+          align = "center",
+          baseline = "top",
+          paddingX = 1,
+          size = 9
+        ),
+        encoding = list(
+          x = list(
+            field = "sample_index",
+            type = "index",
+            band = 0,
+            axis = NULL
+          ),
+          x2 = list(field = "sample_index", band = 1),
+          y = list(value = 0.5),
+          text = list(field = "sample"),
+          color = list(value = "#555555")
+        )
+      ),
+      oncoplot_empty_view(width = 40, height = 80),
+      oncoplot_empty_view(width = 120, height = 80)
+    )
+  }
+
   body <- list(
     columns = 4,
     spacing = 4,
     resolve = list(
       scale = list(x = "shared", y = "shared", color = "shared"),
-      legend = list(color = "shared")
+      legend = list(color = "collected")
     ),
     scales = list(
       x = list(paddingInner = 0.04, paddingOuter = 0),
       y = list(reverse = TRUE, paddingInner = 0.04, paddingOuter = 0)
     ),
-    legends = list(color = list(
-      title = NULL,
-      orient = "bottom",
-      direction = "horizontal"
-    )),
-    concat = list(
+    concat = c(list(
       oncoplot_empty_view(width = 70, height = 90),
       top_bar_view,
       oncoplot_empty_view(width = 40, height = 90),
@@ -211,20 +318,29 @@ oncoplot_spec <- function(data) {
       matrix_view,
       percentages_view,
       right_bar_view
-    )
+    ), clinical_views, sample_label_views)
   )
+
+  datasets <- list(
+    genes = data$genes,
+    cells = data$cells,
+    topBars = data$top_bars,
+    rightBars = data$right_bars,
+    title = data.frame(label = title_text)
+  )
+  if (nrow(data$clinical) > 0L) {
+    datasets$clinical <- data$clinical
+    datasets$clinicalFeatures <- clinical_labels
+  }
+  if (showTumorSampleBarcodes) {
+    datasets$samples <- data$samples
+  }
 
   list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
     name = "mutglyph-oncoplot",
     background = "white",
-    datasets = list(
-      genes = data$genes,
-      cells = data$cells,
-      topBars = data$top_bars,
-      rightBars = data$right_bars,
-      title = data.frame(label = title_text)
-    ),
+    datasets = datasets,
     spacing = 4,
     vconcat = list(title_view, body),
     config = list(
@@ -234,7 +350,13 @@ oncoplot_spec <- function(data) {
         titleColor = "#333333",
         titleFontWeight = "normal"
       ),
-      legend = list(labelFontSize = 11, symbolSize = 100),
+      legend = list(
+        labelFontSize = 11,
+        symbolSize = 100,
+        title = NULL,
+        orient = "bottom",
+        direction = "horizontal"
+      ),
       scale = list(zoom = FALSE),
       mark = list(tooltip = FALSE)
     )

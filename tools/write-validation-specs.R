@@ -40,3 +40,13 @@ writeLines(
   file.path(output_dir, "oncoplot.json"),
   useBytes = TRUE
 )
+writeLines(
+  as_json(mutglyph_oncoplot(
+    laml,
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    showTumorSampleBarcodes = TRUE
+  )),
+  file.path(output_dir, "oncoplot-options.json"),
+  useBytes = TRUE
+)

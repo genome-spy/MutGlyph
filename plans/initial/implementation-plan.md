@@ -345,6 +345,27 @@ feat: add sample labels and clinical annotations
 
 Pause if clinical annotation support requires committing to a broader public customization API or if categorical-only support is not acceptable.
 
+Implementation re-evaluation (2026-08-12):
+
+- `clinicalFeatures` is intentionally categorical-only in this iteration.
+  Requested missing fields are reported, numeric fields fail clearly, and no
+  palette or annotation-sorting API was needed.
+- Annotation values receive deterministic `hcl.colors()` colors, with a fixed
+  gray for missing values. The clinical rows and optional sample-label row use
+  the same sample scale as the TMB bars and mutation matrix.
+- Following review feedback, mutation and clinical legends keep independent
+  color scales but use GenomeSpy's `"collected"` legend resolution. This
+  produces one compact bottom legend region instead of fragmenting the grid.
+- Sample names use ranged text (`x`/`x2` over each sample band), following the
+  oncoprint example. Labels squeeze or disappear in the dense overview rather
+  than overlap, and browser checks confirmed they appear when the sample bands
+  are wide enough. Step 7's horizontal zoom will make them inspectable in the
+  ordinary dense view.
+- The optional LAML specification passes the bundled GenomeSpy schema and
+  renders with aligned annotation cells, collected legends, and no browser
+  console warnings or errors. The default specification remains free of these
+  optional rows and datasets.
+
 ## Step 7 — Add the deliberately small interaction layer
 
 Add only the interactions selected for the first release:

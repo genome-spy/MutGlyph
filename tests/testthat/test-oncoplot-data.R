@@ -85,3 +85,46 @@ test_that("oncoplot data validates its small input surface", {
   expect_error(oncoplot_data(maf, top = 1), "at least two")
   expect_error(oncoplot_data(maf, genes = "FLT3"), "at least two")
 })
+
+test_that("categorical clinical rows follow the ordered samples", {
+  data <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification"
+  )
+
+  expect_equal(nrow(data$clinical), 193)
+  expect_identical(unique(data$clinical$feature), "FAB_classification")
+  expect_identical(data$clinical$sample, data$samples$sample)
+  expect_true(all(data$clinical$value %in% names(data$clinical_colors)))
+  expect_identical(
+    data$clinical_colors,
+    oncoplot_data(
+      laml_maf(),
+      top = 10,
+      clinicalFeatures = "FAB_classification"
+    )$clinical_colors
+  )
+})
+
+test_that("clinical feature validation is explicit", {
+  maf <- laml_maf()
+
+  expect_warning(
+    data <- oncoplot_data(
+      maf,
+      top = 10,
+      clinicalFeatures = c("FAB_classification", "not_a_field")
+    ),
+    "Ignoring missing clinical fields"
+  )
+  expect_identical(unique(data$clinical$feature), "FAB_classification")
+  expect_error(
+    suppressWarnings(oncoplot_data(maf, top = 10, clinicalFeatures = "not_a_field")),
+    "None of the requested"
+  )
+  expect_error(
+    oncoplot_data(maf, top = 10, clinicalFeatures = "days_to_last_followup"),
+    "Only categorical"
+  )
+})

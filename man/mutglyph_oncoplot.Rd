@@ -8,6 +8,8 @@ mutglyph_oncoplot(
   maf,
   top = 20,
   genes = NULL,
+  clinicalFeatures = NULL,
+  showTumorSampleBarcodes = FALSE,
   width = NULL,
   height = NULL,
   elementId = NULL
@@ -19,6 +21,10 @@ mutglyph_oncoplot(
 \item{top}{Number of genes to display when \code{genes} is \code{NULL}.}
 
 \item{genes}{Optional gene symbols to display instead of selecting top genes.}
+
+\item{clinicalFeatures}{Optional categorical clinical fields to display.}
+
+\item{showTumorSampleBarcodes}{Show rotated sample names below the matrix.}
 
 \item{width, height}{Widget dimensions.}
 

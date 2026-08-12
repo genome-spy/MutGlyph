@@ -365,6 +365,86 @@ oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
   )
 }
 
+oncoplot_titv_views <- function(data, matrix_width) {
+  if (is.null(data$titv)) {
+    return(list())
+  }
+
+  color_encoding <- list(
+    field = "substitution_class",
+    type = "nominal",
+    scale = list(
+      domain = unname(names(data$titv$colors)),
+      range = unname(data$titv$colors)
+    ),
+    legend = list(title = "Ti/Tv")
+  )
+  track <- list(
+    name = "transition-transversion",
+    width = matrix_width,
+    height = 28,
+    resolve = list(scale = list(y = "excluded", color = "excluded")),
+    layer = list(
+      list(
+        data = list(sequence = list(
+          start = 1,
+          stop = nrow(data$samples) + 1,
+          as = "sample_index"
+        )),
+        mark = list(type = "rect", color = "#D3D3D3", style = "outline"),
+        encoding = list(
+          x = list(field = "sample_index", type = "index", axis = NULL),
+          y = list(value = 0),
+          y2 = list(value = 1)
+        )
+      ),
+      list(
+        data = list(name = "titv"),
+        transform = list(
+          oncoplot_sample_index_lookup(),
+          list(
+            type = "stack",
+            field = "percentage",
+            groupby = list("sample_index"),
+            sort = list(
+              field = "substitution_class_index", order = "ascending"
+            ),
+            as = list("percentage_start", "percentage_end")
+          )
+        ),
+        mark = list(type = "rect", style = "outline"),
+        encoding = list(
+          x = list(field = "sample_index", type = "index", axis = NULL),
+          y = list(
+            field = "percentage_start",
+            type = "quantitative",
+            scale = list(domain = list(0, 100)),
+            axis = NULL
+          ),
+          y2 = list(field = "percentage_end"),
+          color = color_encoding,
+          tooltip = list(
+            list(field = "sample", title = "Sample"),
+            list(field = "substitution_class", title = "Substitution"),
+            list(
+              field = "percentage",
+              type = "quantitative",
+              title = "Percentage"
+            )
+          )
+        )
+      )
+    )
+  )
+
+  list(
+    oncoplot_empty_view(),
+    track,
+    oncoplot_empty_view(),
+    oncoplot_empty_view()
+  )
+}
+
 oncoplot_color_encoding <- function(data) {
   list(
     field = "variant_classification",

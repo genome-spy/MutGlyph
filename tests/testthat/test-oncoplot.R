@@ -224,6 +224,39 @@ test_that("selection flags validate scalar logical values", {
   }
 })
 
+test_that("Ti/Tv adds one aligned row and an independent color scale", {
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    draw_titv = TRUE,
+    showTumorSampleBarcodes = TRUE
+  )$x$spec
+  body <- spec$vconcat[[2]]
+  titv_view <- body$concat[[14]]
+
+  expect_true("titv" %in% names(spec$datasets))
+  expect_identical(titv_view$name, "transition-transversion")
+  expect_identical(titv_view$height, 28)
+  expect_identical(titv_view$resolve$scale$color, "excluded")
+  expect_identical(
+    titv_view$layer[[1]]$data$sequence$stop,
+    nrow(spec$datasets$samples) + 1
+  )
+  expect_identical(
+    vapply(titv_view$layer[[2]]$transform, `[[`, character(1), "type"),
+    c("lookup", "stack")
+  )
+  expect_identical(body$concat[[18]]$name, "sample-labels")
+})
+
+test_that("Ti/Tv flag validates a scalar logical", {
+  expect_error(
+    mutglyph_oncoplot(laml_maf(), draw_titv = 1),
+    "TRUE or FALSE"
+  )
+})
+
 test_that("sample label flag is scalar logical", {
   expect_error(
     mutglyph_oncoplot(laml_maf(), showTumorSampleBarcodes = 1),

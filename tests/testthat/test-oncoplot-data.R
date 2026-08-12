@@ -251,6 +251,46 @@ test_that("sample filtering retains cohort denominator semantics", {
   expect_identical(mutated_only$title, baseline$title)
 })
 
+test_that("Ti/Tv data normalize exported maftools fractions", {
+  data <- oncoplot_data(laml_maf(), top = 10, draw_titv = TRUE)
+  source <- as.data.frame(
+    maftools::titv(laml_maf(), useSyn = TRUE, plot = FALSE)$fraction.contribution
+  )
+  sample <- intersect(
+    data$samples$sample,
+    as.character(source$Tumor_Sample_Barcode)
+  )[[1]]
+  expected <- as.numeric(source[
+    as.character(source$Tumor_Sample_Barcode) == sample,
+    c("C>T", "C>G", "C>A", "T>A", "T>C", "T>G")
+  ])
+  actual <- setNames(rep(0, 6), c("C>T", "C>G", "C>A", "T>A", "T>C", "T>G"))
+  rows <- data$titv$data[data$titv$data$sample == sample, ]
+  actual[rows$substitution_class] <- rows$percentage
+
+  expect_equal(unname(actual), expected)
+  sums <- tapply(data$titv$data$percentage, data$titv$data$sample, sum)
+  expect_true(all(abs(sums - 100) < 1e-6))
+  expect_true(any(!data$samples$sample %in% names(sums)))
+})
+
+test_that("Ti/Tv colors support partial overrides", {
+  data <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    draw_titv = TRUE,
+    titv_col = c(`C>T` = "hotpink", `T>G` = "navy")
+  )
+
+  expect_identical(unname(data$titv$colors[["C>T"]]), "hotpink")
+  expect_identical(unname(data$titv$colors[["T>G"]]), "navy")
+  expect_identical(unname(data$titv$colors[["C>G"]]), "#3F51B5")
+  expect_error(
+    oncoplot_data(laml_maf(), draw_titv = TRUE, titv_col = c("red")),
+    "named character vector"
+  )
+})
+
 test_that("categorical clinical rows follow the ordered samples", {
   data <- oncoplot_data(
     laml_maf(),

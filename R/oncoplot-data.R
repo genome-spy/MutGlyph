@@ -11,6 +11,8 @@
 #' @param sampleOrder Optional sample barcodes to select and order.
 #' @param removeNonMutated Remove samples without displayed events.
 #' @param clinicalFeatures Optional categorical clinical fields.
+#' @param draw_titv Derive transition/transversion contribution data.
+#' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars.
 #'
@@ -27,6 +29,8 @@ oncoplot_data <- function(maf,
                           sampleOrder = NULL,
                           removeNonMutated = FALSE,
                           clinicalFeatures = NULL,
+                          draw_titv = FALSE,
+                          titv_col = NULL,
                           includeColBarCN = TRUE) {
   if (!inherits(maf, "MAF")) {
     stop("`maf` must be a maftools MAF object.", call. = FALSE)
@@ -74,6 +78,11 @@ oncoplot_data <- function(maf,
     sample_order = samples_data$sample,
     clinicalFeatures = clinicalFeatures
   )
+  titv <- if (draw_titv) {
+    oncoplot_titv_data(maf, samples_data$sample, titv_col)
+  } else {
+    NULL
+  }
   events <- oncoplot_event_data(oncomatrix, matrix_data$cnv_classes)
   mutation_classes <- matrix_data$mutation_classes
   top_bars <- oncoplot_top_bars(
@@ -85,7 +94,7 @@ oncoplot_data <- function(maf,
   right_bars <- oncoplot_right_bars(events, genes_data$gene, mutation_classes)
   altered_samples <- sum(colSums(cohort_matrix != "") > 0)
 
-  list(
+  result <- list(
     genes = genes_data,
     samples = samples_data,
     clinical = clinical$data,
@@ -101,6 +110,10 @@ oncoplot_data <- function(maf,
     mutation_classes = mutation_classes,
     mutation_colors = oncoplot_mutation_colors(mutation_classes, colors)
   )
+  if (draw_titv) {
+    result$titv <- titv
+  }
+  result
 }
 
 oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
@@ -501,6 +514,56 @@ oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
   data <- data[data$count != 0, , drop = FALSE]
   rownames(data) <- NULL
   data
+}
+
+oncoplot_titv_data <- function(maf, sample_order, titv_col = NULL) {
+  classes <- c("C>T", "C>G", "C>A", "T>A", "T>C", "T>G")
+  # Adapted from maftools R/titv.R (get_titvCol).
+  colors <- c(
+    `C>T` = "#F44336",
+    `C>G` = "#3F51B5",
+    `C>A` = "#2196F3",
+    `T>A` = "#4CAF50",
+    `T>C` = "#FFC107",
+    `T>G` = "#FF9800"
+  )
+  if (!is.null(titv_col)) {
+    if (
+      !is.character(titv_col) || length(titv_col) == 0L ||
+        is.null(names(titv_col)) || anyNA(names(titv_col)) ||
+        any(!nzchar(names(titv_col))) || anyDuplicated(names(titv_col)) > 0L ||
+        anyNA(titv_col) || any(!nzchar(titv_col))
+    ) {
+      stop(
+        "`titv_col` must be a named character vector with unique, non-empty names and values.",
+        call. = FALSE
+      )
+    }
+    colors[names(titv_col)] <- unname(titv_col)
+  }
+
+  fractions <- as.data.frame(
+    maftools::titv(maf, useSyn = TRUE, plot = FALSE)$fraction.contribution
+  )
+  sample_field <- "Tumor_Sample_Barcode"
+  sample_rows <- match(sample_order, as.character(fractions[[sample_field]]))
+  available <- !is.na(sample_rows)
+  rows <- lapply(seq_along(classes), function(class_index) {
+    data.frame(
+      sample = sample_order[available],
+      substitution_class = classes[class_index],
+      substitution_class_index = class_index,
+      percentage = as.numeric(
+        fractions[[classes[class_index]]][sample_rows[available]]
+      ),
+      stringsAsFactors = FALSE
+    )
+  })
+  data <- do.call(rbind, rows)
+  data <- data[data$percentage > 0, , drop = FALSE]
+  rownames(data) <- NULL
+
+  list(data = data, colors = colors[classes])
 }
 
 oncoplot_mutation_colors <- function(mutation_classes, colors = NULL) {

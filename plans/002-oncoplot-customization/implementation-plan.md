@@ -412,7 +412,7 @@ Re-evaluation outcome:
 - explicit `sampleOrder` remains the final ordering operation and should take
   precedence over annotation sorting in Step 6.
 
-## Step 4 — Add the transition/transversion track
+## Step 4 — Add the transition/transversion track (completed)
 
 Add the exact maftools-style arguments:
 
@@ -479,13 +479,15 @@ Tentative commit:
 feat: add transition transversion oncoplot track
 ```
 
-Re-evaluate:
+Re-evaluation outcome:
 
-- Does a 28-pixel fixed track remain legible at ordinary widget sizes?
-- Does the collected legend remain understandable when mutation, Ti/Tv, and
-  clinical legends are all present?
-- If legend density is poor, first improve collection/layout rather than add a
-  new public legend-placement API.
+- the 28-pixel track remains legible at the ordinary widget size and leaves
+  sample labels as the bottom-most row;
+- the mutation, clinical, and Ti/Tv legends remain understandable in the
+  collected two-row legend region;
+- the sparse track uses the shared sample lookup instead of serializing sample
+  indices, consistent with Step 0.5; and
+- no public legend-placement control or wider label column is needed.
 
 ## Step 5 — Add feature-specific and numeric clinical annotations
 

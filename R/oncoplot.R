@@ -16,6 +16,8 @@
 #' @param sampleOrder Optional sample barcodes to select and order.
 #' @param removeNonMutated Remove samples without events in the displayed genes.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
+#' @param draw_titv Show a transition/transversion contribution track.
+#' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars, matching `maftools::oncoplot()`.
 #' @param showTumorSampleBarcodes Show rotated sample names below the matrix.
@@ -64,6 +66,8 @@ mutglyph_oncoplot <- function(maf,
                               sampleOrder = NULL,
                               removeNonMutated = FALSE,
                               clinicalFeatures = NULL,
+                              draw_titv = FALSE,
+                              titv_col = NULL,
                               includeColBarCN = TRUE,
                               showTumorSampleBarcodes = FALSE,
                               rowHeight = 24,
@@ -80,6 +84,7 @@ mutglyph_oncoplot <- function(maf,
   oncoplot_flag(altered, "altered")
   oncoplot_flag(keepGeneOrder, "keepGeneOrder")
   oncoplot_flag(removeNonMutated, "removeNonMutated")
+  oncoplot_flag(draw_titv, "draw_titv")
   oncoplot_flag(drawRowBar, "drawRowBar")
   oncoplot_flag(drawColBar, "drawColBar")
   oncoplot_flag(showPct, "showPct")
@@ -114,6 +119,8 @@ mutglyph_oncoplot <- function(maf,
     sampleOrder = sampleOrder,
     removeNonMutated = removeNonMutated,
     clinicalFeatures = clinicalFeatures,
+    draw_titv = draw_titv,
+    titv_col = titv_col,
     includeColBarCN = includeColBarCN
   )
   mutglyph_widget(

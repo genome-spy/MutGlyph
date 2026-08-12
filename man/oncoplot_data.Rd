@@ -16,6 +16,8 @@ oncoplot_data(
   sampleOrder = NULL,
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
+  draw_titv = FALSE,
+  titv_col = NULL,
   includeColBarCN = TRUE
 )
 }
@@ -41,6 +43,10 @@ oncoplot_data(
 \item{removeNonMutated}{Remove samples without displayed events.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields.}
+
+\item{draw_titv}{Derive transition/transversion contribution data.}
+
+\item{titv_col}{Optional named character vector of Ti/Tv class colors.}
 
 \item{includeColBarCN}{Include \code{Amp} and \code{Del} gene-level copy-number calls
 in the top sample summary bars.}

@@ -62,6 +62,7 @@ oncoplot_body <- function(data,
     showTumorSampleBarcodes,
     matrix_width = matrix_width
   )
+  titv_views <- oncoplot_titv_views(data, matrix_width)
 
   top_bar_views <- list()
   if (drawColBar) {
@@ -105,7 +106,7 @@ oncoplot_body <- function(data,
       ),
       percentages_view,
       right_bar_view
-    ), clinical_views, sample_label_views)
+    ), clinical_views, titv_views, sample_label_views)
   )
 }
 
@@ -136,6 +137,9 @@ oncoplot_datasets <- function(data, clinical_labels, showTitle, titleText) {
   if (nrow(data$clinical) > 0L) {
     datasets$clinical <- data$clinical
     datasets$clinicalFeatures <- clinical_labels
+  }
+  if (!is.null(data$titv)) {
+    datasets$titv <- data$titv$data
   }
   datasets
 }

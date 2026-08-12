@@ -48,6 +48,8 @@ writeLines(
     top = 10,
     colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60"),
     clinicalFeatures = "FAB_classification",
+    draw_titv = TRUE,
+    titv_col = c(`C>T` = "#D81B60"),
     showTumorSampleBarcodes = TRUE
   )),
   file.path(output_dir, "oncoplot-options.json"),

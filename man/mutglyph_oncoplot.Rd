@@ -16,6 +16,8 @@ mutglyph_oncoplot(
   sampleOrder = NULL,
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
+  draw_titv = FALSE,
+  titv_col = NULL,
   includeColBarCN = TRUE,
   showTumorSampleBarcodes = FALSE,
   rowHeight = 24,
@@ -51,6 +53,10 @@ mutglyph_oncoplot(
 \item{removeNonMutated}{Remove samples without events in the displayed genes.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields to display.}
+
+\item{draw_titv}{Show a transition/transversion contribution track.}
+
+\item{titv_col}{Optional named character vector of Ti/Tv class colors.}
 
 \item{includeColBarCN}{Include \code{Amp} and \code{Del} gene-level copy-number calls
 in the top sample summary bars, matching \code{maftools::oncoplot()}.}

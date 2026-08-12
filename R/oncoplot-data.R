@@ -15,6 +15,10 @@
 #'   numeric color schemes.
 #' @param sortByAnnotation Sort samples by selected clinical features.
 #' @param annotationOrder Optional named list of categorical level orders.
+#' @param topBarData Optional two-column sample metric data or clinical field.
+#' @param topBarLims Optional custom top-bar limits.
+#' @param leftBarData,rightBarData Optional two-column gene metric data.
+#' @param leftBarLims,rightBarLims Optional custom side-bar limits.
 #' @param draw_titv Derive transition/transversion contribution data.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -36,6 +40,12 @@ oncoplot_data <- function(maf,
                           annotationColor = NULL,
                           sortByAnnotation = FALSE,
                           annotationOrder = NULL,
+                          topBarData = NULL,
+                          topBarLims = NULL,
+                          leftBarData = NULL,
+                          leftBarLims = NULL,
+                          rightBarData = NULL,
+                          rightBarLims = NULL,
                           draw_titv = FALSE,
                           titv_col = NULL,
                           includeColBarCN = TRUE) {
@@ -119,6 +129,24 @@ oncoplot_data <- function(maf,
     include_col_bar_cnv = includeColBarCN
   )
   right_bars <- oncoplot_right_bars(events, genes_data$gene, mutation_classes)
+  custom_top_bar <- oncoplot_custom_top_bar(
+    maf,
+    topBarData,
+    samples_data$sample,
+    topBarLims
+  )
+  custom_left_bar <- oncoplot_custom_bar(
+    leftBarData,
+    genes_data$gene,
+    leftBarLims,
+    side = "left"
+  )
+  custom_right_bar <- oncoplot_custom_bar(
+    rightBarData,
+    genes_data$gene,
+    rightBarLims,
+    side = "right"
+  )
   altered_samples <- sum(colSums(cohort_matrix != "") > 0)
 
   result <- list(
@@ -138,6 +166,15 @@ oncoplot_data <- function(maf,
   )
   if (draw_titv) {
     result$titv <- titv
+  }
+  if (!is.null(custom_top_bar)) {
+    result$custom_top_bar <- custom_top_bar
+  }
+  if (!is.null(custom_left_bar)) {
+    result$custom_left_bar <- custom_left_bar
+  }
+  if (!is.null(custom_right_bar)) {
+    result$custom_right_bar <- custom_right_bar
   }
   result
 }
@@ -586,6 +623,121 @@ oncoplot_sample_data <- function(maf, sample_order) {
     total_mutations = as.numeric(totals),
     stringsAsFactors = FALSE
   )
+}
+
+oncoplot_custom_top_bar <- function(maf, data, sample_order, limits) {
+  if (is.null(data)) {
+    if (!is.null(limits)) {
+      stop("`topBarLims` requires `topBarData`.", call. = FALSE)
+    }
+    return(NULL)
+  }
+
+  if (is.character(data) && length(data) == 1L && !is.na(data)) {
+    clinical <- as.data.frame(maftools::getClinicalData(maf))
+    if (!data %in% names(clinical)) {
+      stop(sprintf("Clinical field `%s` is not present in the MAF.", data), call. = FALSE)
+    }
+    data <- clinical[c("Tumor_Sample_Barcode", data)]
+    if (is.numeric(data[[2]])) {
+      data <- data[is.finite(data[[2]]), , drop = FALSE]
+    }
+  }
+  oncoplot_normalize_custom_bar(
+    data,
+    key_order = sample_order,
+    key_name = "sample",
+    limits = limits,
+    argument = "topBarData"
+  )
+}
+
+oncoplot_custom_bar <- function(data, gene_order, limits, side) {
+  limit_argument <- paste0(side, "BarLims")
+  if (is.null(data)) {
+    if (!is.null(limits)) {
+      stop(sprintf("`%s` requires `%sBarData`.", limit_argument, side), call. = FALSE)
+    }
+    return(NULL)
+  }
+  oncoplot_normalize_custom_bar(
+    data,
+    key_order = gene_order,
+    key_name = "gene",
+    limits = limits,
+    argument = paste0(side, "BarData")
+  )
+}
+
+oncoplot_normalize_custom_bar <- function(data,
+                                          key_order,
+                                          key_name,
+                                          limits,
+                                          argument) {
+  if (!is.data.frame(data) || ncol(data) != 2L) {
+    stop(sprintf("`%s` must be a two-column data frame.", argument), call. = FALSE)
+  }
+  metric <- names(data)[2]
+  if (is.null(metric) || is.na(metric) || !nzchar(metric)) {
+    stop(sprintf("The value column of `%s` must have a name.", argument), call. = FALSE)
+  }
+  keys <- as.character(data[[1]])
+  values <- data[[2]]
+  if (anyNA(keys) || any(!nzchar(keys)) || anyDuplicated(keys) > 0L) {
+    stop(sprintf("`%s` keys must be unique and non-missing.", argument), call. = FALSE)
+  }
+  if (!is.numeric(values)) {
+    stop(sprintf("The value column of `%s` must be numeric.", argument), call. = FALSE)
+  }
+  invalid_values <- !is.finite(values)
+  if (any(invalid_values & keys %in% key_order)) {
+    stop(sprintf("The value column of `%s` must be finite.", argument), call. = FALSE)
+  }
+
+  matched <- match(key_order, keys)
+  missing <- is.na(matched)
+  # Materialize exactly one record per displayed dimension member. Keeping the
+  # public bar data keyed by readable IDs lets the same GenomeSpy lookups used
+  # by sparse event data attach the final row or column indices.
+  normalized_values <- numeric(length(key_order))
+  normalized_values[!missing] <- values[matched[!missing]]
+  if (any(missing)) {
+    warning(
+      sprintf(
+        "`%s` is missing %d displayed %s; using zero.",
+        argument,
+        sum(missing),
+        if (key_name == "sample") "samples" else "genes"
+      ),
+      call. = FALSE
+    )
+  }
+
+  normalized_data <- data.frame(
+      key = key_order,
+      value = normalized_values,
+      stringsAsFactors = FALSE
+  )
+  names(normalized_data)[1] <- key_name
+  list(
+    data = normalized_data,
+    key_name = key_name,
+    metric = metric,
+    limits = oncoplot_bar_limits(limits, paste0(sub("Data$", "", argument), "Lims"))
+  )
+}
+
+oncoplot_bar_limits <- function(limits, argument) {
+  if (is.null(limits)) {
+    return(NULL)
+  }
+  if (
+    !is.numeric(limits) || length(limits) != 2L || anyNA(limits) ||
+      any(!is.finite(limits)) || limits[1] >= limits[2]
+  ) {
+    stop(sprintf("`%s` must be two finite increasing numbers.", argument), call. = FALSE)
+  }
+  unname(limits)
 }
 
 oncoplot_top_bars <- function(maf,

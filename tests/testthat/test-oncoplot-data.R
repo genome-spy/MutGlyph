@@ -454,3 +454,116 @@ test_that("annotation order validation is explicit", {
     "numeric feature"
   )
 })
+
+test_that("custom bars normalize to the final sample and gene order", {
+  baseline <- oncoplot_data(laml_maf(), top = 10)
+  samples <- baseline$samples$sample[c(3, 1)]
+  genes <- baseline$genes$gene[c(2, 1, 3)]
+  top_bar <- data.frame(
+    sample = rev(samples),
+    Purity = c(-0.25, 0.75),
+    stringsAsFactors = FALSE
+  )
+  left_bar <- data.frame(
+    gene = rev(genes),
+    Mean_VAF = c(30, 20, 10),
+    stringsAsFactors = FALSE
+  )
+  right_bar <- data.frame(
+    gene = genes,
+    qvalue = c(0.01, 0.02, 0.03),
+    stringsAsFactors = FALSE
+  )
+
+  data <- oncoplot_data(
+    laml_maf(),
+    genes = genes,
+    keepGeneOrder = TRUE,
+    sampleOrder = samples,
+    topBarData = top_bar,
+    topBarLims = c(-1, 1),
+    leftBarData = left_bar,
+    leftBarLims = c(0, 100),
+    rightBarData = right_bar,
+    rightBarLims = c(0, 0.1)
+  )
+
+  expect_identical(data$custom_top_bar$data$sample, samples)
+  expect_identical(data$custom_top_bar$data$value, c(0.75, -0.25))
+  expect_identical(data$custom_top_bar$metric, "Purity")
+  expect_identical(data$custom_top_bar$limits, c(-1, 1))
+  expect_identical(data$custom_left_bar$data$gene, genes)
+  expect_identical(data$custom_left_bar$data$value, c(10, 20, 30))
+  expect_identical(data$custom_right_bar$data$gene, genes)
+  expect_identical(data$custom_right_bar$data$value, c(0.01, 0.02, 0.03))
+})
+
+test_that("custom bars fill missing displayed keys with zero", {
+  baseline <- oncoplot_data(laml_maf(), top = 3)
+  top_bar <- data.frame(
+    sample = baseline$samples$sample[-1],
+    score = seq_len(nrow(baseline$samples) - 1),
+    stringsAsFactors = FALSE
+  )
+  side_bar <- data.frame(
+    gene = baseline$genes$gene[-1],
+    score = seq_len(nrow(baseline$genes) - 1),
+    stringsAsFactors = FALSE
+  )
+
+  expect_warning(
+    top <- oncoplot_data(laml_maf(), top = 3, topBarData = top_bar),
+    "missing 1 displayed samples"
+  )
+  expect_warning(
+    side <- oncoplot_data(laml_maf(), top = 3, leftBarData = side_bar),
+    "missing 1 displayed genes"
+  )
+  expect_identical(top$custom_top_bar$data$value[1], 0)
+  expect_identical(side$custom_left_bar$data$value[1], 0)
+})
+
+test_that("a numeric clinical field can supply the custom top bar", {
+  expect_warning(
+    data <- oncoplot_data(
+      laml_maf(),
+      top = 10,
+      topBarData = "days_to_last_followup"
+    ),
+    "using zero"
+  )
+
+  expect_identical(data$custom_top_bar$metric, "days_to_last_followup")
+  expect_identical(data$custom_top_bar$data$sample, data$samples$sample)
+  expect_true(is.numeric(data$custom_top_bar$data$value))
+  expect_true(all(is.finite(data$custom_top_bar$data$value)))
+})
+
+test_that("custom bar contracts and limits fail clearly", {
+  maf <- laml_maf()
+  duplicate <- data.frame(gene = c("FLT3", "FLT3"), value = c(1, 2))
+  nonnumeric <- data.frame(gene = c("FLT3", "NPM1"), value = c("a", "b"))
+  missing_key <- data.frame(gene = c("FLT3", NA), value = c(1, 2))
+  nonfinite <- data.frame(gene = c("FLT3", "NPM1"), value = c(1, Inf))
+
+  expect_error(oncoplot_data(maf, leftBarData = data.frame(x = 1)), "two-column")
+  expect_error(oncoplot_data(maf, leftBarData = duplicate), "unique and non-missing")
+  expect_error(oncoplot_data(maf, leftBarData = nonnumeric), "must be numeric")
+  expect_error(oncoplot_data(maf, leftBarData = missing_key), "unique and non-missing")
+  expect_error(oncoplot_data(maf, genes = c("FLT3", "NPM1"), leftBarData = nonfinite), "must be finite")
+  expect_error(oncoplot_data(maf, topBarData = "not_a_field"), "not present")
+  expect_error(oncoplot_data(maf, topBarData = "FAB_classification"), "must be numeric")
+  expect_error(oncoplot_data(maf, topBarLims = c(0, 1)), "requires `topBarData`")
+  expect_error(oncoplot_data(maf, rightBarLims = c(0, 1)), "requires `rightBarData`")
+  for (limits in list(c(1, 0), c(0, Inf), 1, c(0, NA_real_))) {
+    expect_error(
+      oncoplot_data(
+        maf,
+        genes = c("FLT3", "NPM1"),
+        leftBarData = data.frame(gene = c("FLT3", "NPM1"), value = c(1, 2)),
+        leftBarLims = limits
+      ),
+      "two finite increasing"
+    )
+  }
+})

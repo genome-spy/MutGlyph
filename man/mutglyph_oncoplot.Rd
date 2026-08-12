@@ -19,6 +19,12 @@ mutglyph_oncoplot(
   annotationColor = NULL,
   sortByAnnotation = FALSE,
   annotationOrder = NULL,
+  topBarData = NULL,
+  topBarLims = NULL,
+  leftBarData = NULL,
+  leftBarLims = NULL,
+  rightBarData = NULL,
+  rightBarLims = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE,
@@ -63,6 +69,14 @@ mappings or numeric GenomeSpy color-scheme names.}
 \item{sortByAnnotation}{Sort samples by the selected clinical features.}
 
 \item{annotationOrder}{Optional named list of partial categorical level orders.}
+
+\item{topBarData}{Optional two-column sample metric data or one clinical field.}
+
+\item{topBarLims}{Optional numeric limits for the custom top bar.}
+
+\item{leftBarData, rightBarData}{Optional two-column gene metric data.}
+
+\item{leftBarLims, rightBarLims}{Optional numeric limits for custom side bars.}
 
 \item{draw_titv}{Show a transition/transversion contribution track.}
 

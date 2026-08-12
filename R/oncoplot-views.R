@@ -20,6 +20,23 @@ oncoplot_title_view <- function() {
   )
 }
 
+oncoplot_grid_row <- function(has_left_bar,
+                              left = NULL,
+                              label = NULL,
+                              matrix = NULL,
+                              percentage = NULL,
+                              right = NULL) {
+  # The accepted/default plot remains a four-column grid. A custom left bar is
+  # the only option that introduces a fifth column, so every auxiliary row is
+  # padded through this helper only when that real column exists.
+  view <- function(x) if (is.null(x)) oncoplot_empty_view() else x
+  row <- list(view(label), view(matrix), view(percentage), view(right))
+  if (has_left_bar) {
+    row <- c(list(view(left)), row)
+  }
+  row
+}
+
 oncoplot_top_bar_view <- function(color_encoding, matrix_width) {
   list(
     name = "sample-mutation-burden",
@@ -58,6 +75,43 @@ oncoplot_top_bar_view <- function(color_encoding, matrix_width) {
           title = "Variant classification"
         ),
         list(field = "count", type = "quantitative", title = "Count")
+      )
+    )
+  )
+}
+
+oncoplot_custom_top_bar_view <- function(bar, matrix_width) {
+  list(
+    name = "custom-sample-summary",
+    width = matrix_width,
+    height = 90,
+    resolve = list(scale = list(y = "excluded")),
+    overhang = list(left = FALSE),
+    data = list(name = "customTopBar"),
+    transform = list(oncoplot_sample_index_lookup()),
+    mark = list(
+      type = "rect",
+      color = "#535c68",
+      strokeWidth = 0,
+      tooltip = list(handler = "default")
+    ),
+    encoding = list(
+      x = list(field = "sample_index", type = "index", axis = NULL),
+      y = list(
+        field = "value",
+        type = "quantitative",
+        scale = oncoplot_custom_bar_scale(bar$limits),
+        axis = list(
+          title = bar$metric,
+          grid = FALSE,
+          tickCount = 3,
+          offset = 3
+        )
+      ),
+      y2 = list(value = 0),
+      tooltip = list(
+        list(field = "sample", title = "Sample"),
+        list(field = "value", type = "quantitative", title = bar$metric)
       )
     )
   )
@@ -253,7 +307,58 @@ oncoplot_right_bar_view <- function(color_encoding, matrix_height) {
   )
 }
 
-oncoplot_clinical_views <- function(data, matrix_width) {
+oncoplot_custom_side_bar_view <- function(bar, matrix_height, side) {
+  left <- identical(side, "left")
+  dataset <- if (left) "customLeftBar" else "customRightBar"
+  list(
+    name = paste0("custom-gene-summary-", side),
+    width = if (left) 100 else 120,
+    height = matrix_height,
+    data = list(name = dataset),
+    resolve = list(scale = list(x = "excluded")),
+    overhang = list(top = FALSE),
+    transform = list(oncoplot_gene_index_lookup()),
+    mark = list(
+      type = "rect",
+      color = "#535c68",
+      strokeWidth = 0,
+      tooltip = list(handler = "default")
+    ),
+    encoding = list(
+      x = list(
+        field = "value",
+        type = "quantitative",
+        scale = oncoplot_custom_bar_scale(bar$limits, reverse = left),
+        axis = list(
+          title = bar$metric,
+          grid = FALSE,
+          tickCount = 3,
+          orient = "top",
+          offset = 3
+        )
+      ),
+      x2 = list(value = 0),
+      y = list(field = "gene_index", type = "index", axis = NULL),
+      tooltip = list(
+        list(field = "gene", title = "Gene"),
+        list(field = "value", type = "quantitative", title = bar$metric)
+      )
+    )
+  )
+}
+
+oncoplot_custom_bar_scale <- function(limits, reverse = FALSE) {
+  scale <- list(zero = TRUE)
+  if (!is.null(limits)) {
+    scale$domain <- limits
+  }
+  if (reverse) {
+    scale$reverse <- TRUE
+  }
+  scale
+}
+
+oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
   if (length(data$clinical) == 0L) {
     return(list())
   }
@@ -333,8 +438,9 @@ oncoplot_clinical_views <- function(data, matrix_width) {
       )
     }
 
-    list(
-      list(
+    oncoplot_grid_row(
+      has_left_bar,
+      label = list(
         name = paste0("clinical-feature-label-", index),
         width = 120,
         height = 18,
@@ -355,22 +461,21 @@ oncoplot_clinical_views <- function(data, matrix_width) {
           color = list(value = "#333333")
         )
       ),
-      annotation_view,
-      oncoplot_empty_view(),
-      oncoplot_empty_view()
+      matrix = annotation_view
     )
   }), recursive = FALSE)
 }
 
 oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
-                                        matrix_width) {
+                                        matrix_width,
+                                        has_left_bar) {
   if (!showTumorSampleBarcodes) {
     return(list())
   }
 
-  list(
-    oncoplot_empty_view(),
-    list(
+  oncoplot_grid_row(
+    has_left_bar,
+    matrix = list(
       name = "sample-labels",
       width = matrix_width,
       height = 80,
@@ -396,13 +501,11 @@ oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
         text = list(field = "sample"),
         color = list(value = "#555555")
       )
-    ),
-    oncoplot_empty_view(),
-    oncoplot_empty_view()
+    )
   )
 }
 
-oncoplot_titv_views <- function(data, matrix_width) {
+oncoplot_titv_views <- function(data, matrix_width, has_left_bar) {
   if (is.null(data$titv)) {
     return(list())
   }
@@ -474,12 +577,7 @@ oncoplot_titv_views <- function(data, matrix_width) {
     )
   )
 
-  list(
-    oncoplot_empty_view(),
-    track,
-    oncoplot_empty_view(),
-    oncoplot_empty_view()
-  )
+  oncoplot_grid_row(has_left_bar, matrix = track)
 }
 
 oncoplot_color_encoding <- function(data) {

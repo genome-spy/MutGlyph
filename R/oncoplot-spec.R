@@ -49,23 +49,29 @@ oncoplot_body <- function(data,
                           drawRowBar,
                           drawColBar,
                           showPct) {
+  has_left_bar <- !is.null(data$custom_left_bar)
   clinical_views <- oncoplot_clinical_views(
     data,
-    matrix_width = matrix_width
+    matrix_width = matrix_width,
+    has_left_bar = has_left_bar
   )
   sample_label_views <- oncoplot_sample_label_views(
     showTumorSampleBarcodes,
-    matrix_width = matrix_width
+    matrix_width = matrix_width,
+    has_left_bar = has_left_bar
   )
-  titv_views <- oncoplot_titv_views(data, matrix_width)
+  titv_views <- oncoplot_titv_views(data, matrix_width, has_left_bar)
 
   top_bar_views <- list()
   if (drawColBar) {
-    top_bar_views <- list(
-      oncoplot_empty_view(),
-      oncoplot_top_bar_view(color_encoding, matrix_width),
-      oncoplot_empty_view(),
-      oncoplot_empty_view()
+    top_bar_view <- if (is.null(data$custom_top_bar)) {
+      oncoplot_top_bar_view(color_encoding, matrix_width)
+    } else {
+      oncoplot_custom_top_bar_view(data$custom_top_bar, matrix_width)
+    }
+    top_bar_views <- oncoplot_grid_row(
+      has_left_bar,
+      matrix = top_bar_view
     )
   }
   percentages_view <- if (showPct) {
@@ -74,13 +80,30 @@ oncoplot_body <- function(data,
     oncoplot_empty_view()
   }
   right_bar_view <- if (drawRowBar) {
-    oncoplot_right_bar_view(color_encoding, matrix_height)
+    if (is.null(data$custom_right_bar)) {
+      oncoplot_right_bar_view(color_encoding, matrix_height)
+    } else {
+      oncoplot_custom_side_bar_view(
+        data$custom_right_bar,
+        matrix_height,
+        side = "right"
+      )
+    }
   } else {
     oncoplot_empty_view()
   }
+  left_bar_view <- if (has_left_bar) {
+    oncoplot_custom_side_bar_view(
+      data$custom_left_bar,
+      matrix_height,
+      side = "left"
+    )
+  } else {
+    NULL
+  }
 
   list(
-    columns = 4,
+    columns = 4L + as.integer(has_left_bar),
     spacing = 4,
     resolve = list(
       scale = list(x = "shared", y = "shared", color = "shared"),
@@ -90,31 +113,52 @@ oncoplot_body <- function(data,
       x = list(zoom = TRUE, paddingInner = 0.04, paddingOuter = 0),
       y = list(reverse = TRUE, paddingInner = 0.04, paddingOuter = 0)
     ),
-    concat = c(top_bar_views, list(
-      oncoplot_gene_labels_view(matrix_height),
-      oncoplot_matrix_view(
+    concat = c(top_bar_views, oncoplot_grid_row(
+      has_left_bar,
+      left = left_bar_view,
+      label = oncoplot_gene_labels_view(matrix_height),
+      matrix = oncoplot_matrix_view(
         color_encoding,
         matrix_width,
         matrix_height,
         sample_count = nrow(data$samples),
         gene_count = nrow(data$genes)
       ),
-      percentages_view,
-      right_bar_view
+      percentage = percentages_view,
+      right = right_bar_view
     ), clinical_views, titv_views, sample_label_views)
   )
 }
 
 oncoplot_datasets <- function(data, showTitle, titleText) {
+  top_bar_name <- if (is.null(data$custom_top_bar)) "topBars" else "customTopBar"
+  top_bar_data <- if (is.null(data$custom_top_bar)) {
+    data$top_bars
+  } else {
+    data$custom_top_bar$data
+  }
+  right_bar_name <- if (is.null(data$custom_right_bar)) {
+    "rightBars"
+  } else {
+    "customRightBar"
+  }
+  right_bar_data <- if (is.null(data$custom_right_bar)) {
+    data$right_bars
+  } else {
+    data$custom_right_bar$data
+  }
   datasets <- list(
     genes = data$genes,
     # Samples and genes are dimension tables. Sparse facts carry stable IDs,
     # and GenomeSpy lookup transforms attach their display indices.
     samples = data$samples[c("sample", "sample_index")],
-    events = data$events,
-    topBars = data$top_bars,
-    rightBars = data$right_bars
+    events = data$events
   )
+  datasets[[top_bar_name]] <- top_bar_data
+  datasets[[right_bar_name]] <- right_bar_data
+  if (!is.null(data$custom_left_bar)) {
+    datasets$customLeftBar <- data$custom_left_bar$data
+  }
 
   if (showTitle) {
     title_text <- if (is.null(titleText)) {

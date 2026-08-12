@@ -19,6 +19,12 @@ oncoplot_data(
   annotationColor = NULL,
   sortByAnnotation = FALSE,
   annotationOrder = NULL,
+  topBarData = NULL,
+  topBarLims = NULL,
+  leftBarData = NULL,
+  leftBarLims = NULL,
+  rightBarData = NULL,
+  rightBarLims = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE
@@ -53,6 +59,14 @@ numeric color schemes.}
 \item{sortByAnnotation}{Sort samples by selected clinical features.}
 
 \item{annotationOrder}{Optional named list of categorical level orders.}
+
+\item{topBarData}{Optional two-column sample metric data or clinical field.}
+
+\item{topBarLims}{Optional custom top-bar limits.}
+
+\item{leftBarData, rightBarData}{Optional two-column gene metric data.}
+
+\item{leftBarLims, rightBarLims}{Optional custom side-bar limits.}
 
 \item{draw_titv}{Derive transition/transversion contribution data.}
 

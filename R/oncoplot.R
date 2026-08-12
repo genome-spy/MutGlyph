@@ -20,6 +20,10 @@
 #'   mappings or numeric GenomeSpy color-scheme names.
 #' @param sortByAnnotation Sort samples by the selected clinical features.
 #' @param annotationOrder Optional named list of partial categorical level orders.
+#' @param topBarData Optional two-column sample metric data or one clinical field.
+#' @param topBarLims Optional numeric limits for the custom top bar.
+#' @param leftBarData,rightBarData Optional two-column gene metric data.
+#' @param leftBarLims,rightBarLims Optional numeric limits for custom side bars.
 #' @param draw_titv Show a transition/transversion contribution track.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -73,6 +77,12 @@ mutglyph_oncoplot <- function(maf,
                               annotationColor = NULL,
                               sortByAnnotation = FALSE,
                               annotationOrder = NULL,
+                              topBarData = NULL,
+                              topBarLims = NULL,
+                              leftBarData = NULL,
+                              leftBarLims = NULL,
+                              rightBarData = NULL,
+                              rightBarLims = NULL,
                               draw_titv = FALSE,
                               titv_col = NULL,
                               includeColBarCN = TRUE,
@@ -130,6 +140,12 @@ mutglyph_oncoplot <- function(maf,
     annotationColor = annotationColor,
     sortByAnnotation = sortByAnnotation,
     annotationOrder = annotationOrder,
+    topBarData = topBarData,
+    topBarLims = topBarLims,
+    leftBarData = leftBarData,
+    leftBarLims = leftBarLims,
+    rightBarData = rightBarData,
+    rightBarLims = rightBarLims,
     draw_titv = draw_titv,
     titv_col = titv_col,
     includeColBarCN = includeColBarCN

@@ -294,3 +294,97 @@ test_that("copy-number top-bar flag is scalar logical", {
     "TRUE or FALSE"
   )
 })
+
+test_that("custom summary bars replace defaults and expose their metrics", {
+  baseline <- oncoplot_data(laml_maf(), top = 3)
+  top_bar <- data.frame(
+    sample = baseline$samples$sample,
+    Purity = seq(0, 1, length.out = nrow(baseline$samples))
+  )
+  left_bar <- data.frame(
+    gene = baseline$genes$gene,
+    Mean_VAF = c(45, 35, 25)
+  )
+  right_bar <- data.frame(
+    gene = baseline$genes$gene,
+    `-log10(q)` = c(12, 8, 4),
+    check.names = FALSE
+  )
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 3,
+    topBarData = top_bar,
+    topBarLims = c(0, 1),
+    leftBarData = left_bar,
+    leftBarLims = c(0, 100),
+    rightBarData = right_bar,
+    rightBarLims = c(0, 20),
+    clinicalFeatures = "FAB_classification",
+    draw_titv = TRUE,
+    showTumorSampleBarcodes = TRUE
+  )$x$spec
+  body <- spec$vconcat[[2]]
+  names <- vapply(
+    body$concat,
+    function(view) if (is.null(view$name)) "" else view$name,
+    character(1)
+  )
+
+  expect_identical(body$columns, 5L)
+  expect_equal(length(body$concat) %% body$columns, 0)
+  expect_true(all(c(
+    "custom-sample-summary",
+    "custom-gene-summary-left",
+    "custom-gene-summary-right",
+    "clinical-annotation-1",
+    "transition-transversion",
+    "sample-labels"
+  ) %in% names))
+  expect_named(spec$datasets, c(
+    "genes", "samples", "events", "customTopBar", "customRightBar",
+    "customLeftBar", "title", "clinical1", "titv"
+  ))
+  expect_false(any(c("topBars", "rightBars") %in% names(spec$datasets)))
+
+  top_view <- body$concat[[3]]
+  left_view <- body$concat[[6]]
+  right_view <- body$concat[[10]]
+  expect_identical(top_view$encoding$y$axis$title, "Purity")
+  expect_identical(top_view$encoding$y$scale$domain, c(0, 1))
+  expect_identical(top_view$mark$tooltip$handler, "default")
+  expect_identical(left_view$encoding$x$axis$title, "Mean_VAF")
+  expect_true(left_view$encoding$x$scale$reverse)
+  expect_identical(left_view$mark$tooltip$handler, "default")
+  expect_identical(right_view$encoding$x$axis$title, "-log10(q)")
+  expect_identical(right_view$encoding$x$scale$domain, c(0, 20))
+  expect_identical(
+    vapply(top_view$encoding$tooltip, `[[`, character(1), "title"),
+    c("Sample", "Purity")
+  )
+  expect_identical(
+    vapply(right_view$encoding$tooltip, `[[`, character(1), "title"),
+    c("Gene", "-log10(q)")
+  )
+})
+
+test_that("custom bars do not alter the default grid", {
+  default <- mutglyph_oncoplot(laml_maf(), top = 10)$x$spec
+  right_only <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    rightBarData = data.frame(
+      gene = default$datasets$genes$gene,
+      score = seq_len(nrow(default$datasets$genes))
+    )
+  )$x$spec
+
+  expect_identical(default$vconcat[[2]]$columns, 4L)
+  expect_identical(right_only$vconcat[[2]]$columns, 4L)
+  expect_length(default$vconcat[[2]]$concat, 8)
+  expect_length(right_only$vconcat[[2]]$concat, 8)
+  expect_identical(default$vconcat[[2]]$concat[[8]]$name, "gene-mutation-counts")
+  expect_identical(
+    right_only$vconcat[[2]]$concat[[8]]$name,
+    "custom-gene-summary-right"
+  )
+})

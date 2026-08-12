@@ -591,7 +591,7 @@ Re-evaluation outcome:
 - matching the planned maftools workflow does not require
   `groupAnnotationBySize` or another public ordering mode.
 
-## Step 7 — Add custom top and side bars
+## Step 7 — Add custom top and side bars (completed)
 
 Add the useful core of maftools' custom-bar API:
 
@@ -649,15 +649,35 @@ Verification:
 - combined custom bars remain aligned during resizing and zooming; and
 - default output remains structurally and visually unchanged.
 
+Verification completed:
+
+- structural tests cover sample/gene reordering, missing-key zero filling,
+  clinical-field top data, mixed-sign values, validation, replacement
+  semantics, metric titles, tooltips, and explicit domains;
+- default and right-only plots retain the existing four-column grid, while a
+  supplied left bar produces a consistent five-column grid across matrix,
+  clinical, Ti/Tv, and sample-label rows;
+- default, GISTIC, combined customization, and custom-bar specifications pass
+  the pinned GenomeSpy schema; and
+- a browser render of the combined VAF/metric workflow confirms that top,
+  left, and right bars remain aligned with the matrix and its auxiliary rows.
+
 Tentative commit:
 
 ```text
 feat: add custom oncoplot summary bars
 ```
 
-Re-evaluate the stable five-column grid after browser inspection. Pause before
-adding reference-line arguments or multiple metrics per bar; both would enlarge
-the public contract beyond the demonstrated two-column use cases.
+Re-evaluation outcome:
+
+- a permanently empty fifth column would change default specifications without
+  user-visible value, so the small `oncoplot_grid_row()` helper retains four
+  columns by default and adds the fifth only for a supplied left bar;
+- one normalized two-column contract and the existing sample/gene lookup
+  transforms are sufficient for every custom bar; and
+- reference lines, multiple metrics, and separate bar-color arguments remain
+  deferred because they would enlarge the public contract beyond the
+  demonstrated use cases.
 
 ## Step 8 — Complete examples, validation, and package checks
 

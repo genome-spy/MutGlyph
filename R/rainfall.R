@@ -1,0 +1,88 @@
+#' Draw an interactive rainfall plot
+#'
+#' Creates a GenomeSpy rainfall plot from a `maftools` MAF object. The API
+#' deliberately follows [maftools::rainfallPlot()] where practical, making the
+#' function an almost drop-in interactive replacement.
+#'
+#' @param maf A maftools `MAF` object.
+#' @param tsb One tumor sample barcode. When `NULL`, the most mutated sample is
+#'   selected.
+#' @param detectChangePoints Detect and annotate potential kataegis loci using
+#'   the maftools criterion: at least six consecutive mutations with an average
+#'   intermutation distance no greater than 1,000 bp.
+#' @param ref.build Reference assembly: `"hg18"`, `"hg19"`, or `"hg38"`.
+#' @param color Optional named character vector overriding colors for the six
+#'   pyrimidine substitution classes.
+#' @param savePlot Retained for maftools API familiarity. `TRUE` is unsupported;
+#'   use the widget's **Save as SVG** button instead.
+#' @param width,height Widget dimensions. Unlike maftools, these do not describe
+#'   a PDF device.
+#' @param fontSize Relative font-size multiplier.
+#' @param pointSize Relative mutation-point size.
+#' @param elementId Optional element ID.
+#'
+#' @details
+#' Only SNP records are plotted, including synonymous variants. Substitutions
+#' are normalized to the six pyrimidine classes. Inter-event distances are
+#' calculated independently within each chromosome, so chromosome boundaries
+#' do not create artificial distances.
+#'
+#' With `detectChangePoints = TRUE`, detected kataegis intervals are shaded and
+#' marked with upward arrows. The complete locus table is retained in
+#' `plot$x$spec$datasets$kataegis` and no files are written as a side effect.
+#'
+#' @return A MutGlyph htmlwidget.
+#' @seealso [mutglyph_oncoplot()] and [as_json()].
+#'
+#' @examples
+#' if (interactive()) {
+#'   brca <- maftools::read.maf(
+#'     maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+#'     verbose = FALSE
+#'   )
+#'   mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
+#' }
+#' @export
+mutglyph_rainfall_plot <- function(maf,
+                                   tsb = NULL,
+                                   detectChangePoints = FALSE,
+                                   ref.build = "hg19",
+                                   color = NULL,
+                                   savePlot = FALSE,
+                                   width = NULL,
+                                   height = NULL,
+                                   fontSize = 1.2,
+                                   pointSize = 0.4,
+                                   elementId = NULL) {
+  mutglyph_flag(savePlot, "savePlot")
+  if (savePlot) {
+    stop(
+      "`savePlot = TRUE` is not supported; use the widget's Save as SVG button.",
+      call. = FALSE
+    )
+  }
+  rainfall_positive_number(fontSize, "fontSize")
+  rainfall_positive_number(pointSize, "pointSize")
+  data <- rainfall_data(
+    maf,
+    tsb = tsb,
+    detectChangePoints = detectChangePoints,
+    ref.build = ref.build,
+    color = color
+  )
+  mutglyph_widget(
+    rainfall_spec(data, fontSize = fontSize, pointSize = pointSize),
+    width = width,
+    height = height,
+    elementId = elementId
+  )
+}
+
+rainfall_positive_number <- function(value, name) {
+  if (
+    length(value) != 1L || !is.numeric(value) || is.na(value) ||
+      !is.finite(value) || value <= 0
+  ) {
+    stop(sprintf("`%s` must be one finite positive number.", name), call. = FALSE)
+  }
+}

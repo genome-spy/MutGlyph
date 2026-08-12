@@ -171,7 +171,5 @@ mutglyph_oncoplot <- function(maf,
 }
 
 oncoplot_flag <- function(value, name) {
-  if (length(value) != 1L || !is.logical(value) || is.na(value)) {
-    stop(sprintf("`%s` must be TRUE or FALSE.", name), call. = FALSE)
-  }
+  mutglyph_flag(value, name)
 }

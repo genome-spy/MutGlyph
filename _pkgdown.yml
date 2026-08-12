@@ -7,6 +7,7 @@ reference:
 - title: Plotting
   contents:
   - mutglyph_oncoplot
+  - mutglyph_rainfall_plot
 - title: GenomeSpy specification
   contents:
   - as_json

@@ -828,30 +828,8 @@ oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
 }
 
 oncoplot_titv_data <- function(maf, sample_order, titv_col = NULL) {
-  classes <- c("C>T", "C>G", "C>A", "T>A", "T>C", "T>G")
-  # Adapted from maftools R/titv.R (get_titvCol).
-  colors <- c(
-    `C>T` = "#F44336",
-    `C>G` = "#3F51B5",
-    `C>A` = "#2196F3",
-    `T>A` = "#4CAF50",
-    `T>C` = "#FFC107",
-    `T>G` = "#FF9800"
-  )
-  if (!is.null(titv_col)) {
-    if (
-      !is.character(titv_col) || length(titv_col) == 0L ||
-        is.null(names(titv_col)) || anyNA(names(titv_col)) ||
-        any(!nzchar(names(titv_col))) || anyDuplicated(names(titv_col)) > 0L ||
-        anyNA(titv_col) || any(!nzchar(titv_col))
-    ) {
-      stop(
-        "`titv_col` must be a named character vector with unique, non-empty names and values.",
-        call. = FALSE
-      )
-    }
-    colors[names(titv_col)] <- unname(titv_col)
-  }
+  classes <- substitution_classes()
+  colors <- substitution_colors(titv_col, argument = "titv_col")
 
   fractions <- as.data.frame(
     maftools::titv(maf, useSyn = TRUE, plot = FALSE)$fraction.contribution

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 <!-- badges: end -->
 
-MutGlyph creates interactive cancer-genomics plots from
+MutGlyph creates interactive oncoplots and rainfall plots from
 [`maftools`](https://bioconductor.org/packages/maftools/) MAF objects. It uses
 [GenomeSpy](https://genomespy.app/) for linked exploration, tooltips, and
 publication-quality SVG export.
@@ -30,6 +30,21 @@ mutglyph_oncoplot(maf = laml, top = 10)
 MutGlyph is not a complete clone of every maftools option. Its focused API
 covers the common oncoplot workflow while adding linked navigation, tooltips,
 clinical tracks, and SVG export.
+
+Rainfall plots follow the same approach. Potential kataegis loci can be
+detected and annotated interactively:
+
+```r
+brca <- maftools::read.maf(
+  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+
+mutglyph_rainfall_plot(
+  maf = brca,
+  detectChangePoints = TRUE
+)
+```
 
 ## Installation
 
@@ -72,6 +87,7 @@ shows biological details, and **Save as SVG** exports the visible composition.
 - Transition/transversion contributions
 - Row height, labels, title, percentages, and summary-track visibility
 - Custom sample- and gene-level summary bars
+- Interactive rainfall plots with optional kataegis detection
 
 See the [getting-started
 article](https://genomespy.app/MutGlyph/articles/MutGlyph.html) for

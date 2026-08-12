@@ -30,3 +30,9 @@ mutglyph_widget <- function(spec,
   attr(widget$x, "TOJSON_FUNC") <- mutglyph_to_json
   widget
 }
+
+mutglyph_flag <- function(value, name) {
+  if (length(value) != 1L || !is.logical(value) || is.na(value)) {
+    stop(sprintf("`%s` must be TRUE or FALSE.", name), call. = FALSE)
+  }
+}

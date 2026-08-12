@@ -188,6 +188,41 @@ mutglyph_oncoplot(
 Set `includeColBarCN = FALSE` to keep the copy-number layer in the matrix but
 limit the top bars to sequence mutations.
 
+## Explore mutation clustering with a rainfall plot
+
+`mutglyph_rainfall_plot()` is the interactive counterpart of
+`maftools::rainfallPlot()`. It defaults to the most mutated sample and plots
+chromosome-local inter-event distances for SNPs, including synonymous
+variants. Scroll or pinch to inspect dense genomic regions.
+
+The bundled BRCA example contains several potential kataegis loci. With
+`detectChangePoints = TRUE`, MutGlyph applies the same operational criterion as
+maftools—at least six consecutive mutations with an average intermutation
+distance no greater than 1,000 bp. Arrows point to the clusters and subtle
+shading shows their complete genomic spans.
+
+```{r rainfall}
+brca <- maftools::read.maf(
+  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+
+mutglyph_rainfall_plot(
+  brca,
+  detectChangePoints = TRUE,
+  pointSize = 0.5,
+  height = 360
+)
+```
+
+Detected loci remain available in the returned specification without writing a
+TSV file:
+
+```{r rainfall-data, eval = FALSE}
+rainfall <- mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
+rainfall$x$spec$datasets$kataegis
+```
+
 ## Use the generated specification
 
 MutGlyph returns an htmlwidget containing the exact GenomeSpy specification

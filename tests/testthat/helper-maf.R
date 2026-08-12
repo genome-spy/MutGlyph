@@ -39,3 +39,17 @@ laml_gistic_maf <- local({
     value
   }
 })
+
+brca_maf <- local({
+  value <- NULL
+
+  function() {
+    if (is.null(value)) {
+      value <<- maftools::read.maf(
+        maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+        verbose = FALSE
+      )
+    }
+    value
+  }
+})

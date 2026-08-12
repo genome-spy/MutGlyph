@@ -1,0 +1,83 @@
+test_that("rainfall plot retains the interactive composition", {
+  plot <- mutglyph_rainfall_plot(brca_maf(), detectChangePoints = TRUE)
+  spec <- plot$x$spec
+
+  expect_s3_class(plot, "mutglyph")
+  expect_identical(spec$name, "mutglyph-rainfall-plot")
+  expect_identical(spec$assembly, "hg19")
+  expect_identical(spec$title$text, "TCGA-A8-A08B")
+  expect_named(spec$datasets, c("mutations", "kataegis"))
+  expect_equal(nrow(spec$datasets$mutations), 1890)
+  expect_equal(nrow(spec$datasets$kataegis), 7)
+  expect_identical(
+    vapply(spec$layer, `[[`, character(1), "name"),
+    c("kataegis-intervals", "rainfall-mutations", "kataegis-arrows")
+  )
+  expect_true(spec$scales$x$zoom)
+})
+
+test_that("kataegis arrows start at the plot bottom and point upward", {
+  arrow <- mutglyph_rainfall_plot(
+    brca_maf(),
+    detectChangePoints = TRUE
+  )$x$spec$layer[[3]]
+
+  expect_identical(arrow$mark$type, "arrow")
+  expect_identical(arrow$encoding$y$field, "arrow_height")
+  expect_identical(arrow$encoding$y2, list(value = 0))
+  expect_identical(arrow$encoding$direction, list(value = "reverse"))
+  expect_identical(arrow$encoding$x$pos, "start_position")
+  expect_identical(arrow$encoding$x2$pos, "start_position")
+})
+
+test_that("kataegis shading encodes the complete locus", {
+  interval <- mutglyph_rainfall_plot(
+    brca_maf(),
+    detectChangePoints = TRUE
+  )$x$spec$layer[[1]]
+
+  expect_identical(interval$mark$type, "rect")
+  expect_identical(interval$encoding$x$pos, "start_position")
+  expect_identical(interval$encoding$x2$pos, "end_position")
+  expect_identical(interval$encoding$y, list(value = 1))
+  expect_identical(interval$encoding$y2, list(value = 0))
+})
+
+test_that("rainfall plot uses chromosome-local distances", {
+  mutations <- mutglyph_rainfall_plot(brca_maf())$x$spec$datasets$mutations
+  chromosome_starts <- !duplicated(mutations$chromosome)
+
+  # The unplottable first mutation of every chromosome was removed, so every
+  # retained point has an actual predecessor on the same chromosome.
+  expect_true(all(mutations$inter_event_distance >= 0))
+  expect_true(all(is.finite(mutations$log10_distance)))
+  expect_true(any(chromosome_starts))
+})
+
+test_that("rainfall JSON contains mutation and kataegis records", {
+  json <- as_json(
+    mutglyph_rainfall_plot(brca_maf(), detectChangePoints = TRUE),
+    pretty = FALSE
+  )
+  decoded <- jsonlite::fromJSON(json, simplifyVector = FALSE)
+
+  expect_length(decoded$datasets$mutations, 1890)
+  expect_length(decoded$datasets$kataegis, 7)
+})
+
+test_that("rainfall display arguments validate", {
+  maf <- brca_maf()
+
+  expect_error(mutglyph_rainfall_plot(maf, savePlot = TRUE), "Save as SVG")
+  expect_error(mutglyph_rainfall_plot(maf, savePlot = 1), "TRUE or FALSE")
+  for (value in list(0, -1, Inf, NA_real_, "1", c(1, 2))) {
+    expect_error(
+      mutglyph_rainfall_plot(maf, fontSize = value),
+      "finite positive"
+    )
+    expect_error(
+      mutglyph_rainfall_plot(maf, pointSize = value),
+      "finite positive"
+    )
+  }
+})

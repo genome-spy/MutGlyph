@@ -1,9 +1,13 @@
 source("R/as-json.R")
 source("R/widget.R")
+source("R/substitution.R")
 source("R/oncoplot-data.R")
 source("R/oncoplot-views.R")
 source("R/oncoplot-spec.R")
 source("R/oncoplot.R")
+source("R/rainfall-data.R")
+source("R/rainfall-spec.R")
+source("R/rainfall.R")
 
 spec <- list(
   `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
@@ -95,5 +99,15 @@ laml_gistic <- maftools::read.maf(
 writeLines(
   as_json(mutglyph_oncoplot(laml_gistic, top = 10)),
   file.path(output_dir, "oncoplot-gistic.json"),
+  useBytes = TRUE
+)
+
+brca <- maftools::read.maf(
+  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+writeLines(
+  as_json(mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)),
+  file.path(output_dir, "rainfall.json"),
   useBytes = TRUE
 )

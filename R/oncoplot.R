@@ -104,6 +104,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     width = matrix_width,
     height = 90,
     resolve = list(scale = list(y = "excluded")),
+    overhang = list(left = FALSE),
     data = list(name = "topBars"),
     transform = list(list(
       type = "stack",
@@ -114,15 +115,14 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     )),
     mark = list(
       type = "rect",
-      strokeWidth = 0,
-      tooltip = list(handler = "default")
+      strokeWidth = 0
     ),
     encoding = list(
       x = list(field = "sample_index", type = "index", axis = NULL),
       y = list(
         field = "count_start",
         type = "quantitative",
-        axis = list(title = "TMB", grid = FALSE, tickCount = 3)
+        axis = list(title = "TMB", grid = FALSE, tickCount = 3, offset = 3)
       ),
       y2 = list(field = "count_end"),
       color = color_encoding,
@@ -170,8 +170,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         mark = list(
           type = "rect",
           color = "#ECF0F1",
-          stroke = "white",
-          strokeWidth = 0.5
+          style = "outline"
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -183,9 +182,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         transform = list(list(type = "filter", expr = "datum.altered")),
         mark = list(
           type = "rect",
-          stroke = "white",
-          strokeWidth = 0.5,
-          tooltip = list(handler = "default")
+          style = "outline"
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -231,6 +228,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     height = matrix_height,
     data = list(name = "rightBars"),
     resolve = list(scale = list(x = "excluded")),
+    overhang = list(top = FALSE),
     transform = list(list(
       type = "stack",
       field = "count",
@@ -240,14 +238,13 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     )),
     mark = list(
       type = "rect",
-      strokeWidth = 0,
-      tooltip = list(handler = "default")
+      strokeWidth = 0
     ),
     encoding = list(
       x = list(
         field = "count_start",
         type = "quantitative",
-        axis = list(title = NULL, grid = FALSE, tickCount = 3)
+        axis = list(title = NULL, grid = FALSE, tickCount = 3, orient = "top", offset = 3)
       ),
       x2 = list(field = "count_end"),
       y = list(field = "gene_index", type = "index", axis = NULL),
@@ -299,9 +296,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         ),
         mark = list(
           type = "rect",
-          stroke = "white",
-          strokeWidth = 0.5,
-          tooltip = list(handler = "default")
+          style = "outline"
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -321,8 +316,8 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
           )
         )
       ),
-      oncoplot_empty_view(width = 40, height = clinical_height),
-      oncoplot_empty_view(width = 120, height = clinical_height)
+      oncoplot_empty_view(),
+      oncoplot_empty_view()
     )
   } else {
     clinical_labels <- NULL
@@ -331,7 +326,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
   sample_label_views <- list()
   if (showTumorSampleBarcodes) {
     sample_label_views <- list(
-      oncoplot_empty_view(width = 70, height = 80),
+      oncoplot_empty_view(),
       list(
         name = "sample-labels",
         width = matrix_width,
@@ -340,10 +335,9 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         resolve = list(scale = list(y = "excluded")),
         mark = list(
           type = "text",
-          angle = 90,
-          align = "center",
-          baseline = "top",
-          paddingX = 1,
+          angle = -90,
+          align = "right",
+          baseline = "middle",
           size = 9
         ),
         encoding = list(
@@ -354,13 +348,14 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
             axis = NULL
           ),
           x2 = list(field = "sample_index", band = 1),
-          y = list(value = 0.5),
+          y = list(value = 0),
+          y2 = list(value = 1),
           text = list(field = "sample"),
           color = list(value = "#555555")
         )
       ),
-      oncoplot_empty_view(width = 40, height = 80),
-      oncoplot_empty_view(width = 120, height = 80)
+      oncoplot_empty_view(),
+      oncoplot_empty_view()
     )
   }
 
@@ -376,10 +371,10 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       y = list(reverse = TRUE, paddingInner = 0.04, paddingOuter = 0)
     ),
     concat = c(list(
-      oncoplot_empty_view(width = 70, height = 90),
+      oncoplot_empty_view(),
       top_bar_view,
-      oncoplot_empty_view(width = 40, height = 90),
-      oncoplot_empty_view(width = 120, height = 90),
+      oncoplot_empty_view(),
+      oncoplot_empty_view(),
       gene_labels_view,
       matrix_view,
       percentages_view,
@@ -424,7 +419,13 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         direction = "horizontal"
       ),
       scale = list(zoom = FALSE),
-      mark = list(tooltip = FALSE)
+      mark = list(tooltip = FALSE),
+      style = list(
+        outline = list(
+          stroke = "white",
+          strokeWidth = 0
+        )
+      )
     )
   )
 }
@@ -440,10 +441,10 @@ oncoplot_color_encoding <- function(data) {
   )
 }
 
-oncoplot_empty_view <- function(width, height) {
+oncoplot_empty_view <- function() {
   list(
-    width = width,
-    height = height,
+    width = list(grow = 0),
+    height = list(grow = 0),
     data = list(values = list()),
     mark = "point"
   )

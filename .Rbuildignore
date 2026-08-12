@@ -1,0 +1,12 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.gitignore$
+^\.github$
+^LICENSE\.md$
+^plans$
+^tmp$
+^node_modules$
+^package\.json$
+^package-lock\.json$
+^vite\.config\.[cm]?js$
+^srcjs$

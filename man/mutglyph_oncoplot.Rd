@@ -11,6 +11,12 @@ mutglyph_oncoplot(
   clinicalFeatures = NULL,
   includeColBarCN = TRUE,
   showTumorSampleBarcodes = FALSE,
+  rowHeight = 24,
+  drawRowBar = TRUE,
+  drawColBar = TRUE,
+  showPct = TRUE,
+  showTitle = TRUE,
+  titleText = NULL,
   width = NULL,
   height = NULL,
   elementId = NULL
@@ -29,6 +35,18 @@ mutglyph_oncoplot(
 in the top sample summary bars, matching \code{maftools::oncoplot()}.}
 
 \item{showTumorSampleBarcodes}{Show rotated sample names below the matrix.}
+
+\item{rowHeight}{Height in pixels of each gene row.}
+
+\item{drawRowBar}{Show the stacked mutation-count bars to the right.}
+
+\item{drawColBar}{Show the stacked sample mutation-burden bars above.}
+
+\item{showPct}{Show altered-sample percentages beside the gene rows.}
+
+\item{showTitle}{Show the cohort summary above the plot.}
+
+\item{titleText}{Optional text that replaces the generated cohort summary.}
 
 \item{width, height}{Widget dimensions.}
 

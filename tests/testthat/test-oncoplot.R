@@ -110,6 +110,85 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   expect_identical(body$concat[[10]]$transform[[1]]$type, "lookup")
 })
 
+test_that("row height aligns every gene-oriented view", {
+  for (row_height in c(12, 24, 40)) {
+    spec <- mutglyph_oncoplot(
+      laml_maf(),
+      top = 10,
+      rowHeight = row_height
+    )$x$spec
+    body <- spec$vconcat[[2]]
+    gene_views <- body$concat[5:8]
+
+    expect_true(all(vapply(
+      gene_views,
+      function(view) identical(view$height, list(step = row_height)),
+      logical(1)
+    )))
+  }
+})
+
+test_that("basic display controls omit or collapse their views", {
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    drawRowBar = FALSE,
+    drawColBar = FALSE,
+    showPct = FALSE,
+    showTitle = FALSE
+  )$x$spec
+  body <- spec$vconcat[[1]]
+
+  expect_length(spec$vconcat, 1)
+  expect_false("title" %in% names(spec$datasets))
+  expect_length(body$concat, 4)
+  expect_identical(
+    vapply(
+      body$concat,
+      function(view) if (is.null(view$name)) "" else view$name,
+      character(1)
+    ),
+    c("gene-labels", "mutation-matrix", "", "")
+  )
+  expect_identical(body$concat[[3]]$width, list(grow = 0))
+  expect_identical(body$concat[[3]]$height, list(grow = 0))
+  expect_identical(body$concat[[4]]$width, list(grow = 0))
+  expect_identical(body$concat[[4]]$height, list(grow = 0))
+})
+
+test_that("custom title text replaces the generated summary", {
+  spec <- mutglyph_oncoplot(
+    laml_maf(),
+    top = 10,
+    titleText = "AML cohort"
+  )$x$spec
+
+  expect_identical(spec$datasets$title$label, "AML cohort")
+})
+
+test_that("basic display arguments validate scalar values", {
+  for (argument in c(
+    "drawRowBar", "drawColBar", "showPct", "showTitle"
+  )) {
+    args <- list(maf = laml_maf())
+    args[[argument]] <- 1
+    expect_error(do.call(mutglyph_oncoplot, args), "TRUE or FALSE")
+  }
+
+  for (row_height in list(0, -1, Inf, NA_real_, "24", c(12, 24))) {
+    expect_error(
+      mutglyph_oncoplot(laml_maf(), rowHeight = row_height),
+      "finite positive"
+    )
+  }
+  for (title_text in list(NA_character_, "", c("one", "two"), 1)) {
+    expect_error(
+      mutglyph_oncoplot(laml_maf(), titleText = title_text),
+      "non-empty character"
+    )
+  }
+})
+
 test_that("sample label flag is scalar logical", {
   expect_error(
     mutglyph_oncoplot(laml_maf(), showTumorSampleBarcodes = 1),

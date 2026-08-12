@@ -12,6 +12,12 @@
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars, matching `maftools::oncoplot()`.
 #' @param showTumorSampleBarcodes Show rotated sample names below the matrix.
+#' @param rowHeight Height in pixels of each gene row.
+#' @param drawRowBar Show the stacked mutation-count bars to the right.
+#' @param drawColBar Show the stacked sample mutation-burden bars above.
+#' @param showPct Show altered-sample percentages beside the gene rows.
+#' @param showTitle Show the cohort summary above the plot.
+#' @param titleText Optional text that replaces the generated cohort summary.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
@@ -46,22 +52,37 @@ mutglyph_oncoplot <- function(maf,
                               clinicalFeatures = NULL,
                               includeColBarCN = TRUE,
                               showTumorSampleBarcodes = FALSE,
+                              rowHeight = 24,
+                              drawRowBar = TRUE,
+                              drawColBar = TRUE,
+                              showPct = TRUE,
+                              showTitle = TRUE,
+                              titleText = NULL,
                               width = NULL,
                               height = NULL,
                               elementId = NULL) {
+  oncoplot_flag(includeColBarCN, "includeColBarCN")
+  oncoplot_flag(showTumorSampleBarcodes, "showTumorSampleBarcodes")
+  oncoplot_flag(drawRowBar, "drawRowBar")
+  oncoplot_flag(drawColBar, "drawColBar")
+  oncoplot_flag(showPct, "showPct")
+  oncoplot_flag(showTitle, "showTitle")
   if (
-    length(includeColBarCN) != 1L ||
-      is.na(includeColBarCN) ||
-      !is.logical(includeColBarCN)
+    length(rowHeight) != 1L ||
+      !is.numeric(rowHeight) ||
+      is.na(rowHeight) ||
+      !is.finite(rowHeight) ||
+      rowHeight <= 0
   ) {
-    stop("`includeColBarCN` must be TRUE or FALSE.", call. = FALSE)
+    stop("`rowHeight` must be one finite positive number.", call. = FALSE)
   }
-  if (
-    length(showTumorSampleBarcodes) != 1L ||
-      is.na(showTumorSampleBarcodes) ||
-      !is.logical(showTumorSampleBarcodes)
-  ) {
-    stop("`showTumorSampleBarcodes` must be TRUE or FALSE.", call. = FALSE)
+  if (!is.null(titleText) && (
+    length(titleText) != 1L ||
+      !is.character(titleText) ||
+      is.na(titleText) ||
+      !nzchar(titleText)
+  )) {
+    stop("`titleText` must be one non-empty character value.", call. = FALSE)
   }
 
   data <- oncoplot_data(
@@ -72,9 +93,24 @@ mutglyph_oncoplot <- function(maf,
     includeColBarCN = includeColBarCN
   )
   mutglyph_widget(
-    oncoplot_spec(data, showTumorSampleBarcodes = showTumorSampleBarcodes),
+    oncoplot_spec(
+      data,
+      showTumorSampleBarcodes = showTumorSampleBarcodes,
+      rowHeight = rowHeight,
+      drawRowBar = drawRowBar,
+      drawColBar = drawColBar,
+      showPct = showPct,
+      showTitle = showTitle,
+      titleText = titleText
+    ),
     width = width,
     height = height,
     elementId = elementId
   )
+}
+
+oncoplot_flag <- function(value, name) {
+  if (length(value) != 1L || !is.logical(value) || is.na(value)) {
+    stop(sprintf("`%s` must be TRUE or FALSE.", name), call. = FALSE)
+  }
 }

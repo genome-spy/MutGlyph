@@ -1,6 +1,13 @@
-oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
+oncoplot_spec <- function(data,
+                          showTumorSampleBarcodes = FALSE,
+                          rowHeight = 24,
+                          drawRowBar = TRUE,
+                          drawColBar = TRUE,
+                          showPct = TRUE,
+                          showTitle = TRUE,
+                          titleText = NULL) {
   matrix_width <- "container"
-  matrix_height <- list(step = 24)
+  matrix_height <- list(step = rowHeight)
   color_encoding <- oncoplot_color_encoding(data)
   clinical_labels <- oncoplot_clinical_labels(data)
 
@@ -10,8 +17,16 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     color_encoding = color_encoding,
     matrix_width = matrix_width,
     matrix_height = matrix_height,
-    showTumorSampleBarcodes = showTumorSampleBarcodes
+    showTumorSampleBarcodes = showTumorSampleBarcodes,
+    drawRowBar = drawRowBar,
+    drawColBar = drawColBar,
+    showPct = showPct
   )
+
+  views <- list(body)
+  if (showTitle) {
+    views <- c(list(oncoplot_title_view()), views)
+  }
 
   list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
@@ -19,10 +34,12 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
     background = "white",
     datasets = oncoplot_datasets(
       data,
-      clinical_labels = clinical_labels
+      clinical_labels = clinical_labels,
+      showTitle = showTitle,
+      titleText = titleText
     ),
     spacing = 4,
-    vconcat = list(oncoplot_title_view(), body),
+    vconcat = views,
     config = oncoplot_config()
   )
 }
@@ -32,7 +49,10 @@ oncoplot_body <- function(data,
                           color_encoding,
                           matrix_width,
                           matrix_height,
-                          showTumorSampleBarcodes) {
+                          showTumorSampleBarcodes,
+                          drawRowBar,
+                          drawColBar,
+                          showPct) {
   clinical_views <- oncoplot_clinical_views(
     data,
     clinical_labels = clinical_labels,
@@ -42,6 +62,26 @@ oncoplot_body <- function(data,
     showTumorSampleBarcodes,
     matrix_width = matrix_width
   )
+
+  top_bar_views <- list()
+  if (drawColBar) {
+    top_bar_views <- list(
+      oncoplot_empty_view(),
+      oncoplot_top_bar_view(color_encoding, matrix_width),
+      oncoplot_empty_view(),
+      oncoplot_empty_view()
+    )
+  }
+  percentages_view <- if (showPct) {
+    oncoplot_percentages_view(matrix_height)
+  } else {
+    oncoplot_empty_view()
+  }
+  right_bar_view <- if (drawRowBar) {
+    oncoplot_right_bar_view(color_encoding, matrix_height)
+  } else {
+    oncoplot_empty_view()
+  }
 
   list(
     columns = 4,
@@ -54,11 +94,7 @@ oncoplot_body <- function(data,
       x = list(zoom = TRUE, paddingInner = 0.04, paddingOuter = 0),
       y = list(reverse = TRUE, paddingInner = 0.04, paddingOuter = 0)
     ),
-    concat = c(list(
-      oncoplot_empty_view(),
-      oncoplot_top_bar_view(color_encoding, matrix_width),
-      oncoplot_empty_view(),
-      oncoplot_empty_view(),
+    concat = c(top_bar_views, list(
       oncoplot_gene_labels_view(matrix_height),
       oncoplot_matrix_view(
         color_encoding,
@@ -67,19 +103,13 @@ oncoplot_body <- function(data,
         sample_count = nrow(data$samples),
         gene_count = nrow(data$genes)
       ),
-      oncoplot_percentages_view(matrix_height),
-      oncoplot_right_bar_view(color_encoding, matrix_height)
+      percentages_view,
+      right_bar_view
     ), clinical_views, sample_label_views)
   )
 }
 
-oncoplot_datasets <- function(data, clinical_labels) {
-  title_text <- sprintf(
-    "Altered in %d (%.2f%%) of %d samples",
-    data$title$altered_samples,
-    data$title$altered_percent,
-    data$title$total_samples
-  )
+oncoplot_datasets <- function(data, clinical_labels, showTitle, titleText) {
   datasets <- list(
     genes = data$genes,
     # Samples and genes are dimension tables. Sparse facts carry stable IDs,
@@ -87,10 +117,22 @@ oncoplot_datasets <- function(data, clinical_labels) {
     samples = data$samples[c("sample", "sample_index")],
     events = data$events,
     topBars = data$top_bars,
-    rightBars = data$right_bars,
-    title = data.frame(label = title_text)
+    rightBars = data$right_bars
   )
 
+  if (showTitle) {
+    title_text <- if (is.null(titleText)) {
+      sprintf(
+        "Altered in %d (%.2f%%) of %d samples",
+        data$title$altered_samples,
+        data$title$altered_percent,
+        data$title$total_samples
+      )
+    } else {
+      titleText
+    }
+    datasets$title <- data.frame(label = title_text)
+  }
   if (nrow(data$clinical) > 0L) {
     datasets$clinical <- data$clinical
     datasets$clinicalFeatures <- clinical_labels

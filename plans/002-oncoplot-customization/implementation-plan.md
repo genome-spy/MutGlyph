@@ -241,7 +241,7 @@ Re-evaluation outcome:
   number of browser-rendered rectangles; and
 - shortening field names or introducing compressed encodings is unnecessary.
 
-## Step 1 — Add row height and basic display controls
+## Step 1 — Add row height and basic display controls (completed)
 
 Add the MutGlyph-specific `rowHeight` argument and the inexpensive maftools-like
 view controls:
@@ -287,12 +287,14 @@ Tentative commit:
 feat: add basic oncoplot display controls
 ```
 
-Re-evaluate:
+Re-evaluation outcome:
 
-- Does the zero-growth placeholder approach remain simpler than changing the
-  concat column count?
-- Is `rowHeight` sufficient, or did implementation reveal a concrete need for
-  a separate clinical-row height? Do not add one speculatively.
+- zero-growth placeholders keep the four-column grid explicit and collapse
+  cleanly when percentages or right bars are disabled;
+- omitting the complete top-bar row and title view leaves no residual spacing;
+- `rowHeight` is sufficient: browser checks at 12 and 40 pixels confirmed that
+  clinical and sample-label tracks retain their independent fixed heights; and
+- no separate clinical-row-height argument or layout abstraction is needed.
 
 ## Step 2 — Support custom mutation colors
 

@@ -1,5 +1,52 @@
 import { embed } from "@genome-spy/core/minimal";
 
+function createExportButton(api) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "Save as SVG";
+  button.setAttribute("aria-label", "Save visualization as SVG");
+
+  Object.assign(button.style, {
+    position: "absolute",
+    top: "8px",
+    right: "8px",
+    zIndex: "1",
+    padding: "4px 8px",
+    border: "1px solid #aaa",
+    borderRadius: "3px",
+    background: "rgba(255, 255, 255, 0.92)",
+    color: "#333",
+    font: "12px sans-serif",
+    cursor: "pointer",
+  });
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    button.textContent = "Saving…";
+
+    try {
+      const { blob, warnings } = await api.imageExport.svg();
+      warnings.forEach((warning) => console.warn(warning));
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "mutglyph.svg";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error("Unable to export MutGlyph as SVG.", error);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Save as SVG";
+    }
+  });
+
+  return button;
+}
+
 HTMLWidgets.widget({
   name: "mutglyph",
   type: "output",
@@ -27,6 +74,7 @@ HTMLWidgets.widget({
 
         if (currentRenderId === renderId) {
           api = nextApi;
+          el.append(createExportButton(api));
         } else {
           nextApi.finalize();
           container.remove();

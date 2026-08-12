@@ -400,6 +400,27 @@ feat: add oncoplot tooltips zoom and SVG export
 
 Pause if export requires switching GenomeSpy entry points, adding a server component, or maintaining a second rendering implementation.
 
+Implementation re-evaluation (2026-08-12):
+
+- Explicit tooltip encodings cover mutation cells, TMB segments, gene-summary
+  segments, and clinical cells. Because the root disables automatic raw-datum
+  tooltips, each interactive mark explicitly selects GenomeSpy's `default`
+  tooltip handler; a browser hover confirmed the expected sample, gene, and
+  variant-class rows.
+- Enabling zoom on the one shared sample-index scale was sufficient for both
+  zooming and panning. A browser wheel test enlarged the same sample window in
+  the TMB, matrix, clinical, and ranged-label rows while gene labels,
+  percentages, and right bars remained fixed.
+- The existing minimal GenomeSpy entry point exposes `imageExport.svg()`, so no
+  dependency or architecture change was needed. The widget binding adds one
+  lifecycle-safe button after a successful render and removes it naturally on
+  rerender with the rest of the widget children.
+- The browser downloaded `mutglyph.svg` successfully. The file is a real SVG
+  and contains the visible title, gene labels, clinical label, and zoomed sample
+  names. Export produced no GenomeSpy warnings.
+- Step 8 therefore remains documentation, attribution, packaging, and final
+  verification work; no automated screenshot suite is indicated.
+
 ## Step 8 — Complete tests, example, documentation, and package checks
 
 Finish the initial release without expanding its feature set:

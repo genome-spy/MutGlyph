@@ -89,7 +89,11 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       sort = list(field = "mutation_class_index", order = "ascending"),
       as = list("count_start", "count_end")
     )),
-    mark = list(type = "rect", strokeWidth = 0),
+    mark = list(
+      type = "rect",
+      strokeWidth = 0,
+      tooltip = list(handler = "default")
+    ),
     encoding = list(
       x = list(field = "sample_index", type = "index", axis = NULL),
       y = list(
@@ -98,7 +102,15 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         axis = list(title = "TMB", grid = FALSE, tickCount = 3)
       ),
       y2 = list(field = "count_end"),
-      color = color_encoding
+      color = color_encoding,
+      tooltip = list(
+        list(field = "sample", title = "Sample"),
+        list(
+          field = "variant_classification",
+          title = "Variant classification"
+        ),
+        list(field = "count", type = "quantitative", title = "Count")
+      )
     )
   )
 
@@ -146,11 +158,24 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       list(
         name = "altered-cells",
         transform = list(list(type = "filter", expr = "datum.altered")),
-        mark = list(type = "rect", stroke = "white", strokeWidth = 0.5),
+        mark = list(
+          type = "rect",
+          stroke = "white",
+          strokeWidth = 0.5,
+          tooltip = list(handler = "default")
+        ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
           y = list(field = "gene_index", type = "index", axis = NULL),
-          color = color_encoding
+          color = color_encoding,
+          tooltip = list(
+            list(field = "sample", title = "Sample"),
+            list(field = "gene", title = "Gene"),
+            list(
+              field = "variant_classification",
+              title = "Variant classification"
+            )
+          )
         )
       )
     )
@@ -190,7 +215,11 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       sort = list(field = "mutation_class_index", order = "ascending"),
       as = list("count_start", "count_end")
     )),
-    mark = list(type = "rect", strokeWidth = 0),
+    mark = list(
+      type = "rect",
+      strokeWidth = 0,
+      tooltip = list(handler = "default")
+    ),
     encoding = list(
       x = list(
         field = "count_start",
@@ -199,7 +228,15 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       ),
       x2 = list(field = "count_end"),
       y = list(field = "gene_index", type = "index", axis = NULL),
-      color = color_encoding
+      color = color_encoding,
+      tooltip = list(
+        list(field = "gene", title = "Gene"),
+        list(
+          field = "variant_classification",
+          title = "Variant classification"
+        ),
+        list(field = "count", type = "quantitative", title = "Count")
+      )
     )
   )
 
@@ -240,7 +277,8 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         mark = list(
           type = "rect",
           stroke = "white",
-          strokeWidth = 0.5
+          strokeWidth = 0.5,
+          tooltip = list(handler = "default")
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -252,6 +290,11 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
               domain = unname(names(data$clinical_colors)),
               range = unname(data$clinical_colors)
             )
+          ),
+          tooltip = list(
+            list(field = "sample", title = "Sample"),
+            list(field = "feature", title = "Clinical feature"),
+            list(field = "value", title = "Value")
           )
         )
       ),
@@ -306,7 +349,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
       legend = list(color = "collected")
     ),
     scales = list(
-      x = list(paddingInner = 0.04, paddingOuter = 0),
+      x = list(zoom = TRUE, paddingInner = 0.04, paddingOuter = 0),
       y = list(reverse = TRUE, paddingInner = 0.04, paddingOuter = 0)
     ),
     concat = c(list(

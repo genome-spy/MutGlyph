@@ -52,3 +52,11 @@ test_that("released packages do not include the development schema", {
 
   expect_length(schemas, 0)
 })
+
+test_that("the committed runtime bundle includes SVG export", {
+  bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
+  bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
+
+  expect_match(bundle, "Save as SVG", fixed = TRUE)
+  expect_match(bundle, "imageExport", fixed = TRUE)
+})

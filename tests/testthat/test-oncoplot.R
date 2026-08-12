@@ -11,6 +11,20 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
   expect_named(spec$datasets, c("genes", "cells", "topBars", "rightBars", "title"))
   expect_equal(nrow(spec$datasets$cells), 1930)
   body <- spec$vconcat[[2]]
+  expect_true(body$scales$x$zoom)
+  expect_identical(
+    vapply(body$concat[[2]]$encoding$tooltip, `[[`, character(1), "title"),
+    c("Sample", "Variant classification", "Count")
+  )
+  expect_identical(
+    vapply(
+      body$concat[[6]]$layer[[2]]$encoding$tooltip,
+      `[[`,
+      character(1),
+      "title"
+    ),
+    c("Sample", "Gene", "Variant classification")
+  )
   expect_identical(
     vapply(
       body$concat,
@@ -68,6 +82,10 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   sample_view <- body$concat[[14]]
   expect_identical(sample_view$encoding$x$band, 0)
   expect_identical(sample_view$encoding$x2$band, 1)
+  expect_identical(
+    vapply(body$concat[[10]]$encoding$tooltip, `[[`, character(1), "title"),
+    c("Sample", "Clinical feature", "Value")
+  )
 })
 
 test_that("sample label flag is scalar logical", {

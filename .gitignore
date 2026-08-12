@@ -2,6 +2,7 @@ tmp/
 .Rhistory
 .RData
 .Rproj.user/
+.playwright-cli/
 *.Rcheck/
 *.tar.gz
 node_modules/

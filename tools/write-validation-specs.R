@@ -42,6 +42,9 @@ writeLines(
   file.path(output_dir, "oncoplot.json"),
   useBytes = TRUE
 )
+reference <- oncoplot_data(laml, top = 10)
+option_genes <- reference$genes$gene
+option_samples <- reference$samples$sample
 writeLines(
   as_json(mutglyph_oncoplot(
     laml,
@@ -53,6 +56,23 @@ writeLines(
     annotationOrder = list(FAB_classification = c("M5", "M4")),
     draw_titv = TRUE,
     titv_col = c(`C>T` = "#D81B60"),
+    topBarData = data.frame(
+      sample = option_samples,
+      Purity = seq(0.2, 0.9, length.out = length(option_samples))
+    ),
+    topBarLims = c(0, 1),
+    leftBarData = data.frame(
+      gene = option_genes,
+      Mean_VAF = seq(20, 80, length.out = length(option_genes))
+    ),
+    leftBarLims = c(0, 100),
+    rightBarData = data.frame(
+      gene = option_genes,
+      `-log10(q)` = seq(2, 20, length.out = length(option_genes)),
+      check.names = FALSE
+    ),
+    rightBarLims = c(0, 20),
+    rowHeight = 18,
     showTumorSampleBarcodes = TRUE
   )),
   file.path(output_dir, "oncoplot-options.json"),

@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.playwright-cli$
 ^\.gitignore$
 ^\.github$
 ^LICENSE\.md$

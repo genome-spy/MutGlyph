@@ -125,6 +125,7 @@ test_that("mixed clinical tracks use independent typed scales", {
   expect_identical(categorical$resolve$scale$color, "excluded")
   expect_identical(numeric$layer[[2]]$encoding$color$type, "quantitative")
   expect_identical(numeric$layer[[2]]$encoding$color$scale$scheme, "blues")
+  expect_identical(numeric$layer[[2]]$encoding$color$legend$tickCount, 3)
   expect_identical(numeric$resolve$scale$color, "excluded")
   expect_named(spec$datasets, c(
     "genes", "samples", "events", "topBars", "rightBars", "title",

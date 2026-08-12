@@ -31,21 +31,121 @@ plot
 Wheel or trackpad gestures zoom and pan the shared sample axis. Hovering shows
 biological details, and **Save as SVG** exports the visible composition.
 
-Categorical clinical annotations and sample names are optional:
+## Common customizations
+
+Use `rowHeight` to control matrix density. The inexpensive display switches
+hide individual parts without changing the underlying cohort summaries:
 
 ```r
 mutglyph_oncoplot(
   laml,
   top = 10,
-  clinicalFeatures = "FAB_classification",
+  rowHeight = 18,
+  drawRowBar = FALSE,
+  showPct = FALSE,
+  titleText = "TCGA acute myeloid leukemia"
+)
+```
+
+Mutation colors are partial named overrides; unspecified classes keep the
+default palette:
+
+```r
+mutglyph_oncoplot(
+  laml,
+  top = 10,
+  colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60")
+)
+```
+
+Gene thresholds, ignored genes, explicit gene order, and sample filtering use
+maftools-like arguments:
+
+```r
+mutglyph_oncoplot(
+  laml,
+  minMut = 0.05,
+  genesToIgnore = "TTN",
+  removeNonMutated = TRUE
+)
+
+mutglyph_oncoplot(
+  laml,
+  genes = c("NPM1", "FLT3", "DNMT3A"),
+  keepGeneOrder = TRUE,
+  sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965")
+)
+```
+
+Categorical and numeric clinical annotations have independent color scales.
+Samples can be sorted by the selected annotations, with optional categorical
+level priorities:
+
+```r
+mutglyph_oncoplot(
+  laml,
+  top = 10,
+  clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+  annotationColor = list(
+    FAB_classification = c(M4 = "#1B9E77", M5 = "#D95F02"),
+    days_to_last_followup = "Blues"
+  ),
+  sortByAnnotation = TRUE,
+  annotationOrder = list(FAB_classification = c("M5", "M4")),
   showTumorSampleBarcodes = TRUE
 )
 ```
 
 Sample names use ranged text: they appear when the sample bands are wide enough
-and otherwise stay hidden instead of overlapping. Zoom in to inspect them.
-Numeric clinical annotations, annotation-based sorting, and custom palettes are
-outside the initial release.
+and otherwise stay hidden instead of overlapping. Zoom in to inspect them. Add
+the transition/transversion contribution track with:
+
+```r
+mutglyph_oncoplot(
+  laml,
+  top = 10,
+  draw_titv = TRUE,
+  titv_col = c(`C>T` = "#D81B60")
+)
+```
+
+Custom summary bars use a deliberately small two-column contract. The first
+column contains a sample barcode for `topBarData` or a gene symbol for side
+bars; the numeric second column supplies both values and the axis title. A
+numeric clinical field name is also accepted as `topBarData`.
+
+```r
+genes <- as.character(maftools::getGeneSummary(laml)$Hugo_Symbol[1:10])
+variants <- maftools::subsetMaf(
+  laml,
+  genes = genes,
+  fields = c("Hugo_Symbol", "i_TumorVAF_WU"),
+  mafObj = FALSE,
+  includeSyn = FALSE
+)
+mean_vaf <- aggregate(i_TumorVAF_WU ~ Hugo_Symbol, variants, mean)
+names(mean_vaf) <- c("gene", "Mean VAF (%)")
+
+# Replace this illustrative metric with results from your significance tool.
+mutsig <- data.frame(gene = genes, `-log10(q)` = seq(2, 20, length.out = 10))
+
+mutglyph_oncoplot(
+  laml,
+  genes = genes,
+  keepGeneOrder = TRUE,
+  topBarData = "days_to_last_followup",
+  leftBarData = mean_vaf,
+  leftBarLims = c(0, 100),
+  rightBarData = mutsig,
+  rightBarLims = c(0, 20)
+)
+```
+
+Custom top and right data replace their default stacked summaries; a custom
+left bar adds a gene-aligned column before the gene labels. Missing displayed
+keys are shown as zero with a warning.
+
+## Copy-number data
 
 MAF objects read with GISTIC results are supported directly. As in maftools,
 gene-level `Amp` and `Del` calls are included in the top sample bars by default:

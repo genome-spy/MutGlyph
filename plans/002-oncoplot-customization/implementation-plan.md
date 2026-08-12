@@ -679,7 +679,7 @@ Re-evaluation outcome:
   deferred because they would enlarge the public contract beyond the
   demonstrated use cases.
 
-## Step 8 — Complete examples, validation, and package checks
+## Step 8 — Complete examples, validation, and package checks (completed)
 
 Update user-facing documentation with compact examples for:
 
@@ -716,6 +716,35 @@ docs: document oncoplot customization options
 This may be combined with a small test-only commit only if implementation leaves
 a coherent independently useful test increment.
 
+Verification completed:
+
+- the README now has compact examples for display controls, mutation colors,
+  selection and filtering, Ti/Tv, mixed clinical tracks, annotation sorting,
+  thresholds and ignored genes, and the custom VAF/significance-bar workflow;
+- one combined development fixture exercises colors, mixed clinical tracks,
+  annotation sorting, Ti/Tv, custom bars, row height, and sample labels, and all
+  generated fixtures pass the pinned GenomeSpy schema;
+- the complete deterministic R suite passes;
+- browser inspection covers the accepted default, a dense customized plot,
+  mixed annotations with Ti/Tv, custom top/left/right bars, narrow and wide
+  collected legends, shared-axis zoom, ranged sample labels, and SVG export;
+- numeric clinical legends use three ticks so their short gradients remain
+  readable at narrow widget widths;
+- a rebuilt source package completes `R CMD check` with `Status: OK`; and
+- that tarball installs into an empty library and runs a representative
+  combined workflow without Node.js or the development schema.
+
+Re-evaluation outcome:
+
+- no vignette or screenshot-regression framework is needed for this milestone;
+  the README, generated Rd reference, structural tests, schema fixture, and
+  focused browser checks cover the public surface with less maintenance;
+- Playwright output is now excluded from both Git and R package builds after a
+  first check correctly exposed it as a development artifact; and
+- a hover check exposed disabled custom-bar tooltips, so those marks now opt in
+  to GenomeSpy's default tooltip handler while the accepted default
+  specification stays byte-for-byte unchanged.
+
 ## Final re-evaluation
 
 Before declaring the milestone complete, answer:
@@ -734,6 +763,31 @@ Before declaring the milestone complete, answer:
 - Is `as_json()` still the exact rendered specification?
 - Does the released source package remain independent of Node.js and the
   development schema?
+
+Final answers:
+
+- Yes. The current default JSON is byte-for-byte identical to the output from
+  the commit immediately before custom bars, and browser inspection still
+  matches the accepted maftools-equivalent composition.
+- Yes. `rowHeight` is used only by gene-aligned views; the title, top bar,
+  clinical rows, Ti/Tv row, labels, and legends retain independent dimensions.
+- Yes. Ti/Tv values come from exported `maftools::titv()` results and are only
+  normalized to the final sample order.
+- Yes. Mutation, Ti/Tv, categorical, and numeric tracks exclude their color
+  scales from one another while legends are collected at the root.
+- Yes. The samples dimension table contains the one final sample order, and
+  every sample-aligned sparse dataset reaches it through the same lookup.
+- Yes. Title and percentage denominators remain based on the full cohort,
+  matching maftools under sample filtering.
+- No inactive public arguments or unused datasets/views remain. The one new
+  grid helper has multiple concrete call sites and avoids duplicated padding.
+- No pathway grouping, event highlighting, reference lines, general styling
+  object, or multi-metric subplot API entered the milestone.
+- Yes. Custom bars retain exactly one keyed numeric metric and optional limits.
+- Yes. `as_json()` remains the exact specification stored in the widget.
+- Yes. The installed source package contains neither Node.js dependencies nor
+  the bundled development schema, and its runtime workflow was verified from
+  an isolated library.
 
 ## Tentative commit sequence
 

@@ -43,9 +43,11 @@
 #' mutation cells and summary bars for details, or use the widget's **Save as
 #' SVG** button to export the currently visible composition.
 #'
-#' Clinical annotations are categorical in the initial release. Sample labels
-#' use ranged text and appear only when their bands are wide enough; zooming in
-#' reveals labels that are hidden in a dense overview.
+#' Categorical and numeric clinical annotations use independent color scales.
+#' Sample labels use ranged text and appear only when their bands are wide
+#' enough; zooming in reveals labels hidden in a dense overview. Custom summary
+#' bars accept one numeric metric keyed by sample or gene, and use the metric's
+#' column name as the axis title.
 #'
 #' @return A MutGlyph htmlwidget.
 #' @seealso [as_json()] to retrieve the rendered GenomeSpy specification.

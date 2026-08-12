@@ -370,7 +370,7 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
         field = "value",
         type = "quantitative",
         scale = list(scheme = track$scheme),
-        legend = list(title = track$feature)
+        legend = list(title = track$feature, tickCount = 3)
       )
     } else {
       list(

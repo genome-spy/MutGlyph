@@ -9,6 +9,8 @@
 #' @param top Number of genes to display when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display instead of selecting top genes.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
+#' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
+#'   in the top sample summary bars, matching `maftools::oncoplot()`.
 #' @param showTumorSampleBarcodes Show rotated sample names below the matrix.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
@@ -42,10 +44,18 @@ mutglyph_oncoplot <- function(maf,
                               top = 20,
                               genes = NULL,
                               clinicalFeatures = NULL,
+                              includeColBarCN = TRUE,
                               showTumorSampleBarcodes = FALSE,
                               width = NULL,
                               height = NULL,
                               elementId = NULL) {
+  if (
+    length(includeColBarCN) != 1L ||
+      is.na(includeColBarCN) ||
+      !is.logical(includeColBarCN)
+  ) {
+    stop("`includeColBarCN` must be TRUE or FALSE.", call. = FALSE)
+  }
   if (
     length(showTumorSampleBarcodes) != 1L ||
       is.na(showTumorSampleBarcodes) ||
@@ -58,7 +68,8 @@ mutglyph_oncoplot <- function(maf,
     maf,
     top = top,
     genes = genes,
-    clinicalFeatures = clinicalFeatures
+    clinicalFeatures = clinicalFeatures,
+    includeColBarCN = includeColBarCN
   )
   mutglyph_widget(
     oncoplot_spec(data, showTumorSampleBarcodes = showTumorSampleBarcodes),
@@ -178,15 +189,42 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
         )
       ),
       list(
-        name = "altered-cells",
-        transform = list(list(type = "filter", expr = "datum.altered")),
+        name = "mutation-events",
+        data = list(name = "events"),
+        transform = list(list(type = "filter", expr = "!datum.copy_number")),
         mark = list(
           type = "rect",
-          style = "outline"
+          style = "outline",
+          tooltip = list(handler = "default")
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
           y = list(field = "gene_index", type = "index", axis = NULL),
+          color = color_encoding,
+          tooltip = list(
+            list(field = "sample", title = "Sample"),
+            list(field = "gene", title = "Gene"),
+            list(
+              field = "variant_classification",
+              title = "Variant classification"
+            )
+          )
+        )
+      ),
+      list(
+        name = "copy-number-events",
+        data = list(name = "events"),
+        transform = list(list(type = "filter", expr = "datum.copy_number")),
+        mark = list(
+          type = "rect",
+          style = "outline",
+          tooltip = list(handler = "default")
+        ),
+        encoding = list(
+          x = list(field = "sample_index", type = "index", axis = NULL),
+          y = list(
+            field = "gene_index", type = "index", band = 0.5, axis = NULL
+          ),
           color = color_encoding,
           tooltip = list(
             list(field = "sample", title = "Sample"),
@@ -385,6 +423,7 @@ oncoplot_spec <- function(data, showTumorSampleBarcodes = FALSE) {
   datasets <- list(
     genes = data$genes,
     cells = data$cells,
+    events = data$events,
     topBars = data$top_bars,
     rightBars = data$right_bars,
     title = data.frame(label = title_text)

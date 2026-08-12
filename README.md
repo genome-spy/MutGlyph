@@ -47,6 +47,16 @@ and otherwise stay hidden instead of overlapping. Zoom in to inspect them.
 Numeric clinical annotations, annotation-based sorting, and custom palettes are
 outside the initial release.
 
+MAF objects read with GISTIC results are supported directly. As in maftools,
+gene-level `Amp` and `Del` calls are included in the top sample bars by default:
+
+```r
+mutglyph_oncoplot(laml_gistic, top = 10)
+```
+
+Use `includeColBarCN = FALSE` when the top bars should contain sequence
+mutations only.
+
 ## GenomeSpy specification
 
 The returned object is an ordinary htmlwidget whose payload contains the exact

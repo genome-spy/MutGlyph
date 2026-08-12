@@ -4,13 +4,16 @@
 #' @param top Number of genes to select when `genes` is `NULL`.
 #' @param genes Optional gene symbols to display.
 #' @param clinicalFeatures Optional categorical clinical fields.
+#' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
+#'   in the top sample summary bars.
 #'
 #' @return A named list of data frames, vectors, and title statistics.
 #' @keywords internal
 oncoplot_data <- function(maf,
                           top = 20,
                           genes = NULL,
-                          clinicalFeatures = NULL) {
+                          clinicalFeatures = NULL,
+                          includeColBarCN = TRUE) {
   if (!inherits(maf, "MAF")) {
     stop("`maf` must be a maftools MAF object.", call. = FALSE)
   }
@@ -45,9 +48,15 @@ oncoplot_data <- function(maf,
     clinicalFeatures = clinicalFeatures
   )
   cells <- oncoplot_cell_data(oncomatrix)
+  events <- oncoplot_event_data(cells, matrix_data$cnv_classes)
   mutation_classes <- matrix_data$mutation_classes
-  top_bars <- oncoplot_top_bars(maf, samples_data$sample, mutation_classes)
-  right_bars <- oncoplot_right_bars(cells, genes_data$gene, mutation_classes)
+  top_bars <- oncoplot_top_bars(
+    maf,
+    samples_data$sample,
+    mutation_classes,
+    include_col_bar_cnv = includeColBarCN
+  )
+  right_bars <- oncoplot_right_bars(events, genes_data$gene, mutation_classes)
   altered_samples <- sum(colSums(oncomatrix != "") > 0)
 
   list(
@@ -56,6 +65,7 @@ oncoplot_data <- function(maf,
     clinical = clinical$data,
     clinical_colors = clinical$colors,
     cells = cells,
+    events = events,
     top_bars = top_bars,
     right_bars = right_bars,
     title = list(
@@ -209,7 +219,8 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
     )
     return(list(
       oncomatrix = oncomatrix,
-      mutation_classes = "Multi_Hit"
+      mutation_classes = "Multi_Hit",
+      cnv_classes = c("Amp", "Del")
     ))
   }
 
@@ -281,16 +292,10 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
     oncomatrix <- cbind(oncomatrix, empty)
   }
 
-  mutation_classes <- unique(c(event_classes, "Multi_Hit"))
-  complex_cells <- oncomatrix != "" & !oncomatrix %in% mutation_classes
-  if (any(complex_cells)) {
-    oncomatrix[complex_cells] <- "Complex_Event"
-    mutation_classes <- unique(c(mutation_classes, "Complex_Event"))
-  }
-
   list(
     oncomatrix = oncomatrix,
-    mutation_classes = mutation_classes
+    mutation_classes = unique(c(event_classes, "Multi_Hit")),
+    cnv_classes = cnv_classes
   )
 }
 
@@ -311,6 +316,35 @@ oncoplot_cell_data <- function(oncomatrix) {
   cells
 }
 
+oncoplot_event_data <- function(cells, cnv_classes) {
+  altered <- cells[cells$altered, , drop = FALSE]
+  if (nrow(altered) == 0L) {
+    return(data.frame(
+      sample = character(),
+      gene = character(),
+      sample_index = integer(),
+      gene_index = integer(),
+      variant_classification = character(),
+      copy_number = logical(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  classes <- strsplit(
+    altered$variant_classification,
+    split = ";",
+    fixed = TRUE
+  )
+  row_indices <- rep(seq_len(nrow(altered)), lengths(classes))
+  events <- altered[row_indices, c(
+    "sample", "gene", "sample_index", "gene_index"
+  )]
+  events$variant_classification <- unlist(classes, use.names = FALSE)
+  events$copy_number <- events$variant_classification %in% cnv_classes
+  rownames(events) <- NULL
+  events
+}
+
 oncoplot_sample_data <- function(maf, sample_order) {
   sample_summary <- as.data.frame(maftools::getSampleSummary(maf))
   row_order <- match(sample_order, as.character(sample_summary[["Tumor_Sample_Barcode"]]))
@@ -324,12 +358,16 @@ oncoplot_sample_data <- function(maf, sample_order) {
   )
 }
 
-oncoplot_top_bars <- function(maf, sample_order, mutation_classes) {
+oncoplot_top_bars <- function(maf,
+                              sample_order,
+                              mutation_classes,
+                              include_col_bar_cnv = TRUE) {
   sample_summary <- as.data.frame(maftools::getSampleSummary(maf))
-  summary_classes <- setdiff(
-    names(sample_summary),
-    c("Tumor_Sample_Barcode", "total", "CNV_total", "Amp", "Del")
-  )
+  excluded_columns <- c("Tumor_Sample_Barcode", "total", "CNV_total")
+  if (!include_col_bar_cnv) {
+    excluded_columns <- c(excluded_columns, "Amp", "Del")
+  }
+  summary_classes <- setdiff(names(sample_summary), excluded_columns)
   classes <- mutation_classes[mutation_classes %in% summary_classes]
   row_order <- match(sample_order, as.character(sample_summary[["Tumor_Sample_Barcode"]]))
 
@@ -360,12 +398,12 @@ oncoplot_top_bars <- function(maf, sample_order, mutation_classes) {
   do.call(rbind, rows)
 }
 
-oncoplot_right_bars <- function(cells, gene_order, mutation_classes) {
+oncoplot_right_bars <- function(events, gene_order, mutation_classes) {
   rows <- lapply(mutation_classes, function(classification) {
     counts <- vapply(gene_order, function(gene) {
       sum(
-        cells$gene == gene &
-          cells$variant_classification == classification
+        events$gene == gene &
+          events$variant_classification == classification
       )
     }, integer(1))
     data.frame(

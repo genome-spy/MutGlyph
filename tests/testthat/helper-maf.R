@@ -16,3 +16,26 @@ laml_maf <- local({
     value
   }
 })
+
+laml_gistic_maf <- local({
+  value <- NULL
+
+  function() {
+    if (is.null(value)) {
+      extdata <- function(filename) {
+        system.file("extdata", filename, package = "maftools")
+      }
+      value <<- maftools::read.maf(
+        maf = extdata("tcga_laml.maf.gz"),
+        gisticAllLesionsFile = extdata("all_lesions.conf_99.txt"),
+        gisticAmpGenesFile = extdata("amp_genes.conf_99.txt"),
+        gisticDelGenesFile = extdata("del_genes.conf_99.txt"),
+        gisticScoresFile = extdata("scores.gistic"),
+        isTCGA = TRUE,
+        clinicalData = extdata("tcga_laml_annot.tsv"),
+        verbose = FALSE
+      )
+    }
+    value
+  }
+})

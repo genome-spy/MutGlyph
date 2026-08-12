@@ -9,6 +9,7 @@ mutglyph_oncoplot(
   top = 20,
   genes = NULL,
   clinicalFeatures = NULL,
+  includeColBarCN = TRUE,
   showTumorSampleBarcodes = FALSE,
   width = NULL,
   height = NULL,
@@ -23,6 +24,9 @@ mutglyph_oncoplot(
 \item{genes}{Optional gene symbols to display instead of selecting top genes.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields to display.}
+
+\item{includeColBarCN}{Include \code{Amp} and \code{Del} gene-level copy-number calls
+in the top sample summary bars, matching \code{maftools::oncoplot()}.}
 
 \item{showTumorSampleBarcodes}{Show rotated sample names below the matrix.}
 

@@ -50,3 +50,22 @@ writeLines(
   file.path(output_dir, "oncoplot-options.json"),
   useBytes = TRUE
 )
+
+extdata <- function(filename) {
+  system.file("extdata", filename, package = "maftools")
+}
+laml_gistic <- maftools::read.maf(
+  maf = extdata("tcga_laml.maf.gz"),
+  gisticAllLesionsFile = extdata("all_lesions.conf_99.txt"),
+  gisticAmpGenesFile = extdata("amp_genes.conf_99.txt"),
+  gisticDelGenesFile = extdata("del_genes.conf_99.txt"),
+  gisticScoresFile = extdata("scores.gistic"),
+  isTCGA = TRUE,
+  clinicalData = extdata("tcga_laml_annot.tsv"),
+  verbose = FALSE
+)
+writeLines(
+  as_json(mutglyph_oncoplot(laml_gistic, top = 10)),
+  file.path(output_dir, "oncoplot-gistic.json"),
+  useBytes = TRUE
+)

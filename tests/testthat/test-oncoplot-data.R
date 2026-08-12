@@ -78,6 +78,52 @@ test_that("normalized cells and bars retain mutation-class counts", {
   )
 })
 
+test_that("compound copy-number and mutation cells become layered events", {
+  cells <- data.frame(
+    sample = c("sample-1", "sample-2", "sample-3"),
+    gene = rep("TP53", 3),
+    sample_index = 1:3,
+    gene_index = rep(1L, 3),
+    variant_classification = c("Amp;Missense_Mutation", "Del", ""),
+    altered = c(TRUE, TRUE, FALSE),
+    stringsAsFactors = FALSE
+  )
+
+  events <- oncoplot_event_data(cells, cnv_classes = c("Amp", "Del"))
+
+  expect_identical(
+    events$variant_classification,
+    c("Amp", "Missense_Mutation", "Del")
+  )
+  expect_identical(events$copy_number, c(TRUE, FALSE, TRUE))
+  expect_identical(events$sample, c("sample-1", "sample-1", "sample-2"))
+})
+
+test_that("GISTIC copy-number calls match maftools top-bar behavior", {
+  with_cnv <- oncoplot_data(laml_gistic_maf(), top = 10)
+  without_cnv <- oncoplot_data(
+    laml_gistic_maf(),
+    top = 10,
+    includeColBarCN = FALSE
+  )
+
+  totals <- tapply(with_cnv$top_bars$count, with_cnv$top_bars$sample, sum)
+  expect_identical(unname(totals[["TCGA-AB-2941"]]), 1894)
+  expect_identical(
+    sum(with_cnv$top_bars$count[
+      with_cnv$top_bars$variant_classification == "Del"
+    ]),
+    26380
+  )
+  expect_false(any(
+    without_cnv$top_bars$variant_classification %in% c("Amp", "Del")
+  ))
+  expect_identical(
+    max(tapply(without_cnv$top_bars$count, without_cnv$top_bars$sample, sum)),
+    34
+  )
+})
+
 test_that("oncoplot data validates its small input surface", {
   maf <- laml_maf()
 

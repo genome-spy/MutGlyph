@@ -8,7 +8,10 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
     spec$datasets$title$label,
     "Altered in 141 \\(73.06%\\) of 193 samples"
   )
-  expect_named(spec$datasets, c("genes", "cells", "topBars", "rightBars", "title"))
+  expect_named(
+    spec$datasets,
+    c("genes", "cells", "events", "topBars", "rightBars", "title")
+  )
   expect_equal(nrow(spec$datasets$cells), 1930)
   body <- spec$vconcat[[2]]
   expect_true(body$scales$x$zoom)
@@ -25,6 +28,13 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
     ),
     c("Sample", "Gene", "Variant classification")
   )
+  matrix_layers <- body$concat[[6]]$layer
+  expect_identical(matrix_layers[[2]]$name, "mutation-events")
+  expect_null(matrix_layers[[2]]$encoding$y$band)
+  expect_null(matrix_layers[[2]]$encoding$y2)
+  expect_identical(matrix_layers[[3]]$name, "copy-number-events")
+  expect_identical(matrix_layers[[3]]$encoding$y$band, 0.5)
+  expect_null(matrix_layers[[3]]$encoding$y2)
   expect_identical(
     vapply(
       body$concat,
@@ -91,6 +101,13 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
 test_that("sample label flag is scalar logical", {
   expect_error(
     mutglyph_oncoplot(laml_maf(), showTumorSampleBarcodes = 1),
+    "TRUE or FALSE"
+  )
+})
+
+test_that("copy-number top-bar flag is scalar logical", {
+  expect_error(
+    mutglyph_oncoplot(laml_maf(), includeColBarCN = 1),
     "TRUE or FALSE"
   )
 })

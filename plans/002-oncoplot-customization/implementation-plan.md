@@ -338,7 +338,7 @@ Re-evaluation outcome:
 - the existing shared color encoding applies the merged palette consistently
   to mutation, CNV, top-bar, and right-bar marks and their collected legend.
 
-## Step 3 — Add gene selection, explicit ordering, and sample filtering
+## Step 3 — Add gene selection, explicit ordering, and sample filtering (completed)
 
 Add:
 
@@ -401,9 +401,16 @@ Tentative commit:
 feat: add oncoplot selection ordering and filtering
 ```
 
-Re-evaluate ordering precedence before Step 6. Explicit `sampleOrder` should
-remain stronger than annotation sorting unless implementation evidence makes
-that behavior untenable.
+Re-evaluation outcome:
+
+- count-, fraction-, and altered-sample selections match maftools for the LAML
+  and GISTIC reference inputs;
+- cohort statistics are calculated before display filtering, preserving the
+  documented maftools denominator semantics;
+- all sample-aligned facts derive from the filtered sample dimension table;
+  and
+- explicit `sampleOrder` remains the final ordering operation and should take
+  precedence over annotation sorting in Step 6.
 
 ## Step 4 — Add the transition/transversion track
 

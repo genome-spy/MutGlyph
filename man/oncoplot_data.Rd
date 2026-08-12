@@ -7,8 +7,14 @@
 oncoplot_data(
   maf,
   top = 20,
+  minMut = NULL,
+  altered = FALSE,
   genes = NULL,
+  genesToIgnore = NULL,
   colors = NULL,
+  keepGeneOrder = FALSE,
+  sampleOrder = NULL,
+  removeNonMutated = FALSE,
   clinicalFeatures = NULL,
   includeColBarCN = TRUE
 )
@@ -18,9 +24,21 @@ oncoplot_data(
 
 \item{top}{Number of genes to select when \code{genes} is \code{NULL}.}
 
+\item{minMut}{Optional minimum mutated/altered sample count or cohort fraction.}
+
+\item{altered}{Use altered rather than mutated sample counts for \code{minMut}.}
+
 \item{genes}{Optional gene symbols to display.}
 
+\item{genesToIgnore}{Optional gene symbols removed after selection.}
+
 \item{colors}{Optional named character vector of mutation-class colors.}
+
+\item{keepGeneOrder}{Preserve the selected gene order.}
+
+\item{sampleOrder}{Optional sample barcodes to select and order.}
+
+\item{removeNonMutated}{Remove samples without displayed events.}
 
 \item{clinicalFeatures}{Optional categorical clinical fields.}
 

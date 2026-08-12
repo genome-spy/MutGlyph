@@ -7,8 +7,14 @@
 #'
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to display when `genes` is `NULL`.
+#' @param minMut Optional minimum mutated/altered sample count or cohort fraction.
+#' @param altered Use altered rather than mutated sample counts for `minMut`.
 #' @param genes Optional gene symbols to display instead of selecting top genes.
+#' @param genesToIgnore Optional gene symbols removed after selection.
 #' @param colors Optional named character vector of mutation-class colors.
+#' @param keepGeneOrder Preserve the supplied/selected gene order.
+#' @param sampleOrder Optional sample barcodes to select and order.
+#' @param removeNonMutated Remove samples without events in the displayed genes.
 #' @param clinicalFeatures Optional categorical clinical fields to display.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars, matching `maftools::oncoplot()`.
@@ -49,8 +55,14 @@
 #' @export
 mutglyph_oncoplot <- function(maf,
                               top = 20,
+                              minMut = NULL,
+                              altered = FALSE,
                               genes = NULL,
+                              genesToIgnore = NULL,
                               colors = NULL,
+                              keepGeneOrder = FALSE,
+                              sampleOrder = NULL,
+                              removeNonMutated = FALSE,
                               clinicalFeatures = NULL,
                               includeColBarCN = TRUE,
                               showTumorSampleBarcodes = FALSE,
@@ -65,6 +77,9 @@ mutglyph_oncoplot <- function(maf,
                               elementId = NULL) {
   oncoplot_flag(includeColBarCN, "includeColBarCN")
   oncoplot_flag(showTumorSampleBarcodes, "showTumorSampleBarcodes")
+  oncoplot_flag(altered, "altered")
+  oncoplot_flag(keepGeneOrder, "keepGeneOrder")
+  oncoplot_flag(removeNonMutated, "removeNonMutated")
   oncoplot_flag(drawRowBar, "drawRowBar")
   oncoplot_flag(drawColBar, "drawColBar")
   oncoplot_flag(showPct, "showPct")
@@ -90,8 +105,14 @@ mutglyph_oncoplot <- function(maf,
   data <- oncoplot_data(
     maf,
     top = top,
+    minMut = minMut,
+    altered = altered,
     genes = genes,
+    genesToIgnore = genesToIgnore,
     colors = colors,
+    keepGeneOrder = keepGeneOrder,
+    sampleOrder = sampleOrder,
+    removeNonMutated = removeNonMutated,
     clinicalFeatures = clinicalFeatures,
     includeColBarCN = includeColBarCN
   )

@@ -182,6 +182,75 @@ test_that("oncoplot data validates its small input surface", {
   expect_error(oncoplot_data(maf, genes = "FLT3"), "at least two")
 })
 
+test_that("gene selection supports thresholds and ignored genes", {
+  maf <- laml_maf()
+  by_count <- oncoplot_data(maf, minMut = 10)
+  by_fraction <- oncoplot_data(maf, minMut = 10 / 193)
+
+  expect_identical(by_count$genes$gene, by_fraction$genes$gene)
+  expect_false("FLT3" %in% oncoplot_data(
+    maf,
+    top = 10,
+    genesToIgnore = "FLT3"
+  )$genes$gene)
+  expect_error(
+    oncoplot_data(maf, top = 2, genesToIgnore = "FLT3"),
+    "at least two"
+  )
+  expect_error(oncoplot_data(maf, minMut = 0), "finite positive")
+})
+
+test_that("altered counts can drive gene selection", {
+  mutated <- oncoplot_data(laml_gistic_maf(), minMut = 20, altered = FALSE)
+  altered <- oncoplot_data(laml_gistic_maf(), minMut = 20, altered = TRUE)
+
+  expect_false("TP53" %in% mutated$genes$gene)
+  expect_true("TP53" %in% altered$genes$gene)
+  expect_gt(nrow(altered$genes), nrow(mutated$genes))
+})
+
+test_that("explicit gene order is optional", {
+  genes <- c("NPM1", "FLT3", "DNMT3A")
+  kept <- oncoplot_data(laml_maf(), genes = genes, keepGeneOrder = TRUE)
+  sorted <- oncoplot_data(laml_maf(), genes = genes, keepGeneOrder = FALSE)
+
+  expect_identical(kept$genes$gene, genes)
+  expect_false(identical(sorted$genes$gene, genes))
+  expect_setequal(sorted$genes$gene, genes)
+})
+
+test_that("sample filtering retains cohort denominator semantics", {
+  baseline <- oncoplot_data(laml_maf(), top = 10)
+  requested <- c(
+    baseline$samples$sample[3],
+    "unknown-sample",
+    baseline$samples$sample[1]
+  )
+  subset <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    sampleOrder = requested,
+    clinicalFeatures = "FAB_classification"
+  )
+
+  expect_identical(subset$samples$sample, requested[c(1, 3)])
+  expect_identical(unique(subset$clinical$sample), requested[c(1, 3)])
+  expect_true(all(subset$events$sample %in% subset$samples$sample))
+  expect_true(all(subset$top_bars$sample %in% subset$samples$sample))
+  expect_identical(subset$title, baseline$title)
+  expect_identical(subset$genes$altered_percent, baseline$genes$altered_percent)
+  expect_error(
+    oncoplot_data(laml_maf(), top = 10, sampleOrder = "unknown-sample"),
+    "does not match"
+  )
+
+  mutated_only <- oncoplot_data(
+    laml_maf(), top = 10, removeNonMutated = TRUE
+  )
+  expect_equal(nrow(mutated_only$samples), baseline$title$altered_samples)
+  expect_identical(mutated_only$title, baseline$title)
+})
+
 test_that("categorical clinical rows follow the ordered samples", {
   data <- oncoplot_data(
     laml_maf(),

@@ -2,8 +2,14 @@
 #'
 #' @param maf A maftools `MAF` object.
 #' @param top Number of genes to select when `genes` is `NULL`.
+#' @param minMut Optional minimum mutated/altered sample count or cohort fraction.
+#' @param altered Use altered rather than mutated sample counts for `minMut`.
 #' @param genes Optional gene symbols to display.
+#' @param genesToIgnore Optional gene symbols removed after selection.
 #' @param colors Optional named character vector of mutation-class colors.
+#' @param keepGeneOrder Preserve the selected gene order.
+#' @param sampleOrder Optional sample barcodes to select and order.
+#' @param removeNonMutated Remove samples without displayed events.
 #' @param clinicalFeatures Optional categorical clinical fields.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars.
@@ -12,37 +18,56 @@
 #' @keywords internal
 oncoplot_data <- function(maf,
                           top = 20,
+                          minMut = NULL,
+                          altered = FALSE,
                           genes = NULL,
+                          genesToIgnore = NULL,
                           colors = NULL,
+                          keepGeneOrder = FALSE,
+                          sampleOrder = NULL,
+                          removeNonMutated = FALSE,
                           clinicalFeatures = NULL,
                           includeColBarCN = TRUE) {
   if (!inherits(maf, "MAF")) {
     stop("`maf` must be a maftools MAF object.", call. = FALSE)
   }
 
-  selected_genes <- select_oncoplot_genes(maf, top = top, genes = genes)
+  selected_genes <- select_oncoplot_genes(
+    maf,
+    top = top,
+    minMut = minMut,
+    altered = altered,
+    genes = genes,
+    genesToIgnore = genesToIgnore
+  )
   matrix_data <- create_oncoplot_matrix(
     maf,
     genes = selected_genes,
-    add_missing_genes = !is.null(genes)
+    add_missing_genes = !is.null(genes),
+    keep_gene_order = keepGeneOrder
   )
-  oncomatrix <- matrix_data$oncomatrix
-  total_samples <- ncol(oncomatrix)
+  cohort_matrix <- matrix_data$oncomatrix
+  total_samples <- ncol(cohort_matrix)
 
   # Adapted from maftools R/oncoplot.R (oncoplot): the displayed summaries
   # are calculated after the oncomatrix has been ordered and completed with
   # samples that have no event in the selected genes.
-  altered_counts <- rowSums(oncomatrix != "")
+  altered_counts <- rowSums(cohort_matrix != "")
   altered_percent <- 100 * altered_counts / total_samples
   genes_data <- data.frame(
-    gene = rownames(oncomatrix),
-    gene_index = seq_len(nrow(oncomatrix)),
+    gene = rownames(cohort_matrix),
+    gene_index = seq_len(nrow(cohort_matrix)),
     altered_samples = unname(altered_counts),
     altered_percent = unname(altered_percent),
     altered_percent_label = paste0(round(altered_percent), "%"),
     stringsAsFactors = FALSE
   )
 
+  oncomatrix <- filter_oncoplot_samples(
+    cohort_matrix,
+    sampleOrder = sampleOrder,
+    removeNonMutated = removeNonMutated
+  )
   samples_data <- oncoplot_sample_data(maf, colnames(oncomatrix))
   clinical <- oncoplot_clinical_data(
     maf,
@@ -58,7 +83,7 @@ oncoplot_data <- function(maf,
     include_col_bar_cnv = includeColBarCN
   )
   right_bars <- oncoplot_right_bars(events, genes_data$gene, mutation_classes)
-  altered_samples <- sum(colSums(oncomatrix != "") > 0)
+  altered_samples <- sum(colSums(cohort_matrix != "") > 0)
 
   list(
     genes = genes_data,
@@ -169,35 +194,67 @@ oncoplot_clinical_data <- function(maf, sample_order, clinicalFeatures) {
   list(data = data, colors = colors[ordered_values])
 }
 
-select_oncoplot_genes <- function(maf, top, genes) {
+select_oncoplot_genes <- function(maf,
+                                  top = 20,
+                                  minMut = NULL,
+                                  altered = FALSE,
+                                  genes = NULL,
+                                  genesToIgnore = NULL) {
   if (!is.null(genes)) {
     genes <- unique(as.character(genes))
     genes <- genes[!is.na(genes) & nzchar(genes)]
-    if (length(genes) < 2L) {
-      stop("`genes` must contain at least two gene symbols.", call. = FALSE)
+  } else {
+    gene_summary <- as.data.frame(maftools::getGeneSummary(maf))
+    if (nrow(gene_summary) < 2L) {
+      stop("The MAF must contain at least two mutated genes.", call. = FALSE)
     }
-    return(genes)
+
+    if (!is.null(minMut)) {
+      if (
+        length(minMut) != 1L || !is.numeric(minMut) || is.na(minMut) ||
+          !is.finite(minMut) || minMut <= 0
+      ) {
+        stop("`minMut` must be one finite positive number.", call. = FALSE)
+      }
+      count_field <- if (altered) "AlteredSamples" else "MutatedSamples"
+      counts <- gene_summary[[count_field]]
+      selected <- if (minMut <= 1) {
+        counts / nrow(maftools::getSampleSummary(maf)) >= minMut
+      } else {
+        counts >= minMut
+      }
+      genes <- as.character(gene_summary[["Hugo_Symbol"]][selected])
+    } else {
+      if (
+        length(top) != 1L || is.na(top) || !is.numeric(top) ||
+          !is.finite(top) || top < 2 || top != as.integer(top)
+      ) {
+        stop("`top` must be a whole number of at least two.", call. = FALSE)
+      }
+      # Adapted from maftools R/oncoplot.R (oncoplot): getGeneSummary's order
+      # defines the top-gene selection before createOncoMatrix reorders ties.
+      gene_count <- min(as.integer(top), nrow(gene_summary))
+      genes <- as.character(
+        gene_summary[["Hugo_Symbol"]][seq_len(gene_count)]
+      )
+    }
   }
 
-  if (
-    length(top) != 1L || is.na(top) || !is.numeric(top) ||
-      !is.finite(top) || top < 2 || top != as.integer(top)
-  ) {
-    stop("`top` must be a whole number of at least two.", call. = FALSE)
+  if (!is.null(genesToIgnore)) {
+    ignored <- unique(as.character(genesToIgnore))
+    ignored <- ignored[!is.na(ignored) & nzchar(ignored)]
+    genes <- genes[!genes %in% ignored]
   }
-
-  gene_summary <- as.data.frame(maftools::getGeneSummary(maf))
-  if (nrow(gene_summary) < 2L) {
-    stop("The MAF must contain at least two mutated genes.", call. = FALSE)
+  if (length(genes) < 2L) {
+    stop("Gene selection must retain at least two genes.", call. = FALSE)
   }
-
-  # Adapted from maftools R/oncoplot.R (oncoplot): getGeneSummary's order
-  # defines the top-gene selection before createOncoMatrix reorders ties.
-  gene_count <- min(as.integer(top), nrow(gene_summary))
-  as.character(gene_summary[["Hugo_Symbol"]])[seq_len(gene_count)]
+  genes
 }
 
-create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
+create_oncoplot_matrix <- function(maf,
+                                   genes,
+                                   add_missing_genes = FALSE,
+                                   keep_gene_order = FALSE) {
   events <- as.data.frame(maftools::subsetMaf(
     maf = maf,
     genes = genes,
@@ -227,7 +284,11 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
   event_classes <- as.character(events[["Variant_Classification"]])
   event_types <- as.character(events[["Variant_Type"]])
 
-  initial_genes <- if (add_missing_genes) genes else sort(unique(event_genes))
+  initial_genes <- if (add_missing_genes || keep_gene_order) {
+    genes
+  } else {
+    sort(unique(event_genes))
+  }
   mutated_samples <- if (is.factor(event_samples)) {
     levels(event_samples)
   } else {
@@ -268,8 +329,10 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
   # Adapted from maftools R/oncomatrix.R (createOncoMatrix): genes are
   # frequency-sorted first, then samples are lexicographically sorted by the
   # binary mutation pattern. Stable ties retain the dcast-like initial order.
-  gene_order <- order(rowSums(oncomatrix != ""), decreasing = TRUE)
-  oncomatrix <- oncomatrix[gene_order, , drop = FALSE]
+  if (!keep_gene_order) {
+    gene_order <- order(rowSums(oncomatrix != ""), decreasing = TRUE)
+    oncomatrix <- oncomatrix[gene_order, , drop = FALSE]
+  }
   if (ncol(oncomatrix) > 1L) {
     binary_by_sample <- as.data.frame(t(oncomatrix != ""), check.names = FALSE)
     sample_order <- do.call(
@@ -295,6 +358,28 @@ create_oncoplot_matrix <- function(maf, genes, add_missing_genes = FALSE) {
     mutation_classes = unique(c(event_classes, "Multi_Hit")),
     cnv_classes = cnv_classes
   )
+}
+
+filter_oncoplot_samples <- function(oncomatrix,
+                                    sampleOrder,
+                                    removeNonMutated) {
+  if (removeNonMutated) {
+    oncomatrix <- oncomatrix[
+      , colSums(oncomatrix != "") > 0, drop = FALSE
+    ]
+  }
+
+  if (!is.null(sampleOrder)) {
+    requested <- unique(as.character(sampleOrder))
+    requested <- requested[!is.na(requested) & nzchar(requested)]
+    matched <- requested[requested %in% colnames(oncomatrix)]
+    if (length(matched) == 0L) {
+      stop("`sampleOrder` does not match any retained samples.", call. = FALSE)
+    }
+    oncomatrix <- oncomatrix[, matched, drop = FALSE]
+  }
+
+  oncomatrix
 }
 
 oncoplot_event_data <- function(oncomatrix, cnv_classes) {

@@ -1,0 +1,1174 @@
+{
+  "description": "A TCGA LUAD oncoprint adapted from the pyoncoprint notebook, with sample-level burden tracks above, the sorted alteration matrix in the middle, and grouped quantitative heatmaps below.",
+  "hconcat": [
+    {
+      "resolve": {
+        "scale": {
+          "x": "shared",
+          "y": "independent"
+        },
+        "axis": {
+          "y": "independent"
+        }
+      },
+      "scales": {
+        "x": {
+          "domain": [
+            -0.5,
+            342.5
+          ],
+          "paddingInner": 0,
+          "paddingOuter": 0,
+          "zoom": true
+        }
+      },
+      "spacing": 4,
+      "vconcat": [
+        {
+          "params": [
+            {
+              "name": "sampleRuler",
+              "persist": false,
+              "ruler": {
+                "encodings": [
+                  "x"
+                ],
+                "snap": false,
+                "mark": {
+                  "opacity": 0.3
+                }
+              }
+            }
+          ],
+          "resolve": {
+            "scale": {
+              "x": "shared",
+              "y": "independent"
+            },
+            "axis": {
+              "y": "independent"
+            }
+          },
+          "spacing": 4,
+          "vconcat": [
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/e4b95102cebd07aceefc0a2030577eadd5cb1912989262515f213b5d13053928.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "class",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "Amplification",
+                      "Deep Deletion",
+                      "Splice Mutation (putative driver)",
+                      "Splice Mutation (putative passenger)",
+                      "Structural Variant (putative driver)",
+                      "Structural Variant (putative passenger)",
+                      "Inframe Mutation (putative driver)",
+                      "Missense Mutation (putative driver)",
+                      "Missense Mutation (putative passenger)",
+                      "Truncating mutation (putative driver)",
+                      "Truncating mutation (putative passenger)"
+                    ],
+                    "range": [
+                      "#ff2d2d",
+                      "#2846ff",
+                      "#d97706",
+                      "#f59e0b",
+                      "#7e22ce",
+                      "#d946ef",
+                      "#8b4513",
+                      "#19a34a",
+                      "#57ff33",
+                      "#111111",
+                      "#f3e21b"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "field": "_y0",
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      0,
+                      6
+                    ],
+                    "reverse": false,
+                    "zero": true
+                  },
+                  "axis": {
+                    "labelFontSize": 9,
+                    "labelPadding": 2,
+                    "tickCount": 3
+                  },
+                  "title": null
+                },
+                "y2": {
+                  "field": "_y1"
+                }
+              },
+              "height": 54,
+              "mark": "rect",
+              "title": {
+                "style": "track-title",
+                "text": "TMB"
+              },
+              "transform": [
+                {
+                  "type": "stack",
+                  "groupby": [
+                    "sample_order"
+                  ],
+                  "as": [
+                    "_y0",
+                    "_y1"
+                  ],
+                  "field": "count"
+                }
+              ],
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/660e0239e7fe6ff3a04d8506bfccd0eba74a6a6cf5c36301e366db48befe7ab2.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "class",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "C>A",
+                      "C>G",
+                      "C>T",
+                      "T>A",
+                      "T>C",
+                      "T>G"
+                    ],
+                    "range": [
+                      "#2b59ff",
+                      "#00b3ff",
+                      "#29bf12",
+                      "#8dff3f",
+                      "#ff9f1c",
+                      "#d7263d"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "field": "_y0",
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      0,
+                      1
+                    ],
+                    "reverse": false,
+                    "zero": true
+                  },
+                  "axis": {
+                    "domain": false,
+                    "labels": false,
+                    "ticks": false
+                  },
+                  "title": null
+                },
+                "y2": {
+                  "field": "_y1"
+                }
+              },
+              "height": 28,
+              "mark": "rect",
+              "title": {
+                "style": "track-title",
+                "text": "Mutation spectrum"
+              },
+              "transform": [
+                {
+                  "type": "stack",
+                  "groupby": [
+                    "sample_order"
+                  ],
+                  "as": [
+                    "_y0",
+                    "_y1"
+                  ],
+                  "field": "count",
+                  "offset": "normalize"
+                }
+              ],
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/2bd0746cd580ab3788aee7f85d8cdfc0ae6fb6ba9348b8ccc83ba7cc9b776526.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "datum": 0,
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      0,
+                      0.5316
+                    ],
+                    "reverse": false,
+                    "zero": true
+                  },
+                  "axis": {
+                    "labelFontSize": 9,
+                    "labelPadding": 2,
+                    "tickCount": 3
+                  },
+                  "title": null
+                },
+                "y2": {
+                  "field": "value"
+                }
+              },
+              "height": 40,
+              "mark": {
+                "type": "rect",
+                "color": "#15803d"
+              },
+              "title": {
+                "style": "track-title",
+                "text": "MSI"
+              },
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/2012995786371f056c68c8a3e6cf1396ea7e2d7309238fb3ec90a404c453a6aa.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "stage",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "T1",
+                      "T1A",
+                      "T1B",
+                      "T2",
+                      "T2A",
+                      "T2B",
+                      "T3",
+                      "T4",
+                      "TX"
+                    ],
+                    "range": [
+                      "#1d4ed8",
+                      "#4f46e5",
+                      "#06b6d4",
+                      "#10b981",
+                      "#84cc16",
+                      "#f59e0b",
+                      "#dc2626",
+                      "#7f1d1d",
+                      "#6b7280"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "datum": 0,
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      0,
+                      1
+                    ],
+                    "reverse": false,
+                    "zero": true
+                  },
+                  "axis": null
+                },
+                "y2": {
+                  "datum": 1
+                }
+              },
+              "height": 24,
+              "mark": "rect",
+              "title": {
+                "style": "track-title",
+                "text": "AJCC Stage"
+              },
+              "width": "container"
+            },
+            {
+              "height": 430,
+              "layer": [
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/c5c21e3968e2f1176b4cadcf91e501a2c0fcbcc1295ee4f249ea28362fd03260.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "x": {
+                      "field": "sample_order",
+                      "type": "index",
+                      "axis": null,
+                      "title": null
+                    },
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal",
+                      "title": null
+                    }
+                  },
+                  "mark": {
+                    "type": "rect",
+                    "color": "#ebebeb",
+                    "stroke": "white",
+                    "strokeWidth": 0.35
+                  }
+                },
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/5d5f03a6b358e620bebd5d38c1958d1e0d4ba94238f3430be5679e1f0e000c67.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "color": {
+                      "field": "class",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "Amplification",
+                          "Deep Deletion",
+                          "Splice Mutation (putative driver)",
+                          "Splice Mutation (putative passenger)",
+                          "Structural Variant (putative driver)",
+                          "Structural Variant (putative passenger)",
+                          "Inframe Mutation (putative driver)",
+                          "Missense Mutation (putative driver)",
+                          "Missense Mutation (putative passenger)",
+                          "Truncating mutation (putative driver)",
+                          "Truncating mutation (putative passenger)"
+                        ],
+                        "range": [
+                          "#ff2d2d",
+                          "#2846ff",
+                          "#d97706",
+                          "#f59e0b",
+                          "#7e22ce",
+                          "#d946ef",
+                          "#8b4513",
+                          "#19a34a",
+                          "#57ff33",
+                          "#111111",
+                          "#f3e21b"
+                        ]
+                      },
+                      "legend": null
+                    },
+                    "x": {
+                      "field": "sample_order",
+                      "type": "index",
+                      "axis": null
+                    },
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal"
+                    }
+                  },
+                  "mark": "rect",
+                  "transform": [
+                    {
+                      "type": "filter",
+                      "expr": "datum.class === 'Amplification' || datum.class === 'Deep Deletion'"
+                    }
+                  ]
+                },
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/5d5f03a6b358e620bebd5d38c1958d1e0d4ba94238f3430be5679e1f0e000c67.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "color": {
+                      "field": "class",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "Amplification",
+                          "Deep Deletion",
+                          "Splice Mutation (putative driver)",
+                          "Splice Mutation (putative passenger)",
+                          "Structural Variant (putative driver)",
+                          "Structural Variant (putative passenger)",
+                          "Inframe Mutation (putative driver)",
+                          "Missense Mutation (putative driver)",
+                          "Missense Mutation (putative passenger)",
+                          "Truncating mutation (putative driver)",
+                          "Truncating mutation (putative passenger)"
+                        ],
+                        "range": [
+                          "#ff2d2d",
+                          "#2846ff",
+                          "#d97706",
+                          "#f59e0b",
+                          "#7e22ce",
+                          "#d946ef",
+                          "#8b4513",
+                          "#19a34a",
+                          "#57ff33",
+                          "#111111",
+                          "#f3e21b"
+                        ]
+                      },
+                      "legend": null
+                    },
+                    "x": {
+                      "field": "sample_order",
+                      "type": "index",
+                      "axis": null
+                    },
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal",
+                      "band": 0.5
+                    }
+                  },
+                  "mark": "rect",
+                  "transform": [
+                    {
+                      "type": "filter",
+                      "expr": "datum.class !== 'Amplification' && datum.class !== 'Deep Deletion' && datum.class !== 'Structural Variant (putative driver)' && datum.class !== 'Structural Variant (putative passenger)'"
+                    }
+                  ]
+                },
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/5d5f03a6b358e620bebd5d38c1958d1e0d4ba94238f3430be5679e1f0e000c67.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "color": {
+                      "field": "class",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "Amplification",
+                          "Deep Deletion",
+                          "Splice Mutation (putative driver)",
+                          "Splice Mutation (putative passenger)",
+                          "Structural Variant (putative driver)",
+                          "Structural Variant (putative passenger)",
+                          "Inframe Mutation (putative driver)",
+                          "Missense Mutation (putative driver)",
+                          "Missense Mutation (putative passenger)",
+                          "Truncating mutation (putative driver)",
+                          "Truncating mutation (putative passenger)"
+                        ],
+                        "range": [
+                          "#ff2d2d",
+                          "#2846ff",
+                          "#d97706",
+                          "#f59e0b",
+                          "#7e22ce",
+                          "#d946ef",
+                          "#8b4513",
+                          "#19a34a",
+                          "#57ff33",
+                          "#111111",
+                          "#f3e21b"
+                        ]
+                      },
+                      "legend": null
+                    },
+                    "x": {
+                      "field": "sample_order",
+                      "type": "index",
+                      "axis": null
+                    },
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal"
+                    }
+                  },
+                  "mark": {
+                    "type": "point",
+                    "filled": true,
+                    "shape": "cross",
+                    "size": 80,
+                    "strokeWidth": 0
+                  },
+                  "transform": [
+                    {
+                      "type": "filter",
+                      "expr": "datum.class === 'Structural Variant (putative driver)' || datum.class === 'Structural Variant (putative passenger)'"
+                    }
+                  ]
+                }
+              ],
+              "scales": {
+                "y": {
+                  "domain": [
+                    "KRAS",
+                    "DAB2",
+                    "BRAF",
+                    "RAB25",
+                    "MAP3K4",
+                    "MAPK9",
+                    "MAP2K3",
+                    "MAPK7",
+                    "MAP3K5",
+                    "MAP3K3",
+                    "MAPK4",
+                    "MAP2K4",
+                    "MAP3K1",
+                    "MAPK12",
+                    "MAPK1",
+                    "MAPK8",
+                    "MAP2K1",
+                    "HRAS",
+                    "MAPK6",
+                    "MAPK14",
+                    "MAPK3",
+                    "MAP3K2",
+                    "RAF1",
+                    "MAP2K5",
+                    "MAP2K2",
+                    "RASSF1"
+                  ],
+                  "reverse": true,
+                  "padding": 0.03
+                }
+              },
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/7820958d627e824b1c57f924eba27a66a058048b5860e2c067bb0668d0e8b72d.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "value",
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      -3.0,
+                      0.0,
+                      3.0
+                    ],
+                    "range": [
+                      "#2166ac",
+                      "#f7f7f7",
+                      "#b2182b"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "field": "track",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "KRAS",
+                      "HRAS",
+                      "BRAF"
+                    ],
+                    "padding": 0.02,
+                    "reverse": false
+                  },
+                  "axis": {
+                    "labelFontSize": 9,
+                    "labelLimit": 74,
+                    "title": null
+                  }
+                }
+              },
+              "height": 64,
+              "mark": {
+                "type": "rect",
+                "stroke": "white",
+                "strokeWidth": 0.35
+              },
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/1cea91977cfda42ce3e4e7937e51572df207acd0d14422c6cfd603ae561ffebc.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "value",
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      0.0,
+                      0.5,
+                      1.0
+                    ],
+                    "range": [
+                      "#eff6ff",
+                      "#60a5fa",
+                      "#1d4ed8"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "field": "track",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "MAPK8IP2 (cg00083937)",
+                      "KRAS (cg00584022)",
+                      "BRAF (cg03148461)"
+                    ],
+                    "padding": 0.02,
+                    "reverse": false
+                  },
+                  "axis": {
+                    "labelFontSize": 9,
+                    "labelLimit": 74,
+                    "title": null
+                  }
+                }
+              },
+              "height": 64,
+              "mark": {
+                "type": "rect",
+                "stroke": "white",
+                "strokeWidth": 0.35
+              },
+              "width": "container"
+            },
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/cd78aa59dfaa71174eb55b3301bfb0b86143093591535e7838bef3bf40acd7a6.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "color": {
+                  "field": "value",
+                  "type": "quantitative",
+                  "scale": {
+                    "domain": [
+                      1.4,
+                      4.6,
+                      7.8
+                    ],
+                    "range": [
+                      "#f6e3c4",
+                      "#c08457",
+                      "#7c3f00"
+                    ]
+                  },
+                  "legend": null
+                },
+                "x": {
+                  "field": "sample_order",
+                  "type": "index",
+                  "axis": null,
+                  "title": null
+                },
+                "y": {
+                  "field": "track",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "Dicipivirus"
+                    ],
+                    "padding": 0.02,
+                    "reverse": false
+                  },
+                  "axis": {
+                    "labelFontSize": 9,
+                    "labelLimit": 74,
+                    "title": null
+                  }
+                }
+              },
+              "height": 28,
+              "mark": {
+                "type": "rect",
+                "stroke": "white",
+                "strokeWidth": 0.35
+              },
+              "width": "container"
+            }
+          ],
+          "width": "container"
+        },
+        {
+          "data": {
+            "url": "../../../_static/generated/arrow/524622939fc6bb89d595e6f452aeb398bc66045fe7e17b56b95fa339ebff1bb3.arrow",
+            "format": {
+              "type": "arrow"
+            }
+          },
+          "encoding": {
+            "text": {
+              "field": "sample",
+              "type": "nominal"
+            },
+            "x": {
+              "field": "sample_order",
+              "type": "index",
+              "band": 0,
+              "axis": null,
+              "title": null
+            },
+            "x2": {
+              "field": "sample_order",
+              "band": 1
+            },
+            "y": {
+              "value": 0.5
+            }
+          },
+          "height": 80,
+          "mark": {
+            "type": "text",
+            "align": "center",
+            "angle": 90,
+            "baseline": "top",
+            "paddingX": 1,
+            "size": 9
+          },
+          "width": "container"
+        }
+      ],
+      "width": "container"
+    },
+    {
+      "spacing": 4,
+      "vconcat": [
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 54,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 28,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 40,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 24,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "hconcat": [
+            {
+              "data": {
+                "url": "../../../_static/generated/arrow/75546387a69e64316f55366388694eae2be20837467401b35550c53ec2c1c941.arrow",
+                "format": {
+                  "type": "arrow"
+                }
+              },
+              "encoding": {
+                "text": {
+                  "field": "label",
+                  "type": "nominal"
+                },
+                "x": {
+                  "value": 1
+                },
+                "y": {
+                  "field": "gene",
+                  "type": "nominal",
+                  "scale": {
+                    "domain": [
+                      "KRAS",
+                      "DAB2",
+                      "BRAF",
+                      "RAB25",
+                      "MAP3K4",
+                      "MAPK9",
+                      "MAP2K3",
+                      "MAPK7",
+                      "MAP3K5",
+                      "MAP3K3",
+                      "MAPK4",
+                      "MAP2K4",
+                      "MAP3K1",
+                      "MAPK12",
+                      "MAPK1",
+                      "MAPK8",
+                      "MAP2K1",
+                      "HRAS",
+                      "MAPK6",
+                      "MAPK14",
+                      "MAPK3",
+                      "MAP3K2",
+                      "RAF1",
+                      "MAP2K5",
+                      "MAP2K2",
+                      "RASSF1"
+                    ],
+                    "padding": 0.03,
+                    "reverse": true
+                  },
+                  "axis": null,
+                  "title": null
+                }
+              },
+              "height": 430,
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "clip": "never",
+                "color": "#4b5563",
+                "dx": -3,
+                "size": 10
+              },
+              "width": 44
+            },
+            {
+              "height": 430,
+              "layer": [
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/f98876c24d80ce4abf868674e5265ecf4e174033c5ab293b6d7c12cd7b0d9446.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "KRAS",
+                          "DAB2",
+                          "BRAF",
+                          "RAB25",
+                          "MAP3K4",
+                          "MAPK9",
+                          "MAP2K3",
+                          "MAPK7",
+                          "MAP3K5",
+                          "MAP3K3",
+                          "MAPK4",
+                          "MAP2K4",
+                          "MAP3K1",
+                          "MAPK12",
+                          "MAPK1",
+                          "MAPK8",
+                          "MAP2K1",
+                          "HRAS",
+                          "MAPK6",
+                          "MAPK14",
+                          "MAPK3",
+                          "MAP3K2",
+                          "RAF1",
+                          "MAP2K5",
+                          "MAP2K2",
+                          "RASSF1"
+                        ],
+                        "padding": 0.03,
+                        "reverse": true
+                      },
+                      "axis": null,
+                      "title": null
+                    }
+                  },
+                  "mark": {
+                    "type": "rect",
+                    "color": "#ebebeb",
+                    "stroke": "white",
+                    "strokeWidth": 0.35
+                  }
+                },
+                {
+                  "data": {
+                    "url": "../../../_static/generated/arrow/dd7e478da25edfcac1e83e8aba2b329042557257e2f2a4da5e68ac61cd8624de.arrow",
+                    "format": {
+                      "type": "arrow"
+                    }
+                  },
+                  "encoding": {
+                    "color": {
+                      "field": "class",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "Amplification",
+                          "Deep Deletion",
+                          "Splice Mutation (putative driver)",
+                          "Splice Mutation (putative passenger)",
+                          "Structural Variant (putative driver)",
+                          "Structural Variant (putative passenger)",
+                          "Inframe Mutation (putative driver)",
+                          "Missense Mutation (putative driver)",
+                          "Missense Mutation (putative passenger)",
+                          "Truncating mutation (putative driver)",
+                          "Truncating mutation (putative passenger)"
+                        ],
+                        "range": [
+                          "#ff2d2d",
+                          "#2846ff",
+                          "#d97706",
+                          "#f59e0b",
+                          "#7e22ce",
+                          "#d946ef",
+                          "#8b4513",
+                          "#19a34a",
+                          "#57ff33",
+                          "#111111",
+                          "#f3e21b"
+                        ]
+                      },
+                      "legend": null
+                    },
+                    "x": {
+                      "field": "_x0",
+                      "type": "quantitative",
+                      "scale": {
+                        "domain": [
+                          0,
+                          187
+                        ],
+                        "zero": true
+                      },
+                      "title": "Altered samples"
+                    },
+                    "x2": {
+                      "field": "_x1"
+                    },
+                    "y": {
+                      "field": "gene",
+                      "type": "nominal",
+                      "scale": {
+                        "domain": [
+                          "KRAS",
+                          "DAB2",
+                          "BRAF",
+                          "RAB25",
+                          "MAP3K4",
+                          "MAPK9",
+                          "MAP2K3",
+                          "MAPK7",
+                          "MAP3K5",
+                          "MAP3K3",
+                          "MAPK4",
+                          "MAP2K4",
+                          "MAP3K1",
+                          "MAPK12",
+                          "MAPK1",
+                          "MAPK8",
+                          "MAP2K1",
+                          "HRAS",
+                          "MAPK6",
+                          "MAPK14",
+                          "MAPK3",
+                          "MAP3K2",
+                          "RAF1",
+                          "MAP2K5",
+                          "MAP2K2",
+                          "RASSF1"
+                        ],
+                        "padding": 0.03,
+                        "reverse": true
+                      },
+                      "axis": null,
+                      "title": null
+                    }
+                  },
+                  "mark": "rect",
+                  "transform": [
+                    {
+                      "type": "stack",
+                      "groupby": [
+                        "gene"
+                      ],
+                      "as": [
+                        "_x0",
+                        "_x1"
+                      ],
+                      "field": "count"
+                    }
+                  ]
+                }
+              ],
+              "width": 120
+            }
+          ],
+          "resolve": {
+            "scale": {
+              "x": "independent",
+              "y": "shared"
+            }
+          },
+          "spacing": 4
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 64,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 64,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 28,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        },
+        {
+          "data": {
+            "values": [
+              {}
+            ]
+          },
+          "height": 80,
+          "mark": {
+            "type": "rect",
+            "opacity": 0
+          },
+          "width": 168
+        }
+      ]
+    }
+  ],
+  "resolve": {
+    "scale": {
+      "x": "independent",
+      "y": "independent"
+    }
+  },
+  "spacing": 4,
+  "title": "TCGA Lung Adenocarcinoma (PanCancer Atlas), default sort method",
+  "viewportHeight": "container",
+  "width": "container",
+  "$schema": "https://cdn.jsdelivr.net/npm/@genome-spy/core@0.82.0/dist/schema.json"
+}

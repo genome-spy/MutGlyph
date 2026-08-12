@@ -334,7 +334,7 @@ test_that("numeric and categorical clinical tracks retain their types", {
   expect_identical(numeric$scheme, "blues")
   expect_identical(
     numeric$data$value_label,
-    as.character(numeric$data$value)
+    ifelse(is.na(numeric$data$value), "NA", as.character(numeric$data$value))
   )
 })
 
@@ -362,5 +362,95 @@ test_that("clinical feature validation is explicit", {
       annotationColor = c(FAB_classification = "red")
     ),
     "named list"
+  )
+})
+
+test_that("annotation sorting groups samples and preserves mutation order", {
+  baseline <- oncoplot_data(
+    laml_maf(), top = 10, clinicalFeatures = "FAB_classification"
+  )
+  sorted <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "FAB_classification",
+    sortByAnnotation = TRUE,
+    annotationOrder = list(FAB_classification = c("M5", "M4"))
+  )
+  values <- sorted$clinical[[1]]$data$value
+  ranks <- match(values, c("M5", "M4", sort(setdiff(unique(values), c("M5", "M4")))))
+
+  expect_true(all(diff(ranks) >= 0))
+  for (value in unique(values)) {
+    expected <- baseline$samples$sample[
+      baseline$clinical[[1]]$data$value == value
+    ]
+    actual <- sorted$samples$sample[values == value]
+    expect_identical(actual, expected)
+  }
+})
+
+test_that("numeric and mixed annotation sorting use successive keys", {
+  numeric <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = "days_to_last_followup",
+    sortByAnnotation = TRUE
+  )
+  numeric_values <- numeric$clinical[[1]]$data$value
+  expect_true(all(diff(numeric_values[!is.na(numeric_values)]) >= 0))
+  expect_false(any(!is.na(numeric_values) & cumsum(is.na(numeric_values)) > 0))
+
+  mixed <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+    sortByAnnotation = TRUE
+  )
+  groups <- split(
+    mixed$clinical[[2]]$data$value,
+    mixed$clinical[[1]]$data$value
+  )
+  expect_true(all(vapply(groups, function(x) {
+    present <- x[!is.na(x)]
+    all(diff(present) >= 0) &&
+      !any(!is.na(x) & cumsum(is.na(x)) > 0)
+  }, logical(1))))
+})
+
+test_that("explicit sample order takes precedence over annotation sorting", {
+  baseline <- oncoplot_data(laml_maf(), top = 10)
+  requested <- baseline$samples$sample[c(5, 2, 8)]
+  data <- oncoplot_data(
+    laml_maf(),
+    top = 10,
+    sampleOrder = requested,
+    clinicalFeatures = "FAB_classification",
+    sortByAnnotation = TRUE
+  )
+
+  expect_identical(data$samples$sample, requested)
+  expect_identical(data$clinical[[1]]$data$sample, requested)
+})
+
+test_that("annotation order validation is explicit", {
+  expect_error(
+    oncoplot_data(laml_maf(), sortByAnnotation = TRUE),
+    "requires at least one"
+  )
+  expect_warning(
+    oncoplot_data(
+      laml_maf(),
+      clinicalFeatures = "FAB_classification",
+      annotationOrder = list(not_selected = "x")
+    ),
+    "unselected fields"
+  )
+  expect_error(
+    oncoplot_data(
+      laml_maf(),
+      clinicalFeatures = "days_to_last_followup",
+      annotationOrder = list(days_to_last_followup = "high")
+    ),
+    "numeric feature"
   )
 })

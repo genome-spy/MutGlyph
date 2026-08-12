@@ -239,7 +239,9 @@ test_that("basic display arguments validate scalar values", {
 })
 
 test_that("selection flags validate scalar logical values", {
-  for (argument in c("altered", "keepGeneOrder", "removeNonMutated")) {
+  for (argument in c(
+    "altered", "keepGeneOrder", "removeNonMutated", "sortByAnnotation"
+  )) {
     args <- list(maf = laml_maf())
     args[[argument]] <- 1
     expect_error(do.call(mutglyph_oncoplot, args), "TRUE or FALSE")

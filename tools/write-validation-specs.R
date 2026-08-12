@@ -49,6 +49,8 @@ writeLines(
     colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60"),
     clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
     annotationColor = list(days_to_last_followup = "Blues"),
+    sortByAnnotation = TRUE,
+    annotationOrder = list(FAB_classification = c("M5", "M4")),
     draw_titv = TRUE,
     titv_col = c(`C>T` = "#D81B60"),
     showTumorSampleBarcodes = TRUE

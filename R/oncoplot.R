@@ -18,6 +18,8 @@
 #' @param clinicalFeatures Optional categorical clinical fields to display.
 #' @param annotationColor Optional named list of per-feature categorical color
 #'   mappings or numeric GenomeSpy color-scheme names.
+#' @param sortByAnnotation Sort samples by the selected clinical features.
+#' @param annotationOrder Optional named list of partial categorical level orders.
 #' @param draw_titv Show a transition/transversion contribution track.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -69,6 +71,8 @@ mutglyph_oncoplot <- function(maf,
                               removeNonMutated = FALSE,
                               clinicalFeatures = NULL,
                               annotationColor = NULL,
+                              sortByAnnotation = FALSE,
+                              annotationOrder = NULL,
                               draw_titv = FALSE,
                               titv_col = NULL,
                               includeColBarCN = TRUE,
@@ -87,6 +91,7 @@ mutglyph_oncoplot <- function(maf,
   oncoplot_flag(altered, "altered")
   oncoplot_flag(keepGeneOrder, "keepGeneOrder")
   oncoplot_flag(removeNonMutated, "removeNonMutated")
+  oncoplot_flag(sortByAnnotation, "sortByAnnotation")
   oncoplot_flag(draw_titv, "draw_titv")
   oncoplot_flag(drawRowBar, "drawRowBar")
   oncoplot_flag(drawColBar, "drawColBar")
@@ -123,6 +128,8 @@ mutglyph_oncoplot <- function(maf,
     removeNonMutated = removeNonMutated,
     clinicalFeatures = clinicalFeatures,
     annotationColor = annotationColor,
+    sortByAnnotation = sortByAnnotation,
+    annotationOrder = annotationOrder,
     draw_titv = draw_titv,
     titv_col = titv_col,
     includeColBarCN = includeColBarCN

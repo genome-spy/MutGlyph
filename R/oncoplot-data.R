@@ -13,6 +13,8 @@
 #' @param clinicalFeatures Optional categorical or numeric clinical fields.
 #' @param annotationColor Optional named list of per-feature color mappings or
 #'   numeric color schemes.
+#' @param sortByAnnotation Sort samples by selected clinical features.
+#' @param annotationOrder Optional named list of categorical level orders.
 #' @param draw_titv Derive transition/transversion contribution data.
 #' @param titv_col Optional named character vector of Ti/Tv class colors.
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
@@ -32,6 +34,8 @@ oncoplot_data <- function(maf,
                           removeNonMutated = FALSE,
                           clinicalFeatures = NULL,
                           annotationColor = NULL,
+                          sortByAnnotation = FALSE,
+                          annotationOrder = NULL,
                           draw_titv = FALSE,
                           titv_col = NULL,
                           includeColBarCN = TRUE) {
@@ -75,13 +79,32 @@ oncoplot_data <- function(maf,
     sampleOrder = sampleOrder,
     removeNonMutated = removeNonMutated
   )
-  samples_data <- oncoplot_sample_data(maf, colnames(oncomatrix))
   clinical <- oncoplot_clinical_data(
     maf,
-    sample_order = samples_data$sample,
+    sample_order = colnames(oncomatrix),
     clinicalFeatures = clinicalFeatures,
     annotationColor = annotationColor
   )
+  annotationOrder <- validate_annotation_order(annotationOrder, clinical)
+  if (sortByAnnotation && is.null(sampleOrder)) {
+    if (length(clinical) == 0L) {
+      stop(
+        "`sortByAnnotation = TRUE` requires at least one clinical feature.",
+        call. = FALSE
+      )
+    }
+    sample_indices <- oncoplot_annotation_sample_order(
+      clinical,
+      annotationOrder
+    )
+    oncomatrix <- oncomatrix[, sample_indices, drop = FALSE]
+    clinical <- lapply(clinical, function(track) {
+      track$data <- track$data[sample_indices, , drop = FALSE]
+      rownames(track$data) <- NULL
+      track
+    })
+  }
+  samples_data <- oncoplot_sample_data(maf, colnames(oncomatrix))
   titv <- if (draw_titv) {
     oncoplot_titv_data(maf, samples_data$sample, titv_col)
   } else {
@@ -184,11 +207,13 @@ oncoplot_clinical_data <- function(maf,
           call. = FALSE
         )
       }
+      missing <- !is.finite(values)
+      values[missing] <- NA_real_
       data <- data.frame(
         sample = sample_order,
         value = as.numeric(values),
-        value_label = ifelse(is.na(values), "NA", as.character(values)),
-        missing = is.na(values),
+        value_label = ifelse(missing, "NA", as.character(values)),
+        missing = missing,
         stringsAsFactors = FALSE
       )
       return(list(
@@ -250,6 +275,75 @@ oncoplot_clinical_data <- function(maf,
   })
   names(tracks) <- clinicalFeatures
   tracks
+}
+
+validate_annotation_order <- function(annotationOrder, clinical) {
+  if (is.null(annotationOrder)) {
+    return(list())
+  }
+  if (
+    !is.list(annotationOrder) || is.null(names(annotationOrder)) ||
+      anyNA(names(annotationOrder)) || any(!nzchar(names(annotationOrder))) ||
+      anyDuplicated(names(annotationOrder)) > 0L
+  ) {
+    stop(
+      "`annotationOrder` must be a named list with unique, non-empty feature names.",
+      call. = FALSE
+    )
+  }
+
+  unused <- setdiff(names(annotationOrder), names(clinical))
+  if (length(unused) > 0L) {
+    warning(
+      "Ignoring annotation orders for unselected fields: ",
+      paste(unused, collapse = ", "),
+      call. = FALSE
+    )
+    annotationOrder <- annotationOrder[setdiff(names(annotationOrder), unused)]
+  }
+  for (feature in names(annotationOrder)) {
+    values <- annotationOrder[[feature]]
+    if (clinical[[feature]]$type != "nominal") {
+      stop(
+        sprintf("`annotationOrder` cannot order numeric feature `%s`.", feature),
+        call. = FALSE
+      )
+    }
+    if (
+      !is.character(values) || length(values) == 0L || anyNA(values) ||
+        any(!nzchar(values)) || anyDuplicated(values) > 0L
+    ) {
+      stop(
+        sprintf(
+          "Annotation order for `%s` must be unique, non-empty character values.",
+          feature
+        ),
+        call. = FALSE
+      )
+    }
+  }
+  annotationOrder
+}
+
+oncoplot_annotation_sample_order <- function(clinical, annotationOrder) {
+  keys <- lapply(clinical, function(track) {
+    values <- track$data$value
+    if (track$type == "quantitative") {
+      values[is.na(values)] <- Inf
+      return(values)
+    }
+
+    missing <- is.na(values) | values == "NA"
+    observed <- sort(unique(values[!missing]))
+    explicit <- annotationOrder[[track$feature]]
+    levels <- unique(c(explicit, setdiff(observed, explicit)))
+    ranks <- match(values, levels)
+    ranks[missing] <- length(levels) + 1L
+    ranks
+  })
+  # The matrix already has maftools-compatible mutation-pattern order. Its
+  # current position is the stable final key within equal annotation groups.
+  do.call(order, c(keys, list(seq_len(nrow(clinical[[1]]$data)))))
 }
 
 select_oncoplot_genes <- function(maf,

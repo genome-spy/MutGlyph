@@ -17,6 +17,8 @@ oncoplot_data(
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
   annotationColor = NULL,
+  sortByAnnotation = FALSE,
+  annotationOrder = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE
@@ -47,6 +49,10 @@ oncoplot_data(
 
 \item{annotationColor}{Optional named list of per-feature color mappings or
 numeric color schemes.}
+
+\item{sortByAnnotation}{Sort samples by selected clinical features.}
+
+\item{annotationOrder}{Optional named list of categorical level orders.}
 
 \item{draw_titv}{Derive transition/transversion contribution data.}
 

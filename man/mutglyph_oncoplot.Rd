@@ -17,6 +17,8 @@ mutglyph_oncoplot(
   removeNonMutated = FALSE,
   clinicalFeatures = NULL,
   annotationColor = NULL,
+  sortByAnnotation = FALSE,
+  annotationOrder = NULL,
   draw_titv = FALSE,
   titv_col = NULL,
   includeColBarCN = TRUE,
@@ -57,6 +59,10 @@ mutglyph_oncoplot(
 
 \item{annotationColor}{Optional named list of per-feature categorical color
 mappings or numeric GenomeSpy color-scheme names.}
+
+\item{sortByAnnotation}{Sort samples by the selected clinical features.}
+
+\item{annotationOrder}{Optional named list of partial categorical level orders.}
 
 \item{draw_titv}{Show a transition/transversion contribution track.}
 

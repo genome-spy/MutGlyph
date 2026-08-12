@@ -541,7 +541,7 @@ Re-evaluation outcome:
 - independent per-feature scales prevent categorical level collisions, so no
   clinical-track class hierarchy is needed.
 
-## Step 6 — Sort samples by clinical annotations
+## Step 6 — Sort samples by clinical annotations (completed)
 
 Add:
 
@@ -581,9 +581,15 @@ Tentative commit:
 feat: sort oncoplots by clinical annotations
 ```
 
-Pause if matching maftools requires exposing `groupAnnotationBySize` or another
-ordering mode. That would expand the public ordering contract and should be a
-deliberate decision rather than an incidental boolean.
+Re-evaluation outcome:
+
+- stable R ordering groups categorical and numeric annotations while retaining
+  the existing mutation-pattern order within ties;
+- non-finite numeric clinical values are normalized as explicit missing values
+  and sort last;
+- explicit `sampleOrder` remains stronger than derived annotation sorting; and
+- matching the planned maftools workflow does not require
+  `groupAnnotationBySize` or another public ordering mode.
 
 ## Step 7 — Add custom top and side bars
 

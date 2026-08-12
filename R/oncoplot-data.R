@@ -238,6 +238,7 @@ oncoplot_top_bars <- function(maf, sample_order, mutation_classes) {
       sample = sample_order,
       sample_index = seq_along(sample_order),
       variant_classification = classification,
+      mutation_class_index = match(classification, mutation_classes),
       count = as.numeric(values),
       stringsAsFactors = FALSE
     )
@@ -247,6 +248,7 @@ oncoplot_top_bars <- function(maf, sample_order, mutation_classes) {
       sample = character(),
       sample_index = integer(),
       variant_classification = character(),
+      mutation_class_index = integer(),
       count = numeric(),
       stringsAsFactors = FALSE
     ))
@@ -266,6 +268,7 @@ oncoplot_right_bars <- function(cells, gene_order, mutation_classes) {
       gene = gene_order,
       gene_index = seq_along(gene_order),
       variant_classification = classification,
+      mutation_class_index = match(classification, mutation_classes),
       count = counts,
       stringsAsFactors = FALSE
     )

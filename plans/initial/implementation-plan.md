@@ -294,6 +294,28 @@ Alternatives to explore when a panel becomes awkward:
 
 Pause before adding custom DOM/SVG rendering, a JavaScript layout engine, or duplicated panel specifications to work around GenomeSpy. Such a workaround changes the architecture and should be agreed explicitly.
 
+Implementation re-evaluation (2026-08-12):
+
+- A four-column `concat` body with shared sample, gene, and mutation-color
+  scales reproduces the reference anatomy without custom JavaScript or
+  duplicated datasets. A one-row `vconcat` title is used because GenomeSpy
+  correctly clips marks that a child view tries to draw outside its composition
+  boundary.
+- The shared sample column uses `"container"` width rather than a fixed pixel
+  step. Browser checks at 900 and 1280 pixels confirmed that the TMB bars and
+  matrix remain aligned while all summary panels remain visible.
+- The LAML `top = 10` specification passes the JSON schema bundled with the
+  pinned GenomeSpy package. Browser rendering produced no console warnings or
+  errors and contains the title, top bars, ordered matrix, gene labels,
+  percentages, right bars, and mutation legend.
+- The public function now exists with the data-selection and widget-size
+  arguments needed by the reference workflow. The two already-planned optional
+  presentation arguments remain deferred to Step 6 so they cannot affect the
+  accepted default composition.
+- Step 6 can add sample labels and clinical tracks beneath the existing matrix
+  by extending the same sample scale; no change to the R/JavaScript boundary is
+  indicated.
+
 ## Step 6 — Add the two optional maftools-like presentation features
 
 Only after the default reference plot works, support the checked decisions that are not visible in the default vignette example:

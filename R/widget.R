@@ -31,7 +31,7 @@ mutglyph_widget <- function(spec,
     )
   )
 
-  attr(widget$x, "TOJSON_FUNC") <- mutglyph_to_json
+  attr(widget$x, "TOJSON_FUNC") <- mutglyph_widget_to_json
   widget
 }
 

@@ -1,5 +1,7 @@
 import { embed } from "@genome-spy/core/minimal";
 
+import { decodeMutGlyphTransport } from "./transport.js";
+
 // Font Awesome Free 6.5.2 icons, https://fontawesome.com/license/free
 // Only the four required SVG paths are embedded to avoid bundling its runtime,
 // stylesheet, or font files. See inst/NOTICE for attribution.
@@ -219,6 +221,7 @@ HTMLWidgets.widget({
     return {
       async renderValue(x) {
         const currentRenderId = ++renderId;
+        const spec = decodeMutGlyphTransport(x.spec);
 
         api?.finalize();
         api = undefined;
@@ -228,12 +231,12 @@ HTMLWidgets.widget({
         container.style.height = "100%";
         el.replaceChildren(container);
 
-        const nextApi = await embed(container, x.spec);
+        const nextApi = await embed(container, spec);
         fixBootstrapTooltipCollision(container);
 
         if (currentRenderId === renderId) {
           api = nextApi;
-          const controls = createControls(api, el, x.spec);
+          const controls = createControls(api, el, spec);
           fullscreenButton = controls.firstElementChild;
           el.append(createWidgetStyle(), controls);
         } else {

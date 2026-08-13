@@ -5,6 +5,7 @@
   "scripts": {
     "build": "vite build",
     "licenses": "node tools/generate-js-licenses.mjs",
+    "test": "node --test srcjs/*.test.js && npm run validate:specs",
     "validate:specs": "node tools/validate-specs.mjs"
   },
   "dependencies": {

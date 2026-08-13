@@ -1,4 +1,5 @@
 source("R/as-json.R")
+source("R/transport.R")
 source("R/widget.R")
 source("R/genomic-region.R")
 source("R/substitution.R")

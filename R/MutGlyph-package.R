@@ -8,7 +8,8 @@
 #' can annotate potential kataegis loci. [lollipopPlot()] provides
 #' both a familiar protein lollipop and a collision-aware displaced layout,
 #' accepts ordinary mutation and domain tables, and can use annotations from
-#' [mutglyph_interpro_domains()].
+#' [mutglyph_interpro_domains()]. [gisticChromPlot()] renders maftools GISTIC
+#' objects as mirrored, zoomable amplification and deletion landscapes.
 #' GenomeSpy owns rendering and interaction in the browser.
 #'
 #' @keywords internal

@@ -18,8 +18,9 @@ knitr::opts_chunk$set(
 
 MutGlyph builds interactive cancer-genomics plots from
 [`maftools`](https://bioconductor.org/packages/maftools/) MAF objects and renders
-them with [GenomeSpy](https://genomespy.app/). Oncoplots, protein lollipops, and
-rainfall plots support tooltips, zooming, and SVG export.
+them with [GenomeSpy](https://genomespy.app/). Oncoplots, protein lollipops,
+rainfall plots, and GISTIC landscapes support tooltips, zooming, and SVG
+export.
 
 `oncoplot()` deliberately imitates `maftools::oncoplot()`: it accepts
 the same MAF objects and follows familiar argument names, ordering behavior,
@@ -65,6 +66,8 @@ The **Save as SVG** button exports the current composition.
   ordinary data frames and composable domain annotations.
 - [Explore mutation clustering](rainfall-plots.html) with rainfall plots and
   optional kataegis detection.
+- [Browse GISTIC copy-number landscapes](gistic-plots.html) with mirrored
+  amplification and deletion profiles.
 
 ## Use the generated specification
 

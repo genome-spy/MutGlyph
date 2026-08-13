@@ -52,3 +52,15 @@ TSV file:
 rainfall <- rainfallPlot(brca, detectChangePoints = TRUE)
 rainfall$x$spec$datasets$kataegis
 ```
+
+Pass `region` to open the interactive plot directly at a locus of interest.
+Coordinate separators are optional, and the plot remains zoomable.
+
+```{r rainfall-region}
+rainfallPlot(
+  brca,
+  detectChangePoints = TRUE,
+  region = "chr8:98,000,000-98,500,000",
+  height = 360
+)
+```

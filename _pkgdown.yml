@@ -9,6 +9,7 @@ reference:
   - oncoplot
   - lollipopPlot
   - rainfallPlot
+  - gisticChromPlot
 - title: GenomeSpy specification
   contents:
   - as_json
@@ -30,3 +31,4 @@ articles:
   - oncoplots
   - lollipop-plots
   - rainfall-plots
+  - gistic-plots

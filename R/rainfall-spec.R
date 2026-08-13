@@ -1,4 +1,7 @@
-rainfall_spec <- function(data, fontSize = 1.2, pointSize = 0.4) {
+rainfall_spec <- function(data,
+                          fontSize = 1.2,
+                          pointSize = 0.4,
+                          region = NULL) {
   colors <- data$colors[substitution_classes()]
   x_encoding <- list(
     chrom = "chromosome",
@@ -46,7 +49,7 @@ rainfall_spec <- function(data, fontSize = 1.2, pointSize = 0.4) {
       kataegis = data$kataegis
     ),
     scales = list(
-      x = list(zoom = TRUE),
+      x = mutglyph_locus_scale(region),
       y = list(zero = TRUE, zoom = FALSE)
     ),
     layer = layers,

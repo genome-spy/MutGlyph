@@ -38,7 +38,7 @@ test_that("basic lollipop uses true-position vertical stems", {
   expect_equal(point$mark$strokeWidth, 1)
   expect_equal(point$mark$strokeOpacity, 1)
   expect_equal(point$mark$fillOpacity, 0.5)
-  expect_equal(spec$vconcat[[2]]$zindex, 1)
+  expect_null(spec$vconcat[[2]][["zindex"]])
   expect_true(all(spec$datasets$mutations$label == ""))
 })
 

@@ -67,6 +67,22 @@ test_that("rainfall JSON contains mutation and kataegis records", {
   expect_length(decoded$datasets$kataegis, 7)
 })
 
+test_that("rainfall plot accepts an initial genomic region", {
+  spec <- rainfallPlot(
+    brca_maf(),
+    region = "chr8:98,000,000-98,500,000"
+  )$x$spec
+
+  expect_identical(
+    spec$scales$x$domain,
+    list(
+      list(chrom = "chr8", pos = 98000000),
+      list(chrom = "chr8", pos = 98500000)
+    )
+  )
+  expect_true(spec$scales$x$zoom)
+})
+
 test_that("rainfall display arguments validate", {
   maf <- brca_maf()
 

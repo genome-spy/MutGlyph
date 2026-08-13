@@ -19,6 +19,11 @@
 #'   a PDF device.
 #' @param fontSize Relative font-size multiplier.
 #' @param pointSize Relative mutation-point size.
+#' @param region Optional initial genomic region such as
+#'   `"chr8:98000000-98500000"`, or a chromosome such as `"chr8"`. Commas and
+#'   whitespace in coordinates are accepted. The endpoints may span
+#'   chromosomes, for example `"chr3:43393228-chr4:8534670"`. The plot remains
+#'   zoomable.
 #' @param elementId Optional element ID.
 #'
 #' @details
@@ -53,6 +58,7 @@ rainfallPlot <- function(maf,
                          height = NULL,
                          fontSize = 1.2,
                          pointSize = 0.4,
+                         region = NULL,
                          elementId = NULL) {
   mutglyph_flag(savePlot, "savePlot")
   if (savePlot) {
@@ -71,7 +77,12 @@ rainfallPlot <- function(maf,
     color = color
   )
   mutglyph_widget(
-    rainfall_spec(data, fontSize = fontSize, pointSize = pointSize),
+    rainfall_spec(
+      data,
+      fontSize = fontSize,
+      pointSize = pointSize,
+      region = region
+    ),
     width = width,
     height = height,
     elementId = elementId

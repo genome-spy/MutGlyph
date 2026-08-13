@@ -1,7 +1,9 @@
 test_that("established plotting names are the public API", {
   exports <- getNamespaceExports("MutGlyph")
 
-  expect_true(all(c("oncoplot", "rainfallPlot", "lollipopPlot") %in% exports))
+  expect_true(all(c(
+    "oncoplot", "rainfallPlot", "lollipopPlot", "gisticChromPlot"
+  ) %in% exports))
   expect_false(any(c(
     "mutglyph_oncoplot",
     "mutglyph_rainfall_plot",
@@ -42,6 +44,14 @@ test_that("common maftools arguments retain their names and defaults", {
       "labPosSize", "collapsePosLabel", "labPosAngle"
     )
   )
+  compare_defaults(
+    gisticChromPlot,
+    maftools::gisticChromPlot,
+    c(
+      "gistic", "fdrCutOff", "markBands", "color", "ref.build",
+      "txtSize", "cytobandTxtSize", "y_lims"
+    )
+  )
 })
 
 test_that("representative maftools calls work after a namespace swap", {
@@ -77,6 +87,10 @@ test_that("representative maftools calls work after a namespace swap", {
       gene = "PIK3CA",
       proteinLength = 1068
     ),
+    "mutglyph"
+  )
+  expect_s3_class(
+    gisticChromPlot(gistic = laml_gistic(), markBands = "all"),
     "mutglyph"
   )
 })

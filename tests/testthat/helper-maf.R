@@ -40,6 +40,21 @@ laml_gistic_maf <- local({
   }
 })
 
+laml_gistic <- local({
+  value <- NULL
+
+  function() {
+    if (is.null(value)) {
+      value <<- maftools::readGistic(
+        gisticDir = system.file("extdata", package = "maftools"),
+        isTCGA = TRUE,
+        verbose = FALSE
+      )
+    }
+    value
+  }
+})
+
 brca_maf <- local({
   value <- NULL
 

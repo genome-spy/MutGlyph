@@ -5,7 +5,8 @@ Authors@R:
     person("Kari", "Lavikka", , "kari@karilavikka.fi", role = c("aut", "cre", "cph"))
 Description: Creates opinionated, interactive cancer genomics plots from
     'maftools' mutation data and ordinary mutation tables, including oncoplots,
-    protein lollipop plots, and rainfall plots. 'GenomeSpy' provides
+    protein lollipop plots, rainfall plots, and GISTIC copy-number landscapes.
+    'GenomeSpy' provides
     browser-based rendering, exploration, and publication-quality vector
     export. Familiar 'maftools' conventions are retained where practical so
     that common calls require minimal changes.

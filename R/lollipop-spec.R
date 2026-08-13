@@ -85,6 +85,8 @@ lollipop_spec <- function(data,
       mutations = data$mutations,
       domains = data$domains
     ),
+    # The protein is the later sibling and is therefore drawn over stems that
+    # intentionally extend out of the mutation view.
     vconcat = list(
       mutation_view,
       lollipop_protein_view(data, showDomainLabel)
@@ -399,7 +401,6 @@ lollipop_protein_view <- function(data, showDomainLabel) {
   }
   list(
     name = "protein",
-    zindex = 1,
     height = lollipop_protein_height,
     padding = list(top = lollipop_protein_padding_top),
     data = list(name = "domains"),

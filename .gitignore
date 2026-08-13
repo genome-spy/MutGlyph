@@ -1,5 +1,6 @@
 tmp/
 .Rhistory
+.Rapp.history
 .RData
 .Rproj.user/
 .playwright-cli/

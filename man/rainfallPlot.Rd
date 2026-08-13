@@ -15,6 +15,7 @@ rainfallPlot(
   height = NULL,
   fontSize = 1.2,
   pointSize = 0.4,
+  region = NULL,
   elementId = NULL
 )
 }
@@ -42,6 +43,12 @@ a PDF device.}
 \item{fontSize}{Relative font-size multiplier.}
 
 \item{pointSize}{Relative mutation-point size.}
+
+\item{region}{Optional initial genomic region such as
+\code{"chr8:98000000-98500000"}, or a chromosome such as \code{"chr8"}. Commas and
+whitespace in coordinates are accepted. The endpoints may span
+chromosomes, for example \code{"chr3:43393228-chr4:8534670"}. The plot remains
+zoomable.}
 
 \item{elementId}{Optional element ID.}
 }

@@ -1,5 +1,6 @@
 source("R/as-json.R")
 source("R/widget.R")
+source("R/genomic-region.R")
 source("R/substitution.R")
 source("R/oncoplot-data.R")
 source("R/oncoplot-views.R")
@@ -11,6 +12,9 @@ source("R/rainfall.R")
 source("R/lollipop-data.R")
 source("R/lollipop-spec.R")
 source("R/lollipop.R")
+source("R/gistic-data.R")
+source("R/gistic-spec.R")
+source("R/gistic.R")
 
 spec <- list(
   `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
@@ -110,7 +114,11 @@ brca <- maftools::read.maf(
   verbose = FALSE
 )
 writeLines(
-  as_json(rainfallPlot(brca, detectChangePoints = TRUE)),
+  as_json(rainfallPlot(
+    brca,
+    detectChangePoints = TRUE,
+    region = "chr8:98,000,000-98,500,000"
+  )),
   file.path(output_dir, "rainfall.json"),
   useBytes = TRUE
 )
@@ -152,5 +160,34 @@ writeLines(
     layout = "displaced"
   )),
   file.path(output_dir, "lollipop-custom-data.json"),
+  useBytes = TRUE
+)
+
+gistic <- maftools::readGistic(
+  gisticDir = system.file("extdata", package = "maftools"),
+  isTCGA = TRUE,
+  verbose = FALSE
+)
+writeLines(
+  as_json(gisticChromPlot(
+    gistic,
+    annotations = data.frame(
+      chromosome = c("chr11", "chr21"),
+      start = c(118307207, 39739183),
+      end = c(118397547, 40033707),
+      label = c("KMT2A", "ERG"),
+      event_type = c("Amp", "Amp")
+    )
+  )),
+  file.path(output_dir, "gistic-chrom.json"),
+  useBytes = TRUE
+)
+writeLines(
+  as_json(gisticChromPlot(
+    gistic,
+    chromosomeTrack = "axis",
+    region = "chr21:5,000,000-48,000,000"
+  )),
+  file.path(output_dir, "gistic-chrom-axis.json"),
   useBytes = TRUE
 )

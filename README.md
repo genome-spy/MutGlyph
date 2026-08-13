@@ -5,9 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 <!-- badges: end -->
 
-MutGlyph creates interactive oncoplots, protein lollipop plots, and rainfall
-plots from [`maftools`](https://bioconductor.org/packages/maftools/) MAF objects;
-lollipop plots also accept ordinary mutation and domain tables. It uses
+MutGlyph creates interactive oncoplots, protein lollipop plots, rainfall plots,
+and GISTIC copy-number landscapes from
+[`maftools`](https://bioconductor.org/packages/maftools/) objects; lollipop
+plots also accept ordinary mutation and domain tables. It uses
 [GenomeSpy](https://genomespy.app/) for linked exploration, tooltips, and
 publication-quality SVG export.
 
@@ -82,6 +83,19 @@ The same function accepts a regular mutation data frame, making custom and
 pre-aggregated inputs composable with either custom or InterPro domains.
 The bundled `pik3ca_tcga_brca` table provides a compact real-data example.
 
+GISTIC chromosome plots use the same `GISTIC` objects as maftools, with
+amplifications above a zoom-aware chromosome strip and deletions below it:
+
+```r
+gistic <- maftools::readGistic(
+  gisticDir = system.file("extdata", package = "maftools"),
+  isTCGA = TRUE,
+  verbose = FALSE
+)
+
+MutGlyph::gisticChromPlot(gistic)
+```
+
 ## Installation
 
 MutGlyph is under development and is not yet on CRAN or Bioconductor. Install
@@ -126,6 +140,7 @@ shows biological details, and **Save as SVG** exports the visible composition.
 - Basic and collision-aware protein lollipop plots
 - Custom and InterPro protein-domain annotations
 - Interactive rainfall plots with optional kataegis detection
+- Mirrored, zoomable GISTIC amplification and deletion landscapes
 
 See the [getting-started
 article](https://genomespy.app/MutGlyph/articles/MutGlyph.html) for

@@ -14,7 +14,8 @@ drop-in interactive replacement for common workflows.
 can annotate potential kataegis loci. \code{\link[=lollipopPlot]{lollipopPlot()}} provides
 both a familiar protein lollipop and a collision-aware displaced layout,
 accepts ordinary mutation and domain tables, and can use annotations from
-\code{\link[=mutglyph_interpro_domains]{mutglyph_interpro_domains()}}.
+\code{\link[=mutglyph_interpro_domains]{mutglyph_interpro_domains()}}. \code{\link[=gisticChromPlot]{gisticChromPlot()}} renders maftools GISTIC
+objects as mirrored, zoomable amplification and deletion landscapes.
 GenomeSpy owns rendering and interaction in the browser.
 }
 \seealso{

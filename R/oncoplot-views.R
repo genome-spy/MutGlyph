@@ -345,7 +345,9 @@ oncoplot_custom_side_bar_view <- function(bar, matrix_height, side) {
           offset = 3
         )
       ),
-      x2 = list(value = 0),
+      # Anchor bars to zero in data space. On the reversed left scale, zero is
+      # at the edge next to the matrix.
+      x2 = list(datum = 0),
       y = list(field = "gene_index", type = "index", axis = NULL),
       tooltip = list(
         list(field = "gene", title = "Gene"),

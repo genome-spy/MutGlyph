@@ -47,6 +47,7 @@ lollipop_spec <- function(data,
       fontWeight = "normal"
     ),
     width = "container",
+    height = "container",
     padding = 10,
     spacing = 0,
     resolve = list(scale = list(x = "shared")),
@@ -86,6 +87,8 @@ lollipop_spec <- function(data,
 lollipop_basic_view <- function(data, colors, yScale, showLegend, pointSize) {
   list(
     name = "mutations-basic",
+    width = "container",
+    height = "container",
     data = list(name = "mutations"),
     encoding = list(
       x = lollipop_x_encoding(),
@@ -135,6 +138,8 @@ lollipop_basic_view <- function(data, colors, yScale, showLegend, pointSize) {
 lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize) {
   list(
     name = "mutations-displaced",
+    width = "container",
+    height = "container",
     spacing = 0,
     resolve = list(
       # Labels and connectors use normalized plot-area coordinates. Keeping
@@ -188,6 +193,8 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
       ),
       list(
         name = "mutations",
+        width = "container",
+        height = "container",
         encoding = list(
           y = lollipop_y_encoding(
             data$count_title,

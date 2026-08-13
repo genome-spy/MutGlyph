@@ -30,7 +30,8 @@
 #' @param includeColBarCN Include `Amp` and `Del` gene-level copy-number calls
 #'   in the top sample summary bars, matching `maftools::oncoplot()`.
 #' @param showTumorSampleBarcodes Show rotated sample names below the matrix.
-#' @param rowHeight Height in pixels of each gene row.
+#' @param rowHeight Preferred height in pixels of each gene row when `height` is
+#'   not supplied. The matrix grows to use the resulting widget height.
 #' @param drawRowBar Show the stacked mutation-count bars to the right.
 #' @param drawColBar Show the stacked sample mutation-burden bars above.
 #' @param showPct Show altered-sample percentages beside the gene rows.
@@ -153,11 +154,19 @@ oncoplot <- function(maf,
     titv_col = titv_col,
     includeColBarCN = includeColBarCN
   )
+  if (is.null(height)) {
+    height <- oncoplot_widget_height(
+      data,
+      rowHeight = rowHeight,
+      drawColBar = drawColBar,
+      showTitle = showTitle,
+      showTumorSampleBarcodes = showTumorSampleBarcodes
+    )
+  }
   mutglyph_widget(
     oncoplot_spec(
       data,
       showTumorSampleBarcodes = showTumorSampleBarcodes,
-      rowHeight = rowHeight,
       drawRowBar = drawRowBar,
       drawColBar = drawColBar,
       showPct = showPct,
@@ -168,6 +177,20 @@ oncoplot <- function(maf,
     height = height,
     elementId = elementId
   )
+}
+
+oncoplot_widget_height <- function(data,
+                                   rowHeight,
+                                   drawColBar,
+                                   showTitle,
+                                   showTumorSampleBarcodes) {
+  height <- nrow(data$genes) * rowHeight + 40
+  if (drawColBar) height <- height + 94
+  if (showTitle) height <- height + 32
+  height <- height + 22 * length(data$clinical)
+  if (!is.null(data$titv)) height <- height + 44
+  if (showTumorSampleBarcodes) height <- height + 84
+  max(320, height)
 }
 
 oncoplot_flag <- function(value, name) {

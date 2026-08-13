@@ -87,7 +87,8 @@ in the top sample summary bars, matching \code{maftools::oncoplot()}.}
 
 \item{showTumorSampleBarcodes}{Show rotated sample names below the matrix.}
 
-\item{rowHeight}{Height in pixels of each gene row.}
+\item{rowHeight}{Preferred height in pixels of each gene row when \code{height} is
+not supplied. The matrix grows to use the resulting widget height.}
 
 \item{drawRowBar}{Show the stacked mutation-count bars to the right.}
 

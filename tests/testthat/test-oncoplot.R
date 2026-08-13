@@ -4,6 +4,8 @@ test_that("oncoplot retains a complete reference composition", {
 
   expect_s3_class(plot, "mutglyph")
   expect_identical(spec$name, "mutglyph-oncoplot")
+  expect_identical(spec$width, "container")
+  expect_identical(spec$height, "container")
   expect_match(
     spec$datasets$title$label,
     "Altered in 141 \\(73.06%\\) of 193 samples"
@@ -15,6 +17,8 @@ test_that("oncoplot retains a complete reference composition", {
   expect_equal(nrow(spec$datasets$samples), 193)
   expect_equal(nrow(spec$datasets$events), 247)
   body <- spec$vconcat[[2]]
+  expect_identical(body$width, "container")
+  expect_identical(body$height, "container")
   expect_true(body$scales$x$zoom)
   expect_identical(
     vapply(body$concat[[2]]$encoding$tooltip, `[[`, character(1), "title"),
@@ -154,22 +158,30 @@ test_that("categorical clinical schemes pass through to GenomeSpy", {
   expect_null(scale$range)
 })
 
-test_that("row height aligns every gene-oriented view", {
+test_that("the matrix grows while row height reserves preferred widget space", {
+  reserved_heights <- numeric()
   for (row_height in c(12, 24, 40)) {
-    spec <- oncoplot(
+    plot <- oncoplot(
       laml_maf(),
       top = 10,
       rowHeight = row_height
-    )$x$spec
+    )
+    spec <- plot$x$spec
     body <- spec$vconcat[[2]]
     gene_views <- body$concat[5:8]
 
     expect_true(all(vapply(
       gene_views,
-      function(view) identical(view$height, list(step = row_height)),
+      function(view) identical(view$height, "container"),
       logical(1)
     )))
+    expect_identical(body$concat[[6]]$width, "container")
+    reserved_heights <- c(reserved_heights, plot$height)
   }
+  expect_true(all(diff(reserved_heights) > 0))
+
+  explicit <- oncoplot(laml_maf(), top = 10, rowHeight = 40, height = 640)
+  expect_identical(explicit$height, 640)
 })
 
 test_that("basic display controls omit or collapse their views", {
@@ -390,9 +402,11 @@ test_that("custom summary bars replace defaults and expose their metrics", {
   expect_identical(top_view$mark$tooltip$handler, "default")
   expect_identical(left_view$encoding$x$axis$title, "Mean_VAF")
   expect_true(left_view$encoding$x$scale$reverse)
+  expect_identical(left_view$encoding$x2$datum, 0)
   expect_identical(left_view$mark$tooltip$handler, "default")
   expect_identical(right_view$encoding$x$axis$title, "-log10(q)")
   expect_identical(right_view$encoding$x$scale$domain, c(0, 20))
+  expect_identical(right_view$encoding$x2$datum, 0)
   expect_identical(
     vapply(top_view$encoding$tooltip, `[[`, character(1), "title"),
     c("Sample", "Purity")

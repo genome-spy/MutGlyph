@@ -46,7 +46,8 @@ oncoplot(
   genes = c("NPM1", "FLT3", "DNMT3A", "IDH1", "IDH2"),
   keepGeneOrder = TRUE,
   sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965"),
-  removeNonMutated = TRUE
+  removeNonMutated = TRUE,
+  height = 500
 )
 ```
 
@@ -55,7 +56,7 @@ value below one is treated as a cohort fraction; a value of one or more is a
 sample count.
 
 ```{r threshold, eval = FALSE}
-oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN")
+oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN", height = 500)
 ```
 
 ## Add clinical and sequence context
@@ -80,7 +81,8 @@ oncoplot(
   ),
   draw_titv = TRUE,
   showTumorSampleBarcodes = TRUE,
-  titleText = "TCGA acute myeloid leukemia"
+  titleText = "TCGA acute myeloid leukemia",
+  height = 700
 )
 ```
 
@@ -94,7 +96,8 @@ oncoplot(
   colors = c(
     Missense_Mutation = "#00897B",
     Multi_Hit = "#D81B60"
-  )
+  ),
+  height = 500
 )
 ```
 
@@ -127,7 +130,8 @@ oncoplot(
   topBarData = "days_to_last_followup",
   leftBarData = mean_vaf,
   leftBarLims = c(0, 100),
-  titleText = "Follow-up and mean variant allele frequency"
+  titleText = "Follow-up and mean variant allele frequency",
+  height = 500
 )
 ```
 
@@ -158,7 +162,8 @@ laml_gistic <- maftools::read.maf(
 oncoplot(
   laml_gistic,
   top = 10,
-  titleText = "Sequence mutations and GISTIC calls"
+  titleText = "Sequence mutations and GISTIC calls",
+  height = 500
 )
 ```
 

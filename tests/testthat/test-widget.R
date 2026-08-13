@@ -17,7 +17,12 @@ test_that("the widget retains a complete GenomeSpy specification", {
   expect_s3_class(widget, "mutglyph")
   expect_s3_class(widget, "htmlwidget")
   expect_identical(widget$x$spec, spec)
+  expect_identical(widget$sizingPolicy$defaultWidth, "100%")
   expect_identical(widget$sizingPolicy$defaultHeight, 500)
+  expect_identical(widget$sizingPolicy$knitr$defaultWidth, "100%")
+  expect_identical(widget$sizingPolicy$knitr$defaultHeight, 500)
+  expect_false(widget$sizingPolicy$knitr$figure)
+  expect_true(widget$sizingPolicy$fill)
   expect_identical(attr(widget$x, "TOJSON_FUNC"), mutglyph_to_json)
 })
 
@@ -59,4 +64,12 @@ test_that("the committed runtime bundle includes SVG export", {
 
   expect_match(bundle, "Save as SVG", fixed = TRUE)
   expect_match(bundle, "imageExport", fixed = TRUE)
+})
+
+test_that("the committed runtime bundle works around Bootstrap tooltips", {
+  bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
+  bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
+
+  expect_match(bundle, ":scope > .tooltip", fixed = TRUE)
+  expect_match(bundle, "style.opacity", fixed = TRUE)
 })

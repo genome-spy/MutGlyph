@@ -49,7 +49,7 @@ laml <- maftools::read.maf(
 ```
 
 ```{r basic-oncoplot}
-oncoplot(maf = laml, top = 10)
+oncoplot(maf = laml, top = 10, height = 500)
 ```
 
 The columns share one sample scale. Scroll or pinch over the plot to zoom and
@@ -73,7 +73,7 @@ used in the browser. `as_json()` creates a portable copy for inspection,
 versioning, or experimentation in the GenomeSpy Playground.
 
 ```{r specification}
-plot <- oncoplot(laml, top = 10)
+plot <- oncoplot(laml, top = 10, height = 500)
 spec_json <- as_json(plot, pretty = TRUE)
 cat(substr(spec_json, 1, 160), "...\n")
 ```

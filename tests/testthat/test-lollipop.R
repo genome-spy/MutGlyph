@@ -9,9 +9,12 @@ test_that("basic lollipop uses true-position vertical stems", {
 
   expect_s3_class(plot, "mutglyph")
   expect_identical(spec$name, "mutglyph-lollipop-plot")
+  expect_identical(spec$width, "container")
+  expect_identical(spec$height, "container")
   expect_named(spec$datasets, c("mutations", "domains"))
   expect_identical(mutation_view$name, "mutations-basic")
-  expect_null(mutation_view$height)
+  expect_identical(mutation_view$width, "container")
+  expect_identical(mutation_view$height, "container")
   expect_identical(mutation_view$encoding$x$field, "position")
   expect_true(mutation_view$encoding$x$scale$zoom)
   expect_identical(mutation_view$encoding$y$scale$type, "linear")
@@ -34,7 +37,10 @@ test_that("displaced lollipop separates and reconnects dense markers", {
   connectors <- mutation_view$vconcat[[3]]
 
   expect_identical(mutation_view$name, "mutations-displaced")
-  expect_null(plot_view$height)
+  expect_identical(mutation_view$width, "container")
+  expect_identical(mutation_view$height, "container")
+  expect_identical(plot_view$width, "container")
+  expect_identical(plot_view$height, "container")
   expect_equal(mutation_view$vconcat[[1]]$height, 82)
   expect_equal(mutation_view$vconcat[[3]]$height, 22)
   expect_equal(spec$vconcat[[2]]$height, 56)

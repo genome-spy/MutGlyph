@@ -23,7 +23,11 @@ mutglyph_widget <- function(spec,
       viewer.padding = 0,
       browser.fill = TRUE,
       defaultWidth = "100%",
-      defaultHeight = 500
+      defaultHeight = 500,
+      knitr.defaultWidth = "100%",
+      knitr.defaultHeight = 500,
+      knitr.figure = FALSE,
+      fill = TRUE
     )
   )
 

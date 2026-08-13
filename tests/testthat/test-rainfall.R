@@ -4,6 +4,8 @@ test_that("rainfall plot retains the interactive composition", {
 
   expect_s3_class(plot, "mutglyph")
   expect_identical(spec$name, "mutglyph-rainfall-plot")
+  expect_identical(spec$width, "container")
+  expect_identical(spec$height, "container")
   expect_identical(spec$assembly, "hg19")
   expect_identical(spec$title$text, "TCGA-A8-A08B")
   expect_named(spec$datasets, c("mutations", "kataegis"))

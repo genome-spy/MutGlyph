@@ -1,5 +1,14 @@
 import { embed } from "@genome-spy/core/minimal";
 
+function fixBootstrapTooltipCollision(container) {
+  // Bootstrap hides the generic `.tooltip` class used by GenomeSpy.
+  // Remove this workaround when https://github.com/genome-spy/genome-spy/issues/470
+  // is resolved and the bundled GenomeSpy version includes the fix.
+  for (const tooltip of container.querySelectorAll(":scope > .tooltip")) {
+    tooltip.style.opacity = "1";
+  }
+}
+
 function createExportButton(api) {
   const button = document.createElement("button");
   button.type = "button";
@@ -71,6 +80,7 @@ HTMLWidgets.widget({
         el.replaceChildren(container);
 
         const nextApi = await embed(container, x.spec);
+        fixBootstrapTooltipCollision(container);
 
         if (currentRenderId === renderId) {
           api = nextApi;

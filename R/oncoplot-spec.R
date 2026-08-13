@@ -1,13 +1,12 @@
 oncoplot_spec <- function(data,
                           showTumorSampleBarcodes = FALSE,
-                          rowHeight = 24,
                           drawRowBar = TRUE,
                           drawColBar = TRUE,
                           showPct = TRUE,
                           showTitle = TRUE,
                           titleText = NULL) {
   matrix_width <- "container"
-  matrix_height <- list(step = rowHeight)
+  matrix_height <- "container"
   color_encoding <- oncoplot_color_encoding(data)
 
   body <- oncoplot_body(
@@ -30,6 +29,8 @@ oncoplot_spec <- function(data,
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
     name = "mutglyph-oncoplot",
     background = "white",
+    width = "container",
+    height = "container",
     datasets = oncoplot_datasets(
       data,
       showTitle = showTitle,
@@ -103,6 +104,8 @@ oncoplot_body <- function(data,
   }
 
   list(
+    width = "container",
+    height = "container",
     columns = 4L + as.integer(has_left_bar),
     spacing = 4,
     resolve = list(

@@ -145,7 +145,7 @@ pik3ca_domains <- data.frame(
 )
 writeLines(
   as_json(lollipopPlot(
-    pik3ca_tcga_brca,
+    data = pik3ca_tcga_brca,
     gene = "PIK3CA",
     domains = pik3ca_domains,
     count = "samples",

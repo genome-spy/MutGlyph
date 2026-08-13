@@ -5,10 +5,13 @@
 #' [maftools::lollipopPlot()], while the displaced layout separates dense
 #' hotspots and connects every marker back to its true protein position.
 #'
-#' @param maf A maftools `MAF` object or a data frame. A data frame must contain
-#'   numeric `position` or a mutation column selected with `AACol`. Optional
-#'   columns are `gene`, `mutation`, `variant_class` (or `classification`),
-#'   `sample`, and `count`.
+#' @param maf A maftools `MAF` object. For backward compatibility during
+#'   development, a data frame is also accepted here; new code should use
+#'   `data` for ordinary tables.
+#' @param data Optional mutation data frame, following `maftools::lollipopPlot()`.
+#'   MutGlyph accepts its two-column position/count convention as well as named
+#'   `position`, `mutation`, `variant_class` (or `classification`), `sample`,
+#'   `gene`, and `count` columns.
 #' @param gene One gene symbol. Required for MAF input; optional when a custom
 #'   data frame contains exactly one value in its `gene` column.
 #' @param AACol Optional column containing protein changes. With MAF input,
@@ -72,7 +75,8 @@
 #'   )
 #' }
 #' @export
-lollipopPlot <- function(maf,
+lollipopPlot <- function(maf = NULL,
+                         data = NULL,
                          gene = NULL,
                          AACol = NULL,
                          labelPos = NULL,
@@ -92,6 +96,10 @@ lollipopPlot <- function(maf,
                          width = NULL,
                          height = NULL,
                          elementId = NULL) {
+  if (!is.null(maf) && !is.null(data)) {
+    stop("Supply only one of `maf` and `data`.", call. = FALSE)
+  }
+  if (is.null(maf)) maf <- data
   layout <- match.arg(layout)
   count <- match.arg(count)
   if (!is.null(yScale)) yScale <- match.arg(yScale, c("linear", "log"))

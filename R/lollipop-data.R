@@ -147,6 +147,7 @@ lollipop_dataframe_data <- function(data,
                                      count = c("events", "samples"),
                                      colors = NULL) {
   count <- match.arg(count)
+  data <- lollipop_normalize_dataframe_columns(data)
   if (!is.null(gene)) gene <- lollipop_string(gene, "gene")
 
   if ("gene" %in% names(data)) {
@@ -277,6 +278,31 @@ lollipop_dataframe_data <- function(data,
     sample_count = NA_integer_,
     mutation_rate = NA_real_
   )
+}
+
+# Accept the small custom-table convention used by maftools::lollipopPlot()
+# while retaining MutGlyph's explicit column names for composable data frames.
+lollipop_normalize_dataframe_columns <- function(data) {
+  if (ncol(data) < 1L) return(data)
+  positional <- !"position" %in% names(data) && ncol(data) >= 2L &&
+    nrow(data) > 0L && all(is.finite(suppressWarnings(as.numeric(
+      as.character(data[[1]])
+    )))) && all(is.finite(suppressWarnings(as.numeric(
+      as.character(data[[2]])
+    ))))
+  if (positional) {
+    names(data)[1] <- "position"
+  }
+  if (positional && !"count" %in% names(data) && ncol(data) >= 2L) {
+    names(data)[2] <- "count"
+  }
+  if (!"mutation" %in% names(data) && "conv" %in% names(data)) {
+    data$mutation <- data$conv
+  }
+  if (!"variant_class" %in% names(data) && "Variant_Classification" %in% names(data)) {
+    data$variant_class <- data$Variant_Classification
+  }
+  data
 }
 
 lollipop_aggregate_mutations <- function(variants,

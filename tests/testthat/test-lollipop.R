@@ -140,7 +140,7 @@ test_that("lollipop JSON retains both recurrence measures", {
 
 test_that("lollipop plots ordinary data frames without MAF metadata", {
   plot <- lollipopPlot(
-    data.frame(
+    data = data.frame(
       gene = "FLT3",
       position = c(599, 599, 835),
       mutation = c("ITD", "ITD", "D835Y"),
@@ -152,6 +152,34 @@ test_that("lollipop plots ordinary data frames without MAF metadata", {
   expect_equal(nrow(plot$x$spec$datasets$mutations), 2)
   expect_equal(nrow(plot$x$spec$datasets$domains), 0)
   expect_identical(plot$x$spec$title$text, "FLT3 mutations")
+})
+
+test_that("lollipop data argument accepts the maftools custom-table convention", {
+  plot <- lollipopPlot(
+    data = data.frame(
+      pos = c(1047, 545),
+      n = c(120, 67),
+      Variant_Classification = c("Missense_Mutation", "Missense_Mutation"),
+      conv = c("H1047R", "E545K")
+    ),
+    gene = "PIK3CA",
+    proteinLength = 1068
+  )
+
+  mutations <- plot$x$spec$datasets$mutations
+  expect_identical(mutations$position, c(545, 1047))
+  expect_identical(mutations$count, c(67, 120))
+  expect_identical(mutations$mutation, c("E545K", "H1047R"))
+})
+
+test_that("lollipop accepts exactly one mutation input", {
+  mutation_data <- data.frame(position = 835, count = 2)
+
+  expect_error(lollipopPlot(), "maf.*data")
+  expect_error(
+    lollipopPlot(maf = mutation_data, data = mutation_data),
+    "only one"
+  )
 })
 
 test_that("pre-aggregated PIK3CA sample counts plot directly", {

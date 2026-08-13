@@ -5,7 +5,8 @@
 \title{Draw an interactive protein lollipop plot}
 \usage{
 lollipopPlot(
-  maf,
+  maf = NULL,
+  data = NULL,
   gene = NULL,
   AACol = NULL,
   labelPos = NULL,
@@ -28,10 +29,14 @@ lollipopPlot(
 )
 }
 \arguments{
-\item{maf}{A maftools \code{MAF} object or a data frame. A data frame must contain
-numeric \code{position} or a mutation column selected with \code{AACol}. Optional
-columns are \code{gene}, \code{mutation}, \code{variant_class} (or \code{classification}),
-\code{sample}, and \code{count}.}
+\item{maf}{A maftools \code{MAF} object. For backward compatibility during
+development, a data frame is also accepted here; new code should use
+\code{data} for ordinary tables.}
+
+\item{data}{Optional mutation data frame, following \code{maftools::lollipopPlot()}.
+MutGlyph accepts its two-column position/count convention as well as named
+\code{position}, \code{mutation}, \code{variant_class} (or \code{classification}), \code{sample},
+\code{gene}, and \code{count} columns.}
 
 \item{gene}{One gene symbol. Required for MAF input; optional when a custom
 data frame contains exactly one value in its \code{gene} column.}

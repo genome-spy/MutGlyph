@@ -591,6 +591,10 @@ filter_oncoplot_samples <- function(oncomatrix,
     oncomatrix <- oncomatrix[, matched, drop = FALSE]
   }
 
+  if (ncol(oncomatrix) == 0L) {
+    stop("No samples remain after applying the oncoplot filters.", call. = FALSE)
+  }
+
   oncomatrix
 }
 

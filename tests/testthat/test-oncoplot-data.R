@@ -251,6 +251,17 @@ test_that("sample filtering retains cohort denominator semantics", {
   expect_identical(mutated_only$title, baseline$title)
 })
 
+test_that("sample filtering rejects an empty displayed cohort", {
+  expect_error(
+    oncoplot_data(
+      laml_maf(),
+      genes = c("NOT_A_GENE_1", "NOT_A_GENE_2"),
+      removeNonMutated = TRUE
+    ),
+    "No samples remain"
+  )
+})
+
 test_that("Ti/Tv data normalize exported maftools fractions", {
   data <- oncoplot_data(laml_maf(), top = 10, draw_titv = TRUE)
   source <- as.data.frame(

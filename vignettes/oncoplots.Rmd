@@ -1,0 +1,166 @@
+---
+title: "Customizing oncoplots"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Customizing oncoplots}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+This article builds on the [basic oncoplot](MutGlyph.html) and covers the main
+ways to select, annotate, and summarize a cohort. The examples use the bundled
+TCGA acute myeloid leukemia data.
+
+```{r data}
+library(MutGlyph)
+
+laml <- maftools::read.maf(
+  maf = system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
+  clinicalData = system.file(
+    "extdata",
+    "tcga_laml_annot.tsv",
+    package = "maftools"
+  ),
+  verbose = FALSE
+)
+```
+
+## Choose genes and samples
+
+Use `top` for the most frequently altered genes, or provide an explicit gene
+list. `keepGeneOrder = TRUE` preserves the supplied order. The same pattern
+works for a selected and ordered set of samples.
+
+```{r selection, eval = FALSE}
+mutglyph_oncoplot(
+  laml,
+  genes = c("NPM1", "FLT3", "DNMT3A", "IDH1", "IDH2"),
+  keepGeneOrder = TRUE,
+  sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965"),
+  removeNonMutated = TRUE
+)
+```
+
+`minMut` provides a concise alternative when the exact genes are not known. A
+value below one is treated as a cohort fraction; a value of one or more is a
+sample count.
+
+```{r threshold, eval = FALSE}
+mutglyph_oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN")
+```
+
+## Add clinical and sequence context
+
+Clinical tracks can be categorical or numeric. Each track gets an independent
+scale, and categorical tracks use GenomeSpy's default categorical palette
+unless a Vega scheme or explicit mapping is supplied. The transition/
+transversion track is computed from the MAF variants.
+
+```{r annotated-oncoplot}
+mutglyph_oncoplot(
+  laml,
+  top = 10,
+  rowHeight = 28,
+  clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
+  annotationColor = list(
+    days_to_last_followup = "blues"
+  ),
+  sortByAnnotation = TRUE,
+  annotationOrder = list(
+    FAB_classification = c("M5", "M4", "M2")
+  ),
+  draw_titv = TRUE,
+  showTumorSampleBarcodes = TRUE,
+  titleText = "TCGA acute myeloid leukemia"
+)
+```
+
+Mutation-class colors are partial overrides, so a plot can emphasize a few
+classes without redefining the whole palette.
+
+```{r mutation-colors, eval = FALSE}
+mutglyph_oncoplot(
+  laml,
+  top = 10,
+  colors = c(
+    Missense_Mutation = "#00897B",
+    Multi_Hit = "#D81B60"
+  )
+)
+```
+
+## Replace or extend summary bars
+
+Custom bars use a two-column data frame. The first column identifies a sample
+or gene; the numeric second column supplies the value and its name becomes the
+axis title. A numeric clinical field name can be used directly for the top bar.
+
+```{r summary-data}
+genes <- as.character(maftools::getGeneSummary(laml)$Hugo_Symbol[1:10])
+
+variants <- maftools::subsetMaf(
+  laml,
+  genes = genes,
+  fields = c("Hugo_Symbol", "i_TumorVAF_WU"),
+  includeSyn = FALSE,
+  mafObj = FALSE
+)
+
+mean_vaf <- aggregate(i_TumorVAF_WU ~ Hugo_Symbol, variants, mean)
+names(mean_vaf) <- c("gene", "Mean VAF (%)")
+```
+
+```{r summary-bars}
+mutglyph_oncoplot(
+  laml,
+  genes = genes,
+  keepGeneOrder = TRUE,
+  topBarData = "days_to_last_followup",
+  leftBarData = mean_vaf,
+  leftBarLims = c(0, 100),
+  titleText = "Follow-up and mean variant allele frequency"
+)
+```
+
+Custom top and right data replace their default stacked summaries. A custom
+left bar adds a new gene-aligned column. Missing displayed keys are shown as
+zero and reported with a warning.
+
+## Include GISTIC calls
+
+When `maftools::read.maf()` is given GISTIC results, MutGlyph adds gene-level
+`Amp` and `Del` events to the matrix. Copy-number events occupy half of a gene
+band so that a sequence mutation in the same cell remains visible. The default
+top bars include both sequence mutations and copy-number events.
+
+```{r gistic}
+extdata <- system.file("extdata", package = "maftools")
+
+laml_gistic <- maftools::read.maf(
+  maf = file.path(extdata, "tcga_laml.maf.gz"),
+  clinicalData = file.path(extdata, "tcga_laml_annot.tsv"),
+  gisticAllLesionsFile = file.path(extdata, "all_lesions.conf_99.txt"),
+  gisticAmpGenesFile = file.path(extdata, "amp_genes.conf_99.txt"),
+  gisticDelGenesFile = file.path(extdata, "del_genes.conf_99.txt"),
+  gisticScoresFile = file.path(extdata, "scores.gistic"),
+  verbose = FALSE
+)
+
+mutglyph_oncoplot(
+  laml_gistic,
+  top = 10,
+  titleText = "Sequence mutations and GISTIC calls"
+)
+```
+
+Set `includeColBarCN = FALSE` to keep the copy-number layer in the matrix but
+limit the top bars to sequence mutations.

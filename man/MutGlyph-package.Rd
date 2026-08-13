@@ -20,9 +20,9 @@ GenomeSpy owns rendering and interaction in the browser.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/HautaniemiLab/MutGlyph}
+  \item \url{https://github.com/genome-spy/MutGlyph}
   \item \url{https://genomespy.app/MutGlyph/}
-  \item Report bugs at \url{https://github.com/HautaniemiLab/MutGlyph/issues}
+  \item Report bugs at \url{https://github.com/genome-spy/MutGlyph/issues}
 }
 
 }

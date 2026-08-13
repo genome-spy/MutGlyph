@@ -24,3 +24,9 @@ articles:
   navbar: ~
   contents:
   - MutGlyph
+- title: Plot guides
+  navbar: ~
+  contents:
+  - oncoplots
+  - lollipop-plots
+  - rainfall-plots

@@ -89,7 +89,7 @@ it from GitHub with [pak](https://pak.r-lib.org/):
 
 ```r
 install.packages("pak")
-pak::pak("HautaniemiLab/MutGlyph")
+pak::pak("genome-spy/MutGlyph")
 ```
 
 ## Basic usage

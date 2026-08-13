@@ -10,9 +10,9 @@ Description: Creates opinionated, interactive cancer genomics plots from
     export. Familiar 'maftools' conventions are retained where practical so
     that common calls require minimal changes.
 License: MIT + file LICENSE
-URL: https://github.com/HautaniemiLab/MutGlyph,
+URL: https://github.com/genome-spy/MutGlyph,
     https://genomespy.app/MutGlyph/
-BugReports: https://github.com/HautaniemiLab/MutGlyph/issues
+BugReports: https://github.com/genome-spy/MutGlyph/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends:
@@ -23,6 +23,7 @@ Imports:
     maftools
 Suggests:
     knitr,
+    R.utils,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr

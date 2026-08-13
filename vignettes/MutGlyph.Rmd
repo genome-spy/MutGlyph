@@ -27,7 +27,7 @@ and plot composition. It is therefore an almost drop-in replacement in common
 workflows, often requiring only a change of function name. MutGlyph does not
 attempt to reproduce every maftools option.
 
-## A basic oncoplot
+## Start with a familiar oncoplot
 
 The bundled TCGA acute myeloid leukemia data makes a convenient small example.
 This starting point deliberately corresponds to the [basic top-ten
@@ -57,286 +57,14 @@ pan, and hover over marks for details. Sample labels can be enabled even for a
 dense cohort: ranged text keeps them hidden until the columns are wide enough.
 The **Save as SVG** button exports the current composition.
 
-## Choose genes and samples
+## Continue with the plot guides
 
-Use `top` for the most frequently altered genes, or provide an explicit gene
-list. `keepGeneOrder = TRUE` preserves the supplied order. The same pattern
-works for a selected and ordered set of samples.
-
-```{r selection, eval = FALSE}
-mutglyph_oncoplot(
-  laml,
-  genes = c("NPM1", "FLT3", "DNMT3A", "IDH1", "IDH2"),
-  keepGeneOrder = TRUE,
-  sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965"),
-  removeNonMutated = TRUE
-)
-```
-
-`minMut` provides a concise alternative when the exact genes are not known. A
-value below one is treated as a cohort fraction; a value of one or more is a
-sample count.
-
-```{r threshold, eval = FALSE}
-mutglyph_oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN")
-```
-
-## Add clinical and sequence context
-
-Clinical tracks can be categorical or numeric. Each track gets an independent
-scale, and categorical tracks use GenomeSpy's default categorical palette
-unless a Vega scheme or explicit mapping is supplied. The transition/
-transversion track is computed from the MAF variants.
-
-```{r annotated-oncoplot}
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  rowHeight = 28,
-  clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
-  annotationColor = list(
-    days_to_last_followup = "blues"
-  ),
-  sortByAnnotation = TRUE,
-  annotationOrder = list(
-    FAB_classification = c("M5", "M4", "M2")
-  ),
-  draw_titv = TRUE,
-  showTumorSampleBarcodes = TRUE,
-  titleText = "TCGA acute myeloid leukemia"
-)
-```
-
-Mutation-class colors are partial overrides, so a plot can emphasize a few
-classes without redefining the whole palette.
-
-```{r mutation-colors, eval = FALSE}
-mutglyph_oncoplot(
-  laml,
-  top = 10,
-  colors = c(
-    Missense_Mutation = "#00897B",
-    Multi_Hit = "#D81B60"
-  )
-)
-```
-
-## Replace or extend summary bars
-
-Custom bars use a two-column data frame. The first column identifies a sample
-or gene; the numeric second column supplies the value and its name becomes the
-axis title. A numeric clinical field name can be used directly for the top bar.
-
-```{r summary-data}
-genes <- as.character(maftools::getGeneSummary(laml)$Hugo_Symbol[1:10])
-
-variants <- maftools::subsetMaf(
-  laml,
-  genes = genes,
-  fields = c("Hugo_Symbol", "i_TumorVAF_WU"),
-  includeSyn = FALSE,
-  mafObj = FALSE
-)
-
-mean_vaf <- aggregate(i_TumorVAF_WU ~ Hugo_Symbol, variants, mean)
-names(mean_vaf) <- c("gene", "Mean VAF (%)")
-```
-
-```{r summary-bars}
-mutglyph_oncoplot(
-  laml,
-  genes = genes,
-  keepGeneOrder = TRUE,
-  topBarData = "days_to_last_followup",
-  leftBarData = mean_vaf,
-  leftBarLims = c(0, 100),
-  titleText = "Follow-up and mean variant allele frequency"
-)
-```
-
-Custom top and right data replace their default stacked summaries. A custom
-left bar adds a new gene-aligned column. Missing displayed keys are shown as
-zero and reported with a warning.
-
-## Include GISTIC calls
-
-When `maftools::read.maf()` is given GISTIC results, MutGlyph adds gene-level
-`Amp` and `Del` events to the matrix. Copy-number events occupy half of a gene
-band so that a sequence mutation in the same cell remains visible. The default
-top bars include both sequence mutations and copy-number events.
-
-```{r gistic}
-extdata <- system.file("extdata", package = "maftools")
-
-laml_gistic <- maftools::read.maf(
-  maf = file.path(extdata, "tcga_laml.maf.gz"),
-  clinicalData = file.path(extdata, "tcga_laml_annot.tsv"),
-  gisticAllLesionsFile = file.path(extdata, "all_lesions.conf_99.txt"),
-  gisticAmpGenesFile = file.path(extdata, "amp_genes.conf_99.txt"),
-  gisticDelGenesFile = file.path(extdata, "del_genes.conf_99.txt"),
-  gisticScoresFile = file.path(extdata, "scores.gistic"),
-  verbose = FALSE
-)
-
-mutglyph_oncoplot(
-  laml_gistic,
-  top = 10,
-  titleText = "Sequence mutations and GISTIC calls"
-)
-```
-
-Set `includeColBarCN = FALSE` to keep the copy-number layer in the matrix but
-limit the top bars to sequence mutations.
-
-## Map mutations onto a protein
-
-`mutglyph_lollipop_plot()` follows the familiar `maftools::lollipopPlot()` data
-conventions but uses a cleaner interactive composition. Mutation events stay
-at their true amino-acid positions, and domains are an ordinary data frame that
-can be inspected, edited, or replaced.
-
-The small table below is a frozen, offline snapshot derived from InterPro's
-representative-domain matches for UniProt P36888 (FLT3), retrieved 2026-08-13.
-Current annotations can instead be requested explicitly with
-`mutglyph_interpro_domains("P36888")`; plotting itself never requires network
-access.
-
-```{r flt3-domains}
-flt3_domains <- data.frame(
-  start = c(246, 438, 564, 756),
-  end = c(357, 531, 695, 958),
-  label = c("Ig-like", "Ig-like", "Kinase N", "Kinase C"),
-  description = c(
-    "Immunoglobulin-like region",
-    "Immunoglobulin-like region",
-    "Protein kinase N-terminal region",
-    "Protein kinase C-terminal region"
-  ),
-  accession = c(
-    "G3DSA:2.60.40.10", "G3DSA:2.60.40.10",
-    "G3DSA:3.30.200.20", "G3DSA:1.10.510.10"
-  ),
-  source_database = "cathgene3d",
-  protein_id = "P36888",
-  protein_length = 993
-)
-```
-
-```{r lollipop-basic}
-mutglyph_lollipop_plot(
-  laml,
-  gene = "FLT3",
-  AACol = "Protein_Change",
-  domains = flt3_domains,
-  height = 420
-)
-```
-
-Dense hotspots often contain several different protein changes at the same or
-nearby residues. The displaced layout reserves marker space in pixels, labels
-recurrent changes, and uses curved connectors to preserve the true protein
-position. Its logarithmic recurrence axis keeps moderately recurrent mutations
-visible beside dominant hotspots. Singletons are omitted by default; set
-`minCount = 1` to include them.
-
-```{r lollipop-displaced}
-mutglyph_lollipop_plot(
-  laml,
-  gene = "FLT3",
-  AACol = "Protein_Change",
-  domains = flt3_domains,
-  layout = "displaced",
-  count = "samples",
-  height = 500
-)
-```
-
-Set `labelPos` to selected residues in the basic view. Both mutation-event and
-distinct-sample counts remain available in tooltips and in the generated
-specification. The mutation input can also be a regular data frame containing
-`position` and optional `mutation`, `variant_class`, `sample`, and `count`
-columns, so custom and pre-aggregated analyses use the same renderer.
-
-### Compose custom mutation and domain data
-
-The bundled `pik3ca_tcga_brca` table demonstrates the same plotting path
-without a MAF object. It contains 26 recurrent PIK3CA mutations from the
-open-access GDC TCGA-BRCA masked somatic mutation data, pre-aggregated by
-distinct tumor sample. Its preparation is an R script under `data-raw/` in the
-source repository.
-
-> **TCGA acknowledgement.** The results shown here are in whole or part based
-> upon data generated by the TCGA Research Network:
-> <https://www.cancer.gov/tcga>.
-
-The five-row domain table is deliberately inline: domains are just data and can
-be edited or replaced. These regions are a frozen snapshot of the main domain
-features in reviewed UniProt entry P42336.
-
-```{r pik3ca-data}
-data(pik3ca_tcga_brca)
-
-pik3ca_domains <- data.frame(
-  start = c(16, 187, 330, 517, 765),
-  end = c(105, 289, 487, 694, 1051),
-  label = c("ABD", "RBD", "C2", "Helical", "Kinase"),
-  description = c(
-    "PI3K adaptor-binding domain",
-    "PI3K Ras-binding domain",
-    "C2 PI3K-type domain",
-    "PIK helical domain",
-    "PI3K/PI4K catalytic domain"
-  ),
-  protein_id = "P42336",
-  protein_length = 1068
-)
-```
-
-```{r lollipop-custom-data}
-mutglyph_lollipop_plot(
-  pik3ca_tcga_brca,
-  gene = "PIK3CA",
-  domains = pik3ca_domains,
-  count = "samples",
-  layout = "displaced",
-  height = 500
-)
-```
-
-## Explore mutation clustering with a rainfall plot
-
-`mutglyph_rainfall_plot()` is the interactive counterpart of
-`maftools::rainfallPlot()`. It defaults to the most mutated sample and plots
-chromosome-local inter-event distances for SNPs, including synonymous
-variants. Scroll or pinch to inspect dense genomic regions.
-
-The bundled BRCA example contains several potential kataegis loci. With
-`detectChangePoints = TRUE`, MutGlyph applies the same operational criterion as
-maftools—at least six consecutive mutations with an average intermutation
-distance no greater than 1,000 bp. Arrows point to the clusters and subtle
-shading shows their complete genomic spans.
-
-```{r rainfall}
-brca <- maftools::read.maf(
-  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
-  verbose = FALSE
-)
-
-mutglyph_rainfall_plot(
-  brca,
-  detectChangePoints = TRUE,
-  pointSize = 0.5,
-  height = 360
-)
-```
-
-Detected loci remain available in the returned specification without writing a
-TSV file:
-
-```{r rainfall-data, eval = FALSE}
-rainfall <- mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
-rainfall$x$spec$datasets$kataegis
-```
+- [Customize oncoplots](oncoplots.html) with clinical tracks, TiTv, summary
+  bars, colors, selection, and GISTIC calls.
+- [Map mutations onto proteins](lollipop-plots.html) using MAF objects or
+  ordinary data frames and composable domain annotations.
+- [Explore mutation clustering](rainfall-plots.html) with rainfall plots and
+  optional kataegis detection.
 
 ## Use the generated specification
 
@@ -353,6 +81,11 @@ cat(substr(spec_json, 1, 160), "...\n")
 Widget width is responsive by default. Set `height` when embedding the plot in
 a constrained layout; matrix height is controlled independently with
 `rowHeight`.
+
+## Data acknowledgement
+
+The results shown in these articles are in whole or part based upon data
+generated by the TCGA Research Network: <https://www.cancer.gov/tcga>.
 
 ```{r session-info}
 sessionInfo()

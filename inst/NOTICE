@@ -5,8 +5,10 @@ maftools
 --------
 
 Parts of MutGlyph's oncoplot transformation and ordering logic are adapted
-from maftools, particularly R/oncoplot.R and R/oncomatrix.R. The adapted blocks
-are identified in MutGlyph's source code.
+from maftools 2.26.0, particularly R/oncoplot.R and R/oncomatrix.R at
+Bioconductor source commit 9e83363e07890e3a9de437f687acf0b8519b902a.
+The adapted blocks are identified in MutGlyph's source code.
+Source: https://git.bioconductor.org/packages/maftools
 
 MIT License
 
@@ -76,3 +78,6 @@ PIK3CA and FLT3 domain annotations shown in the package documentation are
 derived from UniProt and InterPro records. Copyrightable parts of UniProt
 databases are available under the Creative Commons Attribution 4.0
 International license: https://creativecommons.org/licenses/by/4.0/
+
+InterPro downloadable data are available under the CC0 1.0 Universal Public
+Domain Dedication: https://www.ebi.ac.uk/interpro/about/license/

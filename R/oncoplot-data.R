@@ -26,6 +26,9 @@
 #'
 #' @return A named list of data frames, vectors, and title statistics.
 #' @keywords internal
+# Portions marked "Adapted" below are based on maftools 2.26.0,
+# Bioconductor source commit 9e83363e07890e3a9de437f687acf0b8519b902a:
+# https://git.bioconductor.org/packages/maftools
 oncoplot_data <- function(maf,
                           top = 20,
                           minMut = NULL,

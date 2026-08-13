@@ -36,7 +36,8 @@ The small table below is a frozen, offline snapshot derived from InterPro's
 representative-domain matches for UniProt P36888 (FLT3), retrieved 2026-08-13.
 Current annotations can instead be requested explicitly with
 `mutglyph_interpro_domains("P36888")`; plotting itself never requires network
-access.
+access. The retrieval and selection workflow is retained under
+`data-raw/protein-domains/` in the source repository.
 
 ```{r flt3-domains}
 flt3_domains <- data.frame(
@@ -109,6 +110,7 @@ source repository.
 The five-row domain table is deliberately inline: domains are just data and can
 be edited or replaced. These regions are a frozen snapshot of the main domain
 features in reviewed UniProt entry P42336.
+The same provenance workflow records how these features were selected.
 
 ```{r pik3ca-data}
 data(pik3ca_tcga_brca)

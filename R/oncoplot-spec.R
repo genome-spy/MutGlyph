@@ -33,6 +33,9 @@ oncoplot_spec <- function(data,
     height = "container",
     datasets = oncoplot_datasets(
       data,
+      drawRowBar = drawRowBar,
+      drawColBar = drawColBar,
+      showPct = showPct,
       showTitle = showTitle,
       titleText = titleText
     ),
@@ -133,7 +136,12 @@ oncoplot_body <- function(data,
   )
 }
 
-oncoplot_datasets <- function(data, showTitle, titleText) {
+oncoplot_datasets <- function(data,
+                              drawRowBar,
+                              drawColBar,
+                              showPct,
+                              showTitle,
+                              titleText) {
   top_bar_name <- if (is.null(data$custom_top_bar)) "topBars" else "customTopBar"
   top_bar_data <- if (is.null(data$custom_top_bar)) {
     data$top_bars
@@ -151,14 +159,22 @@ oncoplot_datasets <- function(data, showTitle, titleText) {
     data$custom_right_bar$data
   }
   datasets <- list(
-    genes = data$genes,
+    genes = data$genes[c(
+      "gene",
+      "gene_index",
+      if (showPct) "altered_percent_label"
+    )],
     # Samples and genes are dimension tables. Sparse facts carry stable IDs,
     # and GenomeSpy lookup transforms attach their display indices.
     samples = data$samples[c("sample", "sample_index")],
     events = data$events
   )
-  datasets[[top_bar_name]] <- top_bar_data
-  datasets[[right_bar_name]] <- right_bar_data
+  if (drawColBar) {
+    datasets[[top_bar_name]] <- top_bar_data
+  }
+  if (drawRowBar) {
+    datasets[[right_bar_name]] <- right_bar_data
+  }
   if (!is.null(data$custom_left_bar)) {
     datasets$customLeftBar <- data$custom_left_bar$data
   }

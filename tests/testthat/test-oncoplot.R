@@ -89,6 +89,19 @@ test_that("oncoplot JSON contains sparse row-record datasets", {
   expect_length(decoded$datasets$rightBars, 35)
 })
 
+test_that("hidden summaries are omitted from the widget payload", {
+  spec <- oncoplot(
+    laml_maf(),
+    top = 10,
+    drawColBar = FALSE,
+    drawRowBar = FALSE,
+    showPct = FALSE
+  )$x$spec
+
+  expect_false(any(c("topBars", "rightBars") %in% names(spec$datasets)))
+  expect_named(spec$datasets$genes, c("gene", "gene_index"))
+})
+
 test_that("optional clinical tracks and sample labels extend the shared grid", {
   plot <- oncoplot(
     laml_maf(),

@@ -22,7 +22,7 @@ lollipopPlot(
   minCount = NULL,
   yScale = NULL,
   showLegend = TRUE,
-  pointSize = 1,
+  pointSize = 1.5,
   width = NULL,
   height = NULL,
   elementId = NULL
@@ -76,7 +76,8 @@ and displaced plots use logarithmic scaling.}
 
 \item{showLegend}{Show the mutation-class legend.}
 
-\item{pointSize}{Relative marker-size multiplier.}
+\item{pointSize}{Relative marker-size multiplier, matching maftools' linear
+\code{cex} semantics.}
 
 \item{width, height}{Widget dimensions.}
 

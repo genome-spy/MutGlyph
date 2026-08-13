@@ -18,9 +18,27 @@ test_that("basic lollipop uses true-position vertical stems", {
   expect_identical(mutation_view$encoding$x$field, "position")
   expect_true(mutation_view$encoding$x$scale$zoom)
   expect_identical(mutation_view$encoding$y$scale$type, "linear")
-  expect_identical(mutation_view$layer[[1]]$mark$type, "rule")
-  expect_identical(mutation_view$layer[[1]]$encoding$y2, list(value = 0))
-  expect_identical(mutation_view$layer[[2]]$mark$type, "point")
+  stem <- mutation_view$layer[[1]]
+  point <- mutation_view$layer[[2]]
+  expect_identical(stem$mark$type, "rule")
+  expect_identical(stem$encoding$y2, list(value = 0))
+  expect_equal(stem$mark$yOffset, sqrt(point$mark$size) / 2)
+  expect_equal(
+    stem$mark$y2Offset,
+    spec$vconcat[[2]]$height / 2 + spec$vconcat[[2]]$padding$top
+  )
+  expect_identical(stem$mark$clip, "never")
+  expect_null(stem$mark$color)
+  expect_identical(point$mark$type, "point")
+  expect_equal(point$mark$size, 144)
+  expect_false(point$mark$filled)
+  expect_null(point$mark[["color"]])
+  expect_null(point$mark[["fill"]])
+  expect_null(point$mark[["stroke"]])
+  expect_equal(point$mark$strokeWidth, 1)
+  expect_equal(point$mark$strokeOpacity, 1)
+  expect_equal(point$mark$fillOpacity, 0.5)
+  expect_equal(spec$vconcat[[2]]$zindex, 1)
   expect_true(all(spec$datasets$mutations$label == ""))
 })
 
@@ -107,6 +125,46 @@ test_that("labels, counts, scales, and colors are configurable", {
   )
   expect_length(spec$vconcat[[2]]$layer, 2)
   expect_false(grepl("samples", spec$title$text))
+})
+
+test_that("lollipop scales leave headroom and use GenomeSpy colors by default", {
+  basic <- suppressWarnings(lollipopPlot(
+    laml_maf(),
+    gene = "FLT3",
+    AACol = "Protein_Change"
+  ))$x$spec
+  basic_y <- basic$vconcat[[1]]$encoding$y$scale
+  basic_color <- basic$vconcat[[1]]$encoding$color
+
+  expect_identical(basic_y$padding, 0.08)
+  expect_null(basic_y$domainMax)
+  expect_null(basic_color$scale)
+
+  displaced <- suppressWarnings(lollipopPlot(
+    laml_maf(),
+    gene = "FLT3",
+    AACol = "Protein_Change",
+    layout = "displaced"
+  ))$x$spec
+  displaced_y <- displaced$vconcat[[1]]$vconcat[[2]]$encoding$y$scale
+  displaced_color <- displaced$vconcat[[1]]$vconcat[[2]]$layer[[3]]$encoding$color
+
+  expect_identical(displaced_y$padding, 0.08)
+  expect_null(displaced_y$domainMax)
+  expect_null(displaced_color$scale)
+})
+
+test_that("pointSize follows maftools linear cex semantics", {
+  spec <- suppressWarnings(lollipopPlot(
+    laml_maf(),
+    gene = "FLT3",
+    AACol = "Protein_Change",
+    pointSize = 0.8
+  ))$x$spec
+  point <- spec$vconcat[[1]]$layer[[2]]$mark
+
+  expect_equal(point$size, 64 * 0.8^2)
+  expect_equal(sqrt(point$size), 8 * 0.8)
 })
 
 test_that("lollipop display arguments validate", {

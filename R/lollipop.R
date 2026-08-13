@@ -36,7 +36,8 @@
 #' @param yScale `"linear"` or `"log"`. When `NULL`, basic plots use linear
 #'   and displaced plots use logarithmic scaling.
 #' @param showLegend Show the mutation-class legend.
-#' @param pointSize Relative marker-size multiplier.
+#' @param pointSize Relative marker-size multiplier, matching maftools' linear
+#'   `cex` semantics.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
@@ -92,7 +93,7 @@ lollipopPlot <- function(maf = NULL,
                          minCount = NULL,
                          yScale = NULL,
                          showLegend = TRUE,
-                         pointSize = 1,
+                         pointSize = 1.5,
                          width = NULL,
                          height = NULL,
                          elementId = NULL) {

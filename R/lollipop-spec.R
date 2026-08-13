@@ -1,16 +1,28 @@
+lollipop_protein_height <- 56
+lollipop_protein_padding_top <- -5
+# maftools passes pointSize to base graphics as `cex`, which scales linear
+# dimensions. GenomeSpy's point size is area, so its base areas are multiplied
+# by pointSize squared.
+lollipop_basic_point_area <- 64
+lollipop_displaced_point_area <- 260 / 1.5^2
+
 lollipop_spec <- function(data,
                           layout = c("basic", "displaced"),
                           yScale = NULL,
                           showMutationRate = TRUE,
                           showDomainLabel = TRUE,
                           showLegend = TRUE,
-                          pointSize = 1) {
+                          pointSize = 1.5) {
   layout <- match.arg(layout)
   if (is.null(yScale)) {
     yScale <- if (layout == "basic") "linear" else "log"
   }
   yScale <- match.arg(yScale, c("linear", "log"))
-  colors <- data$colors[unique(data$mutations$variant_class)]
+  colors <- if (is.null(data$colors)) {
+    NULL
+  } else {
+    data$colors[unique(data$mutations$variant_class)]
+  }
   mutation_view <- if (layout == "basic") {
     lollipop_basic_view(data, colors, yScale, showLegend, pointSize)
   } else {
@@ -94,25 +106,41 @@ lollipop_basic_view <- function(data, colors, yScale, showLegend, pointSize) {
       x = lollipop_x_encoding(),
       y = lollipop_y_encoding(
         data$count_title,
-        yScale,
-        max(data$mutations$count)
+        yScale
       ),
       color = lollipop_color_encoding(colors, showLegend)
     ),
     layer = list(
       list(
         name = "stems",
-        mark = list(type = "rule", color = "#777777", size = 1, tooltip = NULL),
+        mark = list(
+          type = "rule",
+          size = 1,
+          # GenomeSpy defines the point diameter as sqrt(size). Starting the
+          # stem half a diameter below the point center keeps it out of the
+          # translucent point fill.
+          yOffset = sqrt(lollipop_basic_point_area * pointSize^2) / 2,
+          # Extend into the following view up to the protein center. The
+          # protein view is drawn above this view, hiding the excess stem.
+          y2Offset = lollipop_protein_height / 2 +
+            lollipop_protein_padding_top,
+          clip = "never",
+          tooltip = NULL
+        ),
         encoding = list(y2 = list(value = 0))
       ),
       list(
         name = "lollipops",
         mark = list(
           type = "point",
-          size = 170 * pointSize,
-          filled = TRUE,
-          stroke = "white",
-          strokeWidth = 1.2,
+          size = lollipop_basic_point_area * pointSize^2,
+          # An unfilled point maps the shared color channel to its outline.
+          # The explicit fill opacity also gives it a translucent fill in the
+          # same color without separate fill or stroke encodings.
+          filled = FALSE,
+          strokeWidth = 1,
+          strokeOpacity = 1,
+          fillOpacity = 0.5,
           tooltip = list(handler = "default")
         ),
         encoding = list(tooltip = lollipop_tooltip())
@@ -154,7 +182,7 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
       list(
         type = "displace1d",
         pos = "position",
-        length = 18 * sqrt(pointSize),
+        length = 12 * pointSize,
         positionFactor = list(expr = "pixelsPerResidue"),
         extent = list(
           expr = "[0.5, proteinLength + 0.5 - 25 / max(1, pixelsPerResidue)]"
@@ -198,8 +226,7 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
         encoding = list(
           y = lollipop_y_encoding(
             data$count_title,
-            yScale,
-            max(data$mutations$count)
+            yScale
           )
         ),
         layer = list(
@@ -228,7 +255,7 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
             name = "lollipops",
             mark = list(
               type = "point",
-              size = 260 * pointSize,
+              size = lollipop_displaced_point_area * pointSize^2,
               filled = TRUE,
               stroke = "white",
               strokeWidth = 1.5,
@@ -353,8 +380,9 @@ lollipop_protein_view <- function(data, showDomainLabel) {
   }
   list(
     name = "protein",
-    height = 56,
-    padding = list(top = -5),
+    zindex = 1,
+    height = lollipop_protein_height,
+    padding = list(top = lollipop_protein_padding_top),
     data = list(name = "domains"),
     encoding = list(
       x = list(
@@ -381,12 +409,11 @@ lollipop_x_encoding <- function() {
   )
 }
 
-lollipop_y_encoding <- function(title, scale_type, maximum) {
+lollipop_y_encoding <- function(title, scale_type) {
   scale <- if (scale_type == "log") {
     list(
       type = "log",
       domainMin = 1,
-      domainMax = max(maximum, 1.1),
       nice = FALSE,
       padding = 0.08
     )
@@ -394,7 +421,6 @@ lollipop_y_encoding <- function(title, scale_type, maximum) {
     list(
       type = "linear",
       domainMin = 0,
-      domainMax = maximum,
       nice = TRUE,
       padding = 0.08
     )
@@ -408,16 +434,21 @@ lollipop_y_encoding <- function(title, scale_type, maximum) {
 }
 
 lollipop_color_encoding <- function(colors, showLegend) {
-  list(
+  encoding <- list(
     field = "variant_class",
     type = "nominal",
-    # Lists force JSON arrays even when only one mutation class is present.
-    scale = list(
-      domain = as.list(names(colors)),
-      range = as.list(unname(colors))
-    ),
     legend = if (showLegend) list(title = "Variant class", orient = "top") else NULL
   )
+  if (!is.null(colors)) {
+    # Lists force JSON arrays even when only one mutation class is present.
+    encoding$scale <- list(
+      domain = as.list(names(colors)),
+      range = as.list(unname(colors))
+    )
+  }
+  # With no explicit scale, GenomeSpy supplies its default categorical
+  # palette. An explicit range is emitted only for user-provided colors.
+  encoding
 }
 
 lollipop_tooltip <- function() {

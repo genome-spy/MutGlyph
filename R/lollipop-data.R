@@ -107,7 +107,11 @@ lollipop_data <- function(maf,
     minimumLength = max(mutations$position)
   )
   classes <- unique(mutations$variant_class)
-  colors <- oncoplot_mutation_colors(classes, colors)
+  colors <- if (is.null(colors)) {
+    NULL
+  } else {
+    oncoplot_mutation_colors(classes, colors)
+  }
   sample_count <- nrow(as.data.frame(maftools::getSampleSummary(maf)))
   gene_summary <- as.data.frame(maftools::getGeneSummary(maf))
   mutated_samples <- gene_summary$MutatedSamples[
@@ -260,7 +264,11 @@ lollipop_dataframe_data <- function(data,
     useMafDomains = FALSE
   )
   classes <- unique(mutations$variant_class)
-  colors <- oncoplot_mutation_colors(classes, colors)
+  colors <- if (is.null(colors)) {
+    NULL
+  } else {
+    oncoplot_mutation_colors(classes, colors)
+  }
   samples <- unique(sample[!is.na(sample) & nzchar(sample)])
 
   list(

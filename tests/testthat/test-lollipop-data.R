@@ -15,6 +15,7 @@ test_that("lollipop data reproduces FLT3 recurrence and domains", {
   expect_equal(data$mutated_samples, 52)
   expect_equal(data$sample_count, 193)
   expect_equal(data$mutation_rate, 100 * 52 / 193)
+  expect_null(data$colors)
 
   d835y <- data$mutations[data$mutations$mutation == "D835Y", ]
   expect_equal(d835y$position, 835)

@@ -102,6 +102,8 @@ test_that("labels, counts, scales, and colors are configurable", {
     gene = "FLT3",
     AACol = "Protein_Change",
     labelPos = 835,
+    labPosSize = 1.2,
+    labPosAngle = 30,
     count = "samples",
     yScale = "log",
     colors = c(Missense_Mutation = "hotpink"),
@@ -113,7 +115,12 @@ test_that("labels, counts, scales, and colors are configurable", {
   mutations <- spec$datasets$mutations
 
   expect_true(all(mutations$label[mutations$position != 835] == ""))
-  expect_true(all(nzchar(mutations$label[mutations$position == 835])))
+  labels_835 <- mutations$label[mutations$position == 835]
+  expect_equal(sum(nzchar(labels_835)), 1)
+  expect_match(labels_835[nzchar(labels_835)], "D835.*[/]")
+  label_mark <- spec$vconcat[[1]]$layer[[3]]$mark
+  expect_equal(label_mark$size, 11 * 1.2)
+  expect_equal(label_mark$angle, -30)
   expect_identical(mutations$count, mutations$sample_count)
   expect_identical(spec$vconcat[[1]]$encoding$y$scale$type, "log")
   mutation_color <- spec$vconcat[[1]]$encoding$color$scale
@@ -125,6 +132,30 @@ test_that("labels, counts, scales, and colors are configurable", {
   )
   expect_length(spec$vconcat[[2]]$layer, 2)
   expect_false(grepl("samples", spec$title$text))
+})
+
+test_that("basic mutation annotations collapse shared positions", {
+  mutations <- data.frame(
+    position = c(835, 835, 842),
+    mutation = c("D835Y", "D835H", "N842K"),
+    count = c(10, 2, 3)
+  )
+
+  collapsed <- lollipop_labels(
+    mutations,
+    labelPos = "all",
+    layout = "basic",
+    collapsePosLabel = TRUE
+  )
+  separate <- lollipop_labels(
+    mutations,
+    labelPos = 835,
+    layout = "basic",
+    collapsePosLabel = FALSE
+  )
+
+  expect_identical(collapsed, c("D835Y/H", "", "N842K"))
+  expect_identical(separate, c("D835Y", "D835H", ""))
 })
 
 test_that("lollipop scales leave headroom and use GenomeSpy colors by default", {
@@ -184,6 +215,9 @@ test_that("lollipop display arguments validate", {
   expect_error(call(minCount = 100), "No mutations")
   expect_error(call(labelPos = "hotspots"), "numeric")
   expect_error(call(labelPos = 9999), "None")
+  expect_error(call(labPosSize = 0), "finite positive")
+  expect_error(call(labPosAngle = Inf), "finite number")
+  expect_error(call(collapsePosLabel = 1), "TRUE or FALSE")
   expect_error(call(showLegend = 1), "TRUE or FALSE")
   expect_error(call(pointSize = 0), "finite positive")
 })

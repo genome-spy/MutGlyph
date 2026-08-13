@@ -18,6 +18,12 @@
 #'   `HGVSp_Short`, `Protein_Change`, and `AAChange` are tried in that order.
 #' @param labelPos Amino-acid positions to label, or `"all"`. The displaced
 #'   layout labels all mutations by default; the basic layout labels none.
+#' @param labPosSize Relative mutation-label size, matching maftools' `cex`
+#'   semantics.
+#' @param collapsePosLabel Combine mutation labels at the same amino-acid
+#'   position, for example `D835Y/H`. Used by the basic layout.
+#' @param labPosAngle Mutation-label angle in degrees. Positive values rotate
+#'   counterclockwise, as in maftools. Used by the basic layout.
 #' @param showMutationRate Include the mutated-sample fraction in the title.
 #' @param showDomainLabel Draw ranged labels inside protein domains.
 #' @param refSeqID,proteinID Optional RefSeq transcript or protein identifier.
@@ -81,6 +87,7 @@ lollipopPlot <- function(maf = NULL,
                          gene = NULL,
                          AACol = NULL,
                          labelPos = NULL,
+                         labPosSize = 0.9,
                          showMutationRate = TRUE,
                          showDomainLabel = TRUE,
                          refSeqID = NULL,
@@ -93,6 +100,8 @@ lollipopPlot <- function(maf = NULL,
                          minCount = NULL,
                          yScale = NULL,
                          showLegend = TRUE,
+                         collapsePosLabel = TRUE,
+                         labPosAngle = 0,
                          pointSize = 1.5,
                          width = NULL,
                          height = NULL,
@@ -107,6 +116,14 @@ lollipopPlot <- function(maf = NULL,
   mutglyph_flag(showMutationRate, "showMutationRate")
   mutglyph_flag(showDomainLabel, "showDomainLabel")
   mutglyph_flag(showLegend, "showLegend")
+  mutglyph_flag(collapsePosLabel, "collapsePosLabel")
+  mutglyph_positive_number(labPosSize, "labPosSize")
+  if (
+    length(labPosAngle) != 1L || !is.numeric(labPosAngle) ||
+      is.na(labPosAngle) || !is.finite(labPosAngle)
+  ) {
+    stop("`labPosAngle` must be one finite number.", call. = FALSE)
+  }
   mutglyph_positive_number(pointSize, "pointSize")
   data <- lollipop_data(
     maf,
@@ -142,7 +159,8 @@ lollipopPlot <- function(maf = NULL,
   data$mutations$label <- lollipop_labels(
     data$mutations,
     labelPos = labelPos,
-    layout = layout
+    layout = layout,
+    collapsePosLabel = collapsePosLabel
   )
   mutglyph_widget(
     lollipop_spec(
@@ -152,6 +170,8 @@ lollipopPlot <- function(maf = NULL,
       showMutationRate = showMutationRate,
       showDomainLabel = showDomainLabel,
       showLegend = showLegend,
+      labPosSize = labPosSize,
+      labPosAngle = labPosAngle,
       pointSize = pointSize
     ),
     width = width,
@@ -160,7 +180,10 @@ lollipopPlot <- function(maf = NULL,
   )
 }
 
-lollipop_labels <- function(mutations, labelPos, layout) {
+lollipop_labels <- function(mutations,
+                            labelPos,
+                            layout,
+                            collapsePosLabel = TRUE) {
   if (is.null(labelPos)) {
     return(if (layout == "displaced") {
       lollipop_abbreviate_labels(mutations$mutation)
@@ -172,16 +195,44 @@ lollipop_labels <- function(mutations, labelPos, layout) {
     if (length(labelPos) != 1L || is.na(labelPos) || labelPos != "all") {
       stop("`labelPos` must be numeric amino-acid positions or \"all\".", call. = FALSE)
     }
-    return(lollipop_abbreviate_labels(mutations$mutation))
+    selected <- rep(TRUE, nrow(mutations))
+  } else {
+    if (!is.numeric(labelPos) || length(labelPos) == 0L || anyNA(labelPos)) {
+      stop("`labelPos` must be numeric amino-acid positions or \"all\".", call. = FALSE)
+    }
+    selected <- mutations$position %in% labelPos
+    if (!any(selected)) {
+      stop("None of the requested `labelPos` positions is mutated.", call. = FALSE)
+    }
   }
-  if (!is.numeric(labelPos) || length(labelPos) == 0L || anyNA(labelPos)) {
-    stop("`labelPos` must be numeric amino-acid positions or \"all\".", call. = FALSE)
+
+  labels <- rep("", nrow(mutations))
+  if (layout != "basic" || !collapsePosLabel) {
+    labels[selected] <- lollipop_abbreviate_labels(mutations$mutation[selected])
+    return(labels)
   }
-  selected <- mutations$position %in% labelPos
-  if (!any(selected)) {
-    stop("None of the requested `labelPos` positions is mutated.", call. = FALSE)
+
+  # maftools collapses changes at a shared residue into one label. Attach that
+  # label to the tallest lollipop so its vertical position clears every point
+  # in the group.
+  for (position in unique(mutations$position[selected])) {
+    indices <- which(selected & mutations$position == position)
+    anchor <- indices[which.max(mutations$count[indices])]
+    labels[anchor] <- lollipop_collapse_position_labels(
+      mutations$mutation[indices]
+    )
   }
-  ifelse(selected, lollipop_abbreviate_labels(mutations$mutation), "")
+  labels
+}
+
+lollipop_collapse_position_labels <- function(labels) {
+  labels <- unique(as.character(labels))
+  if (length(labels) == 1L) {
+    return(lollipop_abbreviate_labels(labels))
+  }
+  suffixes <- sub("^[[:alpha:]*]+[[:digit:]]+", "", labels[-1L])
+  suffixes[!nzchar(suffixes)] <- labels[-1L][!nzchar(suffixes)]
+  lollipop_abbreviate_labels(paste(c(labels[1L], suffixes), collapse = "/"))
 }
 
 lollipop_abbreviate_labels <- function(labels, maximum = 18L) {

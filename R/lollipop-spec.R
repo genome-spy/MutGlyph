@@ -12,6 +12,8 @@ lollipop_spec <- function(data,
                           showMutationRate = TRUE,
                           showDomainLabel = TRUE,
                           showLegend = TRUE,
+                          labPosSize = 0.9,
+                          labPosAngle = 0,
                           pointSize = 1.5) {
   layout <- match.arg(layout)
   if (is.null(yScale)) {
@@ -24,7 +26,15 @@ lollipop_spec <- function(data,
     data$colors[unique(data$mutations$variant_class)]
   }
   mutation_view <- if (layout == "basic") {
-    lollipop_basic_view(data, colors, yScale, showLegend, pointSize)
+    lollipop_basic_view(
+      data,
+      colors,
+      yScale,
+      showLegend,
+      labPosSize,
+      labPosAngle,
+      pointSize
+    )
   } else {
     lollipop_displaced_view(data, colors, yScale, showLegend, pointSize)
   }
@@ -96,7 +106,13 @@ lollipop_spec <- function(data,
   )
 }
 
-lollipop_basic_view <- function(data, colors, yScale, showLegend, pointSize) {
+lollipop_basic_view <- function(data,
+                                colors,
+                                yScale,
+                                showLegend,
+                                labPosSize,
+                                labPosAngle,
+                                pointSize) {
   list(
     name = "mutations-basic",
     width = "container",
@@ -151,7 +167,10 @@ lollipop_basic_view <- function(data, colors, yScale, showLegend, pointSize) {
         mark = list(
           type = "text",
           dy = -10,
-          angle = -45,
+          size = 11 * labPosSize,
+          # GenomeSpy's positive text angles rotate clockwise, opposite to
+          # base graphics' `srt` used by maftools.
+          angle = -labPosAngle,
           align = "left",
           baseline = "middle",
           color = "#303030",

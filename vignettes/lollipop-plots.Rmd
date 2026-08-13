@@ -66,7 +66,29 @@ lollipopPlot(
   gene = "FLT3",
   AACol = "Protein_Change",
   domains = flt3_domains,
-  height = 420
+  height = 350
+)
+```
+
+## Annotate selected mutations
+
+`labelPos` accepts amino-acid positions or `"all"`. As in maftools, changes at
+the same residue are collapsed by default: the FLT3 substitutions at residue
+835 become one label such as `D835E/H/Y`, anchored above the tallest lollipop
+at that position. Set `collapsePosLabel = FALSE` when each change needs its own
+label.
+
+```{r lollipop-annotations}
+lollipopPlot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains,
+  labelPos = c(599, 835),
+  labPosSize = 0.9,
+  labPosAngle = 35,
+  collapsePosLabel = TRUE,
+  height = 350
 )
 ```
 
@@ -85,13 +107,12 @@ lollipopPlot(
   domains = flt3_domains,
   layout = "displaced",
   count = "samples",
-  height = 500
+  height = 450
 )
 ```
 
-Set `labelPos` to selected residues in the basic view. Both mutation-event and
-distinct-sample counts remain available in tooltips and in the generated
-specification. The mutation input can also be a regular data frame containing
+Both mutation-event and distinct-sample counts remain available in tooltips and
+in the generated specification. The mutation input can also be a regular data frame containing
 `position` and optional `mutation`, `variant_class`, `sample`, and `count`
 columns, so custom and pre-aggregated analyses use the same renderer.
 
@@ -138,6 +159,6 @@ lollipopPlot(
   domains = pik3ca_domains,
   count = "samples",
   layout = "displaced",
-  height = 500
+  height = 450
 )
 ```

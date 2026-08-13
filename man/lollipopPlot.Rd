@@ -10,6 +10,7 @@ lollipopPlot(
   gene = NULL,
   AACol = NULL,
   labelPos = NULL,
+  labPosSize = 0.9,
   showMutationRate = TRUE,
   showDomainLabel = TRUE,
   refSeqID = NULL,
@@ -22,6 +23,8 @@ lollipopPlot(
   minCount = NULL,
   yScale = NULL,
   showLegend = TRUE,
+  collapsePosLabel = TRUE,
+  labPosAngle = 0,
   pointSize = 1.5,
   width = NULL,
   height = NULL,
@@ -46,6 +49,9 @@ data frame contains exactly one value in its \code{gene} column.}
 
 \item{labelPos}{Amino-acid positions to label, or \code{"all"}. The displaced
 layout labels all mutations by default; the basic layout labels none.}
+
+\item{labPosSize}{Relative mutation-label size, matching maftools' \code{cex}
+semantics.}
 
 \item{showMutationRate}{Include the mutated-sample fraction in the title.}
 
@@ -75,6 +81,12 @@ When \code{NULL}, the basic layout uses one and the displaced layout uses two.}
 and displaced plots use logarithmic scaling.}
 
 \item{showLegend}{Show the mutation-class legend.}
+
+\item{collapsePosLabel}{Combine mutation labels at the same amino-acid
+position, for example \code{D835Y/H}. Used by the basic layout.}
+
+\item{labPosAngle}{Mutation-label angle in degrees. Positive values rotate
+counterclockwise, as in maftools. Used by the basic layout.}
 
 \item{pointSize}{Relative marker-size multiplier, matching maftools' linear
 \code{cex} semantics.}

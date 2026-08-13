@@ -9,7 +9,8 @@ oncoplot_title_view <- function() {
       align = "center",
       baseline = "middle",
       size = 16,
-      fontWeight = "normal"
+      fontWeight = "normal",
+      tooltip = FALSE
     ),
     encoding = list(
       x = list(value = 0.5),
@@ -99,8 +100,7 @@ oncoplot_custom_top_bar_view <- function(bar, matrix_width) {
     mark = list(
       type = "rect",
       color = "#535c68",
-      strokeWidth = 0,
-      tooltip = list(handler = "default")
+      strokeWidth = 0
     ),
     encoding = list(
       x = list(field = "sample_index", type = "index", axis = NULL),
@@ -137,7 +137,8 @@ oncoplot_gene_labels_view <- function(matrix_height) {
       baseline = "middle",
       size = 12,
       dx = -3,
-      clip = "never"
+      clip = "never",
+      tooltip = FALSE
     ),
     encoding = list(
       x = list(value = 1),
@@ -179,7 +180,8 @@ oncoplot_matrix_view <- function(color_encoding,
         mark = list(
           type = "rect",
           color = "#ECF0F1",
-          style = "outline"
+          style = "outline",
+          tooltip = FALSE
         ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
@@ -227,8 +229,7 @@ oncoplot_matrix_view <- function(color_encoding,
 oncoplot_event_mark <- function() {
   list(
     type = "rect",
-    style = "outline",
-    tooltip = list(handler = "default")
+    style = "outline"
   )
 }
 
@@ -255,7 +256,8 @@ oncoplot_percentages_view <- function(matrix_height) {
       align = "left",
       baseline = "middle",
       size = 11,
-      dx = 2
+      dx = 2,
+      tooltip = FALSE
     ),
     encoding = list(
       x = list(value = 0),
@@ -329,8 +331,7 @@ oncoplot_custom_side_bar_view <- function(bar, matrix_height, side) {
     mark = list(
       type = "rect",
       color = "#535c68",
-      strokeWidth = 0,
-      tooltip = list(handler = "default")
+      strokeWidth = 0
     ),
     encoding = list(
       x = list(
@@ -384,6 +385,10 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
       )
     } else {
       scale <- list(domain = unname(track$levels))
+      legend <- list(title = track$feature)
+      if (identical(track$feature, "FAB_classification")) {
+        legend$columns <- 4
+      }
       if (!is.null(track$colors)) {
         scale$range <- unname(track$colors)
       } else if (!is.null(track$scheme)) {
@@ -396,7 +401,7 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
         # (Tableau 10). The explicit domain keeps assignment and legend order
         # deterministic across sample filtering and annotation sorting.
         scale = scale,
-        legend = list(title = track$feature)
+        legend = legend
       )
     }
     annotation_layer <- list(
@@ -462,7 +467,8 @@ oncoplot_clinical_views <- function(data, matrix_width, has_left_bar) {
           baseline = "middle",
           size = 11,
           dx = -3,
-          clip = "never"
+          clip = "never",
+          tooltip = FALSE
         ),
         encoding = list(
           x = list(value = 1),
@@ -497,7 +503,8 @@ oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
         angle = -90,
         align = "right",
         baseline = "middle",
-        size = 9
+        size = 9,
+        tooltip = FALSE
       ),
       encoding = list(
         x = list(
@@ -530,6 +537,7 @@ oncoplot_titv_views <- function(data, matrix_width, has_left_bar) {
     ),
     legend = list(
       title = "Ti/Tv",
+      titleOrient = "left",
       orient = "right",
       direction = "vertical",
       columns = 2
@@ -553,7 +561,12 @@ oncoplot_titv_views <- function(data, matrix_width, has_left_bar) {
           stop = nrow(data$samples) + 1,
           as = "sample_index"
         )),
-        mark = list(type = "rect", color = "#D3D3D3", style = "outline"),
+        mark = list(
+          type = "rect",
+          color = "#D3D3D3",
+          style = "outline",
+          tooltip = FALSE
+        ),
         encoding = list(
           x = list(field = "sample_index", type = "index", axis = NULL),
           y = list(value = 0),
@@ -609,6 +622,12 @@ oncoplot_color_encoding <- function(data) {
     scale = list(
       domain = unname(data$mutation_classes),
       range = unname(data$mutation_colors)
+    ),
+    # Mutation class names are long. Three columns keep the collected legend
+    # compact by wrapping typical oncoplot classes onto multiple rows.
+    legend = list(
+      title = "Variant classification",
+      columns = 3
     )
   )
 }
@@ -641,6 +660,6 @@ oncoplot_empty_view <- function() {
     width = list(grow = 0),
     height = list(grow = 0),
     data = list(values = list()),
-    mark = "point"
+    mark = list(type = "point", tooltip = FALSE)
   )
 }

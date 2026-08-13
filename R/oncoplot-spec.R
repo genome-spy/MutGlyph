@@ -198,12 +198,11 @@ oncoplot_config <- function() {
     legend = list(
       labelFontSize = 11,
       symbolSize = 100,
-      title = NULL,
+      titleOrient = "top",
       orient = "bottom",
       direction = "horizontal"
     ),
     scale = list(zoom = FALSE),
-    mark = list(tooltip = FALSE),
     style = list(
       outline = list(
         stroke = "white",

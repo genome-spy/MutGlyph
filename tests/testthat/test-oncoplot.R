@@ -20,6 +20,14 @@ test_that("oncoplot retains a complete reference composition", {
   expect_identical(body$width, "container")
   expect_identical(body$height, "container")
   expect_true(body$scales$x$zoom)
+  expect_null(spec$config$mark)
+  expect_null(body$concat[[2]]$mark$tooltip)
+  expect_identical(spec$config$legend$titleOrient, "top")
+  expect_identical(
+    body$concat[[2]]$encoding$color$legend$title,
+    "Variant classification"
+  )
+  expect_identical(body$concat[[2]]$encoding$color$legend$columns, 3)
   expect_identical(
     vapply(body$concat[[2]]$encoding$tooltip, `[[`, character(1), "title"),
     c("Sample", "Variant classification", "Count")
@@ -35,6 +43,9 @@ test_that("oncoplot retains a complete reference composition", {
   )
   matrix_layers <- body$concat[[6]]$layer
   background <- matrix_layers[[1]]
+  expect_false(background$mark$tooltip)
+  expect_null(matrix_layers[[2]]$mark$tooltip)
+  expect_null(matrix_layers[[3]]$mark$tooltip)
   expect_identical(background$data$sequence$stop, 194)
   expect_identical(
     background$transform[[1]]$from$data$sequence$stop,
@@ -51,6 +62,7 @@ test_that("oncoplot retains a complete reference composition", {
   expect_identical(matrix_layers[[3]]$name, "copy-number-events")
   expect_identical(matrix_layers[[3]]$encoding$y$band, 0.5)
   expect_null(matrix_layers[[3]]$encoding$y2)
+  expect_null(body$concat[[8]]$mark$tooltip)
   expect_identical(
     vapply(
       body$concat,
@@ -105,9 +117,15 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
     oncoplot_data(laml_maf(), top = 10)$samples$sample
   )
   sample_view <- body$concat[[14]]
+  clinical_label <- body$concat[[9]]
+  clinical_missing <- body$concat[[10]]$layer[[1]]
   clinical_layer <- body$concat[[10]]$layer[[2]]
   expect_identical(sample_view$encoding$x$band, 0)
   expect_identical(sample_view$encoding$x2$band, 1)
+  expect_false(sample_view$mark$tooltip)
+  expect_false(clinical_label$mark$tooltip)
+  expect_null(clinical_missing$mark$tooltip)
+  expect_null(clinical_layer$mark$tooltip)
   expect_identical(
     vapply(clinical_layer$encoding$tooltip, `[[`, character(1), "title"),
     c("Sample", "FAB_classification")
@@ -118,6 +136,11 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
   )
   expect_null(clinical_layer$encoding$color$scale$range)
   expect_null(clinical_layer$encoding$color$scale$scheme)
+  expect_identical(
+    clinical_layer$encoding$color$legend$title,
+    "FAB_classification"
+  )
+  expect_identical(clinical_layer$encoding$color$legend$columns, 4)
 })
 
 test_that("mixed clinical tracks use independent typed scales", {
@@ -298,7 +321,11 @@ test_that("Ti/Tv adds one aligned row and an independent color scale", {
   expect_identical(titv_view$height, 40)
   expect_identical(titv_view$resolve$scale$color, "excluded")
   expect_identical(titv_view$resolve$legend$default, "excluded")
+  expect_false(titv_view$layer[[1]]$mark$tooltip)
+  expect_null(titv_view$layer[[2]]$mark$tooltip)
   legend <- titv_view$layer[[2]]$encoding$color$legend
+  expect_identical(legend$title, "Ti/Tv")
+  expect_identical(legend$titleOrient, "left")
   expect_identical(legend$orient, "right")
   expect_identical(legend$direction, "vertical")
   expect_identical(legend$columns, 2)
@@ -399,11 +426,11 @@ test_that("custom summary bars replace defaults and expose their metrics", {
   right_view <- body$concat[[10]]
   expect_identical(top_view$encoding$y$axis$title, "Purity")
   expect_identical(top_view$encoding$y$scale$domain, c(0, 1))
-  expect_identical(top_view$mark$tooltip$handler, "default")
+  expect_null(top_view$mark$tooltip)
   expect_identical(left_view$encoding$x$axis$title, "Mean_VAF")
   expect_true(left_view$encoding$x$scale$reverse)
   expect_identical(left_view$encoding$x2$datum, 0)
-  expect_identical(left_view$mark$tooltip$handler, "default")
+  expect_null(left_view$mark$tooltip)
   expect_identical(right_view$encoding$x$axis$title, "-log10(q)")
   expect_identical(right_view$encoding$x$scale$domain, c(0, 20))
   expect_identical(right_view$encoding$x2$datum, 0)

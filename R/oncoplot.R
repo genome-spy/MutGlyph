@@ -100,17 +100,17 @@ oncoplot <- function(maf,
                      width = NULL,
                      height = NULL,
                      elementId = NULL) {
-  oncoplot_flag(includeColBarCN, "includeColBarCN")
-  oncoplot_flag(showTumorSampleBarcodes, "showTumorSampleBarcodes")
-  oncoplot_flag(altered, "altered")
-  oncoplot_flag(keepGeneOrder, "keepGeneOrder")
-  oncoplot_flag(removeNonMutated, "removeNonMutated")
-  oncoplot_flag(sortByAnnotation, "sortByAnnotation")
-  oncoplot_flag(draw_titv, "draw_titv")
-  oncoplot_flag(drawRowBar, "drawRowBar")
-  oncoplot_flag(drawColBar, "drawColBar")
-  oncoplot_flag(showPct, "showPct")
-  oncoplot_flag(showTitle, "showTitle")
+  mutglyph_flag(includeColBarCN, "includeColBarCN")
+  mutglyph_flag(showTumorSampleBarcodes, "showTumorSampleBarcodes")
+  mutglyph_flag(altered, "altered")
+  mutglyph_flag(keepGeneOrder, "keepGeneOrder")
+  mutglyph_flag(removeNonMutated, "removeNonMutated")
+  mutglyph_flag(sortByAnnotation, "sortByAnnotation")
+  mutglyph_flag(draw_titv, "draw_titv")
+  mutglyph_flag(drawRowBar, "drawRowBar")
+  mutglyph_flag(drawColBar, "drawColBar")
+  mutglyph_flag(showPct, "showPct")
+  mutglyph_flag(showTitle, "showTitle")
   if (
     length(rowHeight) != 1L ||
       !is.numeric(rowHeight) ||
@@ -191,8 +191,4 @@ oncoplot_widget_height <- function(data,
   if (!is.null(data$titv)) height <- height + 44
   if (showTumorSampleBarcodes) height <- height + 84
   max(320, height)
-}
-
-oncoplot_flag <- function(value, name) {
-  mutglyph_flag(value, name)
 }

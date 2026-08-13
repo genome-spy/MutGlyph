@@ -229,8 +229,7 @@ oncoplot_clinical_data <- function(maf,
     sample_order,
     as.character(clinical[["Tumor_Sample_Barcode"]])
   )
-  tracks <- lapply(seq_along(clinicalFeatures), function(feature_index) {
-    feature <- clinicalFeatures[feature_index]
+  tracks <- lapply(clinicalFeatures, function(feature) {
     values <- clinical[[feature]][sample_rows]
     supplied <- if (is.null(annotationColor)) NULL else annotationColor[[feature]]
 
@@ -258,7 +257,6 @@ oncoplot_clinical_data <- function(maf,
       )
       return(list(
         feature = feature,
-        feature_index = feature_index,
         type = "quantitative",
         data = data,
         scheme = tolower(if (is.null(supplied)) "blues" else supplied)
@@ -305,7 +303,6 @@ oncoplot_clinical_data <- function(maf,
     }
     list(
       feature = feature,
-      feature_index = feature_index,
       type = "nominal",
       data = data.frame(
         sample = sample_order,
@@ -748,7 +745,6 @@ oncoplot_normalize_custom_bar <- function(data,
   names(normalized_data)[1] <- key_name
   list(
     data = normalized_data,
-    key_name = key_name,
     metric = metric,
     limits = oncoplot_bar_limits(limits, paste0(sub("Data$", "", argument), "Lims"))
   )

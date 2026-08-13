@@ -155,7 +155,6 @@ lollipopPlot <- function(maf = NULL,
       call. = FALSE
     )
   }
-  data$min_count <- as.integer(minCount)
   data$mutations$label <- lollipop_labels(
     data$mutations,
     labelPos = labelPos,

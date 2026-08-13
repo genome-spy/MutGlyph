@@ -63,6 +63,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
+Font Awesome
+------------
+
+MutGlyph embeds the Expand, Compress, File Image, and File Code SVG paths from
+Font Awesome Free 6.5.2. No Font Awesome runtime, stylesheet, or font files are
+included. Source: https://fontawesome.com/
+
+Copyright Fonticons, Inc.
+
+The icons are licensed under the Creative Commons Attribution 4.0
+International license: https://creativecommons.org/licenses/by/4.0/
+
+
 Example data
 ------------
 

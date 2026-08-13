@@ -62,8 +62,37 @@ test_that("the committed runtime bundle includes SVG export", {
   bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
   bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
 
-  expect_match(bundle, "Save as SVG", fixed = TRUE)
+  expect_match(bundle, "Download SVG", fixed = TRUE)
   expect_match(bundle, "imageExport", fixed = TRUE)
+})
+
+test_that("the committed runtime bundle includes fullscreen controls", {
+  bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
+  bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
+
+  expect_match(bundle, "Enter fullscreen", fixed = TRUE)
+  expect_match(bundle, "Exit fullscreen", fixed = TRUE)
+  expect_match(bundle, "requestFullscreen", fixed = TRUE)
+  expect_match(bundle, "exitFullscreen", fixed = TRUE)
+})
+
+test_that("the committed runtime bundle downloads the GenomeSpy spec", {
+  bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
+  bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
+
+  expect_match(bundle, "Download GenomeSpy specification", fixed = TRUE)
+  expect_match(bundle, "mutglyph-spec.json", fixed = TRUE)
+  expect_match(bundle, "application/json", fixed = TRUE)
+})
+
+test_that("the committed runtime bundle scopes its subdued toolbar styles", {
+  bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
+  bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
+
+  expect_match(bundle, "CSSScopeRule", fixed = TRUE)
+  expect_match(bundle, "@scope", fixed = TRUE)
+  expect_match(bundle, "mutglyph-toolbar", fixed = TRUE)
+  expect_match(bundle, "opacity", fixed = TRUE)
 })
 
 test_that("the committed runtime bundle works around Bootstrap tooltips", {

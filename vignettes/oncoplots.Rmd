@@ -47,7 +47,7 @@ oncoplot(
   keepGeneOrder = TRUE,
   sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965"),
   removeNonMutated = TRUE,
-  height = 500
+  height = 550
 )
 ```
 
@@ -82,7 +82,7 @@ oncoplot(
   draw_titv = TRUE,
   showTumorSampleBarcodes = TRUE,
   titleText = "TCGA acute myeloid leukemia",
-  height = 700
+  height = 550
 )
 ```
 
@@ -97,7 +97,7 @@ oncoplot(
     Missense_Mutation = "#00897B",
     Multi_Hit = "#D81B60"
   ),
-  height = 500
+  height = 520
 )
 ```
 
@@ -131,7 +131,7 @@ oncoplot(
   leftBarData = mean_vaf,
   leftBarLims = c(0, 100),
   titleText = "Follow-up and mean variant allele frequency",
-  height = 500
+  height = 440
 )
 ```
 
@@ -163,7 +163,7 @@ oncoplot(
   laml_gistic,
   top = 10,
   titleText = "Sequence mutations and GISTIC calls",
-  height = 500
+  height = 440
 )
 ```
 

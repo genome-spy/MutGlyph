@@ -145,6 +145,7 @@ test_that("the committed runtime bundle scopes its subdued toolbar styles", {
   expect_match(bundle, "@scope", fixed = TRUE)
   expect_match(bundle, "mutglyph-toolbar", fixed = TRUE)
   expect_match(bundle, "opacity", fixed = TRUE)
+  expect_match(bundle, "$1.mutglyph $2", fixed = TRUE)
 })
 
 test_that("the committed runtime bundle works around Bootstrap tooltips", {

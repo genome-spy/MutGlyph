@@ -78,9 +78,9 @@ function createWidgetStyle() {
   const style = document.createElement("style");
   if (typeof CSSScopeRule === "undefined") {
     // Fallback for older RStudio Viewer Chromium versions.
-    style.textContent = TOOLBAR_RULES.split(":scope").join(".mutglyph").replace(
-      ".mutglyph-toolbar {",
-      ".mutglyph > .mutglyph-toolbar {",
+    style.textContent = TOOLBAR_RULES.replaceAll(":scope", ".mutglyph").replace(
+      /^(\s*)(\.mutglyph-(?:toolbar|control))/gm,
+      "$1.mutglyph $2",
     );
   } else {
     // A prelude-less scope uses the style element's parent as its root.

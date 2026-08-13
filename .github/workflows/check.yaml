@@ -1,0 +1,44 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+name: R and JavaScript checks
+
+permissions: read-all
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          needs: check
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Test JavaScript and validate GenomeSpy specifications
+        run: npm test
+
+      - name: Verify committed JavaScript artifacts
+        run: |
+          npm run build
+          npm run licenses
+          git diff --exit-code -- inst/htmlwidgets/mutglyph.js inst/JS-LICENSES
+
+      - uses: r-lib/actions/check-r-package@v2

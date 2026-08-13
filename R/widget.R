@@ -36,3 +36,12 @@ mutglyph_flag <- function(value, name) {
     stop(sprintf("`%s` must be TRUE or FALSE.", name), call. = FALSE)
   }
 }
+
+mutglyph_positive_number <- function(value, name) {
+  if (
+    length(value) != 1L || !is.numeric(value) || is.na(value) ||
+      !is.finite(value) || value <= 0
+  ) {
+    stop(sprintf("`%s` must be one finite positive number.", name), call. = FALSE)
+  }
+}

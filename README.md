@@ -5,8 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 <!-- badges: end -->
 
-MutGlyph creates interactive oncoplots and rainfall plots from
-[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects. It uses
+MutGlyph creates interactive oncoplots, protein lollipop plots, and rainfall
+plots from [`maftools`](https://bioconductor.org/packages/maftools/) MAF objects;
+lollipop plots also accept ordinary mutation and domain tables. It uses
 [GenomeSpy](https://genomespy.app/) for linked exploration, tooltips, and
 publication-quality SVG export.
 
@@ -45,6 +46,40 @@ mutglyph_rainfall_plot(
   detectChangePoints = TRUE
 )
 ```
+
+Protein lollipops have two layouts. The basic layout stays close to maftools,
+while the displaced layout separates recurrent hotspots and connects every
+displayed marker back to its true residue. Singletons are omitted from the
+displaced layout by default:
+
+```r
+# Frozen InterPro representative-domain matches for FLT3 (UniProt P36888).
+# Fetch current annotations with mutglyph_interpro_domains("P36888").
+flt3_domains <- data.frame(
+  start = c(246, 438, 564, 756),
+  end = c(357, 531, 695, 958),
+  label = c("Ig-like", "Ig-like", "Kinase N", "Kinase C"),
+  protein_length = 993
+)
+
+mutglyph_lollipop_plot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains
+)
+
+mutglyph_lollipop_plot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains,
+  layout = "displaced"
+)
+```
+
+The same function accepts a regular mutation data frame, making custom and
+pre-aggregated inputs composable with either custom or InterPro domains.
 
 ## Installation
 
@@ -87,6 +122,8 @@ shows biological details, and **Save as SVG** exports the visible composition.
 - Transition/transversion contributions
 - Row height, labels, title, percentages, and summary-track visibility
 - Custom sample- and gene-level summary bars
+- Basic and collision-aware protein lollipop plots
+- Custom and InterPro protein-domain annotations
 - Interactive rainfall plots with optional kataegis detection
 
 See the [getting-started

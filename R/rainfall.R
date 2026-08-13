@@ -61,8 +61,8 @@ mutglyph_rainfall_plot <- function(maf,
       call. = FALSE
     )
   }
-  rainfall_positive_number(fontSize, "fontSize")
-  rainfall_positive_number(pointSize, "pointSize")
+  mutglyph_positive_number(fontSize, "fontSize")
+  mutglyph_positive_number(pointSize, "pointSize")
   data <- rainfall_data(
     maf,
     tsb = tsb,
@@ -76,13 +76,4 @@ mutglyph_rainfall_plot <- function(maf,
     height = height,
     elementId = elementId
   )
-}
-
-rainfall_positive_number <- function(value, name) {
-  if (
-    length(value) != 1L || !is.numeric(value) || is.na(value) ||
-      !is.finite(value) || value <= 0
-  ) {
-    stop(sprintf("`%s` must be one finite positive number.", name), call. = FALSE)
-  }
 }

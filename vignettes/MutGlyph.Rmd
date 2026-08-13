@@ -18,8 +18,8 @@ knitr::opts_chunk$set(
 
 MutGlyph builds interactive cancer-genomics plots from
 [`maftools`](https://bioconductor.org/packages/maftools/) MAF objects and renders
-them with [GenomeSpy](https://genomespy.app/). The first plot type is an
-oncoplot with linked sample ordering, tooltips, zooming, and SVG export.
+them with [GenomeSpy](https://genomespy.app/). Oncoplots, protein lollipops, and
+rainfall plots support tooltips, zooming, and SVG export.
 
 `mutglyph_oncoplot()` deliberately imitates `maftools::oncoplot()`: it accepts
 the same MAF objects and follows familiar argument names, ordering behavior,
@@ -187,6 +187,75 @@ mutglyph_oncoplot(
 
 Set `includeColBarCN = FALSE` to keep the copy-number layer in the matrix but
 limit the top bars to sequence mutations.
+
+## Map mutations onto a protein
+
+`mutglyph_lollipop_plot()` follows the familiar `maftools::lollipopPlot()` data
+conventions but uses a cleaner interactive composition. Mutation events stay
+at their true amino-acid positions, and domains are an ordinary data frame that
+can be inspected, edited, or replaced.
+
+The small table below is a frozen, offline snapshot derived from InterPro's
+representative-domain matches for UniProt P36888 (FLT3), retrieved 2026-08-13.
+Current annotations can instead be requested explicitly with
+`mutglyph_interpro_domains("P36888")`; plotting itself never requires network
+access.
+
+```{r flt3-domains}
+flt3_domains <- data.frame(
+  start = c(246, 438, 564, 756),
+  end = c(357, 531, 695, 958),
+  label = c("Ig-like", "Ig-like", "Kinase N", "Kinase C"),
+  description = c(
+    "Immunoglobulin-like region",
+    "Immunoglobulin-like region",
+    "Protein kinase N-terminal region",
+    "Protein kinase C-terminal region"
+  ),
+  accession = c(
+    "G3DSA:2.60.40.10", "G3DSA:2.60.40.10",
+    "G3DSA:3.30.200.20", "G3DSA:1.10.510.10"
+  ),
+  source_database = "cathgene3d",
+  protein_id = "P36888",
+  protein_length = 993
+)
+```
+
+```{r lollipop-basic}
+mutglyph_lollipop_plot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains,
+  height = 420
+)
+```
+
+Dense hotspots often contain several different protein changes at the same or
+nearby residues. The displaced layout reserves marker space in pixels, labels
+recurrent changes, and uses curved connectors to preserve the true protein
+position. Its logarithmic recurrence axis keeps moderately recurrent mutations
+visible beside dominant hotspots. Singletons are omitted by default; set
+`minCount = 1` to include them.
+
+```{r lollipop-displaced}
+mutglyph_lollipop_plot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains,
+  layout = "displaced",
+  count = "samples",
+  height = 500
+)
+```
+
+Set `labelPos` to selected residues in the basic view. Both mutation-event and
+distinct-sample counts remain available in tooltips and in the generated
+specification. The mutation input can also be a regular data frame containing
+`position` and optional `mutation`, `variant_class`, `sample`, and `count`
+columns, so custom and pre-aggregated analyses use the same renderer.
 
 ## Explore mutation clustering with a rainfall plot
 

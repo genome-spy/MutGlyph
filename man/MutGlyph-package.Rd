@@ -11,8 +11,11 @@ MutGlyph creates opinionated interactive cancer genomics plots from
 familiar \code{maftools::oncoplot()} API and composition, making it an almost
 drop-in interactive replacement for common workflows.
 \code{\link[=mutglyph_rainfall_plot]{mutglyph_rainfall_plot()}} similarly follows \code{maftools::rainfallPlot()} and
-can annotate potential kataegis loci. GenomeSpy owns rendering and
-interaction in the browser.
+can annotate potential kataegis loci. \code{\link[=mutglyph_lollipop_plot]{mutglyph_lollipop_plot()}} provides
+both a familiar protein lollipop and a collision-aware displaced layout,
+accepts ordinary mutation and domain tables, and can use annotations from
+\code{\link[=mutglyph_interpro_domains]{mutglyph_interpro_domains()}}.
+GenomeSpy owns rendering and interaction in the browser.
 }
 \seealso{
 Useful links:

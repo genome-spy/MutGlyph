@@ -8,6 +8,9 @@ source("R/oncoplot.R")
 source("R/rainfall-data.R")
 source("R/rainfall-spec.R")
 source("R/rainfall.R")
+source("R/lollipop-data.R")
+source("R/lollipop-spec.R")
+source("R/lollipop.R")
 
 spec <- list(
   `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
@@ -109,5 +112,25 @@ brca <- maftools::read.maf(
 writeLines(
   as_json(mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)),
   file.path(output_dir, "rainfall.json"),
+  useBytes = TRUE
+)
+
+writeLines(
+  as_json(suppressWarnings(mutglyph_lollipop_plot(
+    laml,
+    gene = "NRAS",
+    AACol = "Protein_Change"
+  ))),
+  file.path(output_dir, "lollipop-basic.json"),
+  useBytes = TRUE
+)
+writeLines(
+  as_json(suppressWarnings(mutglyph_lollipop_plot(
+    laml,
+    gene = "NRAS",
+    AACol = "Protein_Change",
+    layout = "displaced"
+  ))),
+  file.path(output_dir, "lollipop-displaced.json"),
   useBytes = TRUE
 )

@@ -7,10 +7,14 @@ reference:
 - title: Plotting
   contents:
   - mutglyph_oncoplot
+  - mutglyph_lollipop_plot
   - mutglyph_rainfall_plot
 - title: GenomeSpy specification
   contents:
   - as_json
+- title: Protein annotation
+  contents:
+  - mutglyph_interpro_domains
 
 articles:
 - title: Get started

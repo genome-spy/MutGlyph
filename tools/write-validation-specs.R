@@ -134,3 +134,23 @@ writeLines(
   file.path(output_dir, "lollipop-displaced.json"),
   useBytes = TRUE
 )
+
+load(file.path("data", "pik3ca_tcga_brca.rda"))
+pik3ca_domains <- data.frame(
+  start = c(16, 187, 330, 517, 765),
+  end = c(105, 289, 487, 694, 1051),
+  label = c("ABD", "RBD", "C2", "Helical", "Kinase"),
+  protein_id = "P42336",
+  protein_length = 1068
+)
+writeLines(
+  as_json(mutglyph_lollipop_plot(
+    pik3ca_tcga_brca,
+    gene = "PIK3CA",
+    domains = pik3ca_domains,
+    count = "samples",
+    layout = "displaced"
+  )),
+  file.path(output_dir, "lollipop-custom-data.json"),
+  useBytes = TRUE
+)

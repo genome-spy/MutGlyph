@@ -26,7 +26,8 @@
 #' @param layout Either `"basic"` for true-position vertical lollipops or
 #'   `"displaced"` for collision-aware markers, labels, and connectors.
 #' @param count Use mutation `"events"` (the maftools convention) or distinct
-#'   tumor `"samples"` for recurrence heights.
+#'   tumor `"samples"` for recurrence heights. For a pre-aggregated data frame,
+#'   this also defines what its `count` column represents.
 #' @param minCount Minimum plotted recurrence under the selected `count` mode.
 #'   When `NULL`, the basic layout uses one and the displaced layout uses two.
 #' @param yScale `"linear"` or `"log"`. When `NULL`, basic plots use linear

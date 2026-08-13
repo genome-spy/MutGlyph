@@ -15,6 +15,9 @@ reference:
 - title: Protein annotation
   contents:
   - mutglyph_interpro_domains
+- title: Example data
+  contents:
+  - pik3ca_tcga_brca
 
 articles:
 - title: Get started

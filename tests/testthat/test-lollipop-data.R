@@ -139,6 +139,16 @@ test_that("ordinary mutation tables use the same normalized contract", {
     proteinLength = 20
   )
   expect_equal(weighted$mutations$event_count, 7)
+
+  preaggregated_samples <- lollipop_data(
+    data.frame(position = 10, mutation = "A10T", count = 7),
+    gene = "GENE",
+    proteinLength = 20,
+    count = "samples"
+  )
+  expect_equal(preaggregated_samples$mutations$sample_count, 7)
+  expect_true(is.na(preaggregated_samples$mutations$event_count))
+  expect_equal(preaggregated_samples$mutations$count, 7)
 })
 
 test_that("custom mutation tables validate ambiguous and sample inputs", {
@@ -153,5 +163,25 @@ test_that("custom mutation tables validate ambiguous and sample inputs", {
   expect_error(
     lollipop_data(data.frame(position = 10, count = 0)),
     "finite positive"
+  )
+})
+
+test_that("bundled PIK3CA data contains the expected recurrent hotspots", {
+  data("pik3ca_tcga_brca", package = "MutGlyph")
+
+  expect_s3_class(pik3ca_tcga_brca, "data.frame")
+  expect_equal(nrow(pik3ca_tcga_brca), 26)
+  expect_named(pik3ca_tcga_brca, c(
+    "gene", "position", "mutation", "count", "variant_class",
+    "source_protein_position"
+  ))
+  expect_true(all(pik3ca_tcga_brca$count >= 2))
+  expect_equal(
+    pik3ca_tcga_brca$count[pik3ca_tcga_brca$mutation == "H1047R"],
+    120
+  )
+  expect_equal(
+    pik3ca_tcga_brca$count[pik3ca_tcga_brca$mutation == "E545K"],
+    67
   )
 })

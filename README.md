@@ -80,6 +80,7 @@ mutglyph_lollipop_plot(
 
 The same function accepts a regular mutation data frame, making custom and
 pre-aggregated inputs composable with either custom or InterPro domains.
+The bundled `pik3ca_tcga_brca` table provides a compact real-data example.
 
 ## Installation
 

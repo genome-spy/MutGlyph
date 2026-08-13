@@ -1,0 +1,19 @@
+{
+  "dataset": "PIK3CA mutations in TCGA-BRCA",
+  "prepared_at": "2026-08-13 07:11:42 UTC",
+  "gdc_project": "TCGA-BRCA",
+  "gdc_access": "open",
+  "gdc_workflow": "Aliquot Ensemble Somatic Variant Merging and Masking",
+  "gdc_file_count": 992,
+  "manifest_md5": "f76e1034d05d6dc5d9f71a9c03c8cd53",
+  "canonical_transcript": "ENST00000263967",
+  "uniprot_accession": "P42336",
+  "protein_length": 1068,
+  "minimum_distinct_sample_count": 2,
+  "pik3ca_rows": 379,
+  "plottable_rows": 369,
+  "distinct_mutated_samples": 334,
+  "unique_mutations": 66,
+  "output_rows": 26,
+  "omitted_mutations": 40
+}

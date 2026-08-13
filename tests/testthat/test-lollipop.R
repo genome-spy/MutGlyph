@@ -153,3 +153,34 @@ test_that("lollipop plots ordinary data frames without MAF metadata", {
   expect_equal(nrow(plot$x$spec$datasets$domains), 0)
   expect_identical(plot$x$spec$title$text, "FLT3 mutations")
 })
+
+test_that("pre-aggregated PIK3CA sample counts plot directly", {
+  data("pik3ca_tcga_brca", package = "MutGlyph")
+  domains <- data.frame(
+    start = c(16, 765),
+    end = c(105, 1051),
+    label = c("ABD", "Kinase"),
+    protein_length = 1068
+  )
+  spec <- mutglyph_lollipop_plot(
+    pik3ca_tcga_brca,
+    gene = "PIK3CA",
+    domains = domains,
+    count = "samples",
+    layout = "displaced"
+  )$x$spec
+
+  expect_equal(nrow(spec$datasets$mutations), 26)
+  expect_identical(spec$title$text, "PIK3CA mutations")
+  expect_true(all(is.na(spec$datasets$mutations$event_count)))
+  expect_identical(
+    spec$datasets$mutations$count,
+    spec$datasets$mutations$sample_count
+  )
+  expect_equal(
+    spec$datasets$mutations$count[
+      spec$datasets$mutations$mutation == "H1047R"
+    ],
+    120
+  )
+})

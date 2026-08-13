@@ -216,7 +216,8 @@ lollipop_dataframe_data <- function(data,
   }
   variant_class[is.na(variant_class) | !nzchar(variant_class)] <- "Mutation"
   sample <- if ("sample" %in% names(data)) as.character(data$sample) else rep(NA_character_, nrow(data))
-  weight <- if ("count" %in% names(data)) {
+  preaggregated <- "count" %in% names(data)
+  weight <- if (preaggregated) {
     suppressWarnings(as.numeric(as.character(data$count)))
   } else {
     rep(1, nrow(data))
@@ -224,8 +225,14 @@ lollipop_dataframe_data <- function(data,
   if (any(!is.finite(weight) | weight <= 0)) {
     stop("`data$count` must contain finite positive values.", call. = FALSE)
   }
-  if (count == "samples" && all(is.na(sample) | !nzchar(sample))) {
-    stop("`count = \"samples\"` requires a `sample` column in custom data.", call. = FALSE)
+  if (
+    count == "samples" && !preaggregated &&
+      all(is.na(sample) | !nzchar(sample))
+  ) {
+    stop(
+      "`count = \"samples\"` requires a `sample` column or pre-aggregated `count`.",
+      call. = FALSE
+    )
   }
 
   canonical <- data.frame(
@@ -239,7 +246,8 @@ lollipop_dataframe_data <- function(data,
     protein_change = mutation,
     protein_position = position,
     count = count,
-    weight = weight
+    weight = weight,
+    weight_type = if (preaggregated) count else "events"
   )
   domain_data <- lollipop_domain_data(
     gene,
@@ -276,7 +284,8 @@ lollipop_aggregate_mutations <- function(variants,
                                          protein_change,
                                          protein_position,
                                          count,
-                                         weight = rep(1, nrow(variants))) {
+                                         weight = rep(1, nrow(variants)),
+                                         weight_type = "events") {
   variant_class <- as.character(variants$Variant_Classification)
   sample <- as.character(variants$Tumor_Sample_Barcode)
   key <- paste(protein_position, protein_change, variant_class, sep = "\034")
@@ -289,8 +298,14 @@ lollipop_aggregate_mutations <- function(variants,
       position = protein_position[indices[1]],
       mutation = protein_change[indices[1]],
       variant_class = variant_class[indices[1]],
-      event_count = sum(weight[indices]),
-      sample_count = if (length(group_samples)) length(unique(group_samples)) else NA_integer_,
+      event_count = if (weight_type == "events") sum(weight[indices]) else NA_real_,
+      sample_count = if (weight_type == "samples") {
+        sum(weight[indices])
+      } else if (length(group_samples)) {
+        length(unique(group_samples))
+      } else {
+        NA_real_
+      },
       stringsAsFactors = FALSE
     )
   })

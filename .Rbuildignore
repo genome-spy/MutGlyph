@@ -14,3 +14,4 @@
 ^vite\.config\.[cm]?js$
 ^srcjs$
 ^tools$
+^data-raw$

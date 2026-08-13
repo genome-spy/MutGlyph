@@ -60,7 +60,8 @@ colors.}
 \code{"displaced"} for collision-aware markers, labels, and connectors.}
 
 \item{count}{Use mutation \code{"events"} (the maftools convention) or distinct
-tumor \code{"samples"} for recurrence heights.}
+tumor \code{"samples"} for recurrence heights. For a pre-aggregated data frame,
+this also defines what its \code{count} column represents.}
 
 \item{minCount}{Minimum plotted recurrence under the selected \code{count} mode.
 When \code{NULL}, the basic layout uses one and the displaced layout uses two.}

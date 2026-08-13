@@ -1,5 +1,5 @@
-test_that("mutglyph_oncoplot retains a complete reference composition", {
-  plot <- mutglyph_oncoplot(laml_maf(), top = 10)
+test_that("oncoplot retains a complete reference composition", {
+  plot <- oncoplot(laml_maf(), top = 10)
   spec <- plot$x$spec
 
   expect_s3_class(plot, "mutglyph")
@@ -61,7 +61,7 @@ test_that("mutglyph_oncoplot retains a complete reference composition", {
 })
 
 test_that("oncoplot JSON contains sparse row-record datasets", {
-  json <- as_json(mutglyph_oncoplot(laml_maf(), top = 10), pretty = FALSE)
+  json <- as_json(oncoplot(laml_maf(), top = 10), pretty = FALSE)
   decoded <- jsonlite::fromJSON(json, simplifyVector = FALSE)
 
   expect_length(decoded$datasets$events, 247)
@@ -74,7 +74,7 @@ test_that("oncoplot JSON contains sparse row-record datasets", {
 })
 
 test_that("optional clinical tracks and sample labels extend the shared grid", {
-  plot <- mutglyph_oncoplot(
+  plot <- oncoplot(
     laml_maf(),
     top = 10,
     clinicalFeatures = "FAB_classification",
@@ -117,7 +117,7 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
 })
 
 test_that("mixed clinical tracks use independent typed scales", {
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
@@ -141,7 +141,7 @@ test_that("mixed clinical tracks use independent typed scales", {
 })
 
 test_that("categorical clinical schemes pass through to GenomeSpy", {
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     clinicalFeatures = "FAB_classification",
@@ -156,7 +156,7 @@ test_that("categorical clinical schemes pass through to GenomeSpy", {
 
 test_that("row height aligns every gene-oriented view", {
   for (row_height in c(12, 24, 40)) {
-    spec <- mutglyph_oncoplot(
+    spec <- oncoplot(
       laml_maf(),
       top = 10,
       rowHeight = row_height
@@ -173,7 +173,7 @@ test_that("row height aligns every gene-oriented view", {
 })
 
 test_that("basic display controls omit or collapse their views", {
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     drawRowBar = FALSE,
@@ -201,7 +201,7 @@ test_that("basic display controls omit or collapse their views", {
 })
 
 test_that("custom title text replaces the generated summary", {
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     titleText = "AML cohort"
@@ -212,7 +212,7 @@ test_that("custom title text replaces the generated summary", {
 
 test_that("custom mutation colors are shared by every event view", {
   custom <- c(Missense_Mutation = "#123456", Multi_Hit = "hotpink")
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     colors = custom
@@ -243,18 +243,18 @@ test_that("basic display arguments validate scalar values", {
   )) {
     args <- list(maf = laml_maf())
     args[[argument]] <- 1
-    expect_error(do.call(mutglyph_oncoplot, args), "TRUE or FALSE")
+    expect_error(do.call(oncoplot, args), "TRUE or FALSE")
   }
 
   for (row_height in list(0, -1, Inf, NA_real_, "24", c(12, 24))) {
     expect_error(
-      mutglyph_oncoplot(laml_maf(), rowHeight = row_height),
+      oncoplot(laml_maf(), rowHeight = row_height),
       "finite positive"
     )
   }
   for (title_text in list(NA_character_, "", c("one", "two"), 1)) {
     expect_error(
-      mutglyph_oncoplot(laml_maf(), titleText = title_text),
+      oncoplot(laml_maf(), titleText = title_text),
       "non-empty character"
     )
   }
@@ -266,12 +266,12 @@ test_that("selection flags validate scalar logical values", {
   )) {
     args <- list(maf = laml_maf())
     args[[argument]] <- 1
-    expect_error(do.call(mutglyph_oncoplot, args), "TRUE or FALSE")
+    expect_error(do.call(oncoplot, args), "TRUE or FALSE")
   }
 })
 
 test_that("Ti/Tv adds one aligned row and an independent color scale", {
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 10,
     clinicalFeatures = "FAB_classification",
@@ -312,21 +312,21 @@ test_that("Ti/Tv adds one aligned row and an independent color scale", {
 
 test_that("Ti/Tv flag validates a scalar logical", {
   expect_error(
-    mutglyph_oncoplot(laml_maf(), draw_titv = 1),
+    oncoplot(laml_maf(), draw_titv = 1),
     "TRUE or FALSE"
   )
 })
 
 test_that("sample label flag is scalar logical", {
   expect_error(
-    mutglyph_oncoplot(laml_maf(), showTumorSampleBarcodes = 1),
+    oncoplot(laml_maf(), showTumorSampleBarcodes = 1),
     "TRUE or FALSE"
   )
 })
 
 test_that("copy-number top-bar flag is scalar logical", {
   expect_error(
-    mutglyph_oncoplot(laml_maf(), includeColBarCN = 1),
+    oncoplot(laml_maf(), includeColBarCN = 1),
     "TRUE or FALSE"
   )
 })
@@ -346,7 +346,7 @@ test_that("custom summary bars replace defaults and expose their metrics", {
     `-log10(q)` = c(12, 8, 4),
     check.names = FALSE
   )
-  spec <- mutglyph_oncoplot(
+  spec <- oncoplot(
     laml_maf(),
     top = 3,
     topBarData = top_bar,
@@ -404,8 +404,8 @@ test_that("custom summary bars replace defaults and expose their metrics", {
 })
 
 test_that("custom bars do not alter the default grid", {
-  default <- mutglyph_oncoplot(laml_maf(), top = 10)$x$spec
-  right_only <- mutglyph_oncoplot(
+  default <- oncoplot(laml_maf(), top = 10)$x$spec
+  right_only <- oncoplot(
     laml_maf(),
     top = 10,
     rightBarData = data.frame(

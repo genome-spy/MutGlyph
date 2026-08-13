@@ -1,5 +1,5 @@
 test_that("basic lollipop uses true-position vertical stems", {
-  plot <- suppressWarnings(mutglyph_lollipop_plot(
+  plot <- suppressWarnings(lollipopPlot(
     laml_maf(),
     gene = "FLT3",
     AACol = "Protein_Change"
@@ -22,7 +22,7 @@ test_that("basic lollipop uses true-position vertical stems", {
 })
 
 test_that("displaced lollipop separates and reconnects dense markers", {
-  spec <- suppressWarnings(mutglyph_lollipop_plot(
+  spec <- suppressWarnings(lollipopPlot(
     laml_maf(),
     gene = "FLT3",
     AACol = "Protein_Change",
@@ -56,7 +56,7 @@ test_that("displaced lollipop separates and reconnects dense markers", {
 })
 
 test_that("protein domains use ranged text and a shared protein scale", {
-  spec <- suppressWarnings(mutglyph_lollipop_plot(
+  spec <- suppressWarnings(lollipopPlot(
     laml_maf(),
     gene = "FLT3",
     AACol = "Protein_Change"
@@ -73,7 +73,7 @@ test_that("protein domains use ranged text and a shared protein scale", {
 })
 
 test_that("labels, counts, scales, and colors are configurable", {
-  plot <- suppressWarnings(mutglyph_lollipop_plot(
+  plot <- suppressWarnings(lollipopPlot(
     laml_maf(),
     gene = "FLT3",
     AACol = "Protein_Change",
@@ -105,7 +105,7 @@ test_that("labels, counts, scales, and colors are configurable", {
 
 test_that("lollipop display arguments validate", {
   maf <- laml_maf()
-  call <- function(...) suppressWarnings(mutglyph_lollipop_plot(
+  call <- function(...) suppressWarnings(lollipopPlot(
     maf,
     gene = "FLT3",
     AACol = "Protein_Change",
@@ -125,7 +125,7 @@ test_that("lollipop display arguments validate", {
 })
 
 test_that("lollipop JSON retains both recurrence measures", {
-  json <- suppressWarnings(as_json(mutglyph_lollipop_plot(
+  json <- suppressWarnings(as_json(lollipopPlot(
     laml_maf(),
     gene = "FLT3",
     AACol = "Protein_Change",
@@ -139,7 +139,7 @@ test_that("lollipop JSON retains both recurrence measures", {
 })
 
 test_that("lollipop plots ordinary data frames without MAF metadata", {
-  plot <- mutglyph_lollipop_plot(
+  plot <- lollipopPlot(
     data.frame(
       gene = "FLT3",
       position = c(599, 599, 835),
@@ -162,7 +162,7 @@ test_that("pre-aggregated PIK3CA sample counts plot directly", {
     label = c("ABD", "Kinase"),
     protein_length = 1068
   )
-  spec <- mutglyph_lollipop_plot(
+  spec <- lollipopPlot(
     pik3ca_tcga_brca,
     gene = "PIK3CA",
     domains = domains,

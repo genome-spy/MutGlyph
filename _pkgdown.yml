@@ -6,9 +6,9 @@ template:
 reference:
 - title: Plotting
   contents:
-  - mutglyph_oncoplot
-  - mutglyph_lollipop_plot
-  - mutglyph_rainfall_plot
+  - oncoplot
+  - lollipopPlot
+  - rainfallPlot
 - title: GenomeSpy specification
   contents:
   - as_json

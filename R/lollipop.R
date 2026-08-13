@@ -47,7 +47,7 @@
 #' `plot$x$spec$datasets$mutations`, irrespective of which one is plotted.
 #'
 #' @return A MutGlyph htmlwidget.
-#' @seealso [mutglyph_oncoplot()], [mutglyph_rainfall_plot()], and [as_json()].
+#' @seealso [oncoplot()], [rainfallPlot()], and [as_json()].
 #'
 #' @examples
 #' if (interactive()) {
@@ -63,7 +63,7 @@
 #'     label = c("Ig-like", "Ig-like", "Kinase N", "Kinase C"),
 #'     protein_length = 993
 #'   )
-#'   mutglyph_lollipop_plot(
+#'   lollipopPlot(
 #'     laml,
 #'     gene = "FLT3",
 #'     AACol = "Protein_Change",
@@ -72,26 +72,26 @@
 #'   )
 #' }
 #' @export
-mutglyph_lollipop_plot <- function(maf,
-                                   gene = NULL,
-                                   AACol = NULL,
-                                   labelPos = NULL,
-                                   showMutationRate = TRUE,
-                                   showDomainLabel = TRUE,
-                                   refSeqID = NULL,
-                                   proteinID = NULL,
-                                   colors = NULL,
-                                   domains = NULL,
-                                   proteinLength = NULL,
-                                   layout = c("basic", "displaced"),
-                                   count = c("events", "samples"),
-                                   minCount = NULL,
-                                   yScale = NULL,
-                                   showLegend = TRUE,
-                                   pointSize = 1,
-                                   width = NULL,
-                                   height = NULL,
-                                   elementId = NULL) {
+lollipopPlot <- function(maf,
+                         gene = NULL,
+                         AACol = NULL,
+                         labelPos = NULL,
+                         showMutationRate = TRUE,
+                         showDomainLabel = TRUE,
+                         refSeqID = NULL,
+                         proteinID = NULL,
+                         colors = NULL,
+                         domains = NULL,
+                         proteinLength = NULL,
+                         layout = c("basic", "displaced"),
+                         count = c("events", "samples"),
+                         minCount = NULL,
+                         yScale = NULL,
+                         showLegend = TRUE,
+                         pointSize = 1,
+                         width = NULL,
+                         height = NULL,
+                         elementId = NULL) {
   layout <- match.arg(layout)
   count <- match.arg(count)
   if (!is.null(yScale)) yScale <- match.arg(yScale, c("linear", "log"))

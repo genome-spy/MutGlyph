@@ -1,5 +1,5 @@
 test_that("rainfall plot retains the interactive composition", {
-  plot <- mutglyph_rainfall_plot(brca_maf(), detectChangePoints = TRUE)
+  plot <- rainfallPlot(brca_maf(), detectChangePoints = TRUE)
   spec <- plot$x$spec
 
   expect_s3_class(plot, "mutglyph")
@@ -17,7 +17,7 @@ test_that("rainfall plot retains the interactive composition", {
 })
 
 test_that("kataegis arrows start at the plot bottom and point upward", {
-  arrow <- mutglyph_rainfall_plot(
+  arrow <- rainfallPlot(
     brca_maf(),
     detectChangePoints = TRUE
   )$x$spec$layer[[3]]
@@ -31,7 +31,7 @@ test_that("kataegis arrows start at the plot bottom and point upward", {
 })
 
 test_that("kataegis shading encodes the complete locus", {
-  interval <- mutglyph_rainfall_plot(
+  interval <- rainfallPlot(
     brca_maf(),
     detectChangePoints = TRUE
   )$x$spec$layer[[1]]
@@ -44,7 +44,7 @@ test_that("kataegis shading encodes the complete locus", {
 })
 
 test_that("rainfall plot uses chromosome-local distances", {
-  mutations <- mutglyph_rainfall_plot(brca_maf())$x$spec$datasets$mutations
+  mutations <- rainfallPlot(brca_maf())$x$spec$datasets$mutations
   chromosome_starts <- !duplicated(mutations$chromosome)
 
   # The unplottable first mutation of every chromosome was removed, so every
@@ -56,7 +56,7 @@ test_that("rainfall plot uses chromosome-local distances", {
 
 test_that("rainfall JSON contains mutation and kataegis records", {
   json <- as_json(
-    mutglyph_rainfall_plot(brca_maf(), detectChangePoints = TRUE),
+    rainfallPlot(brca_maf(), detectChangePoints = TRUE),
     pretty = FALSE
   )
   decoded <- jsonlite::fromJSON(json, simplifyVector = FALSE)
@@ -68,15 +68,15 @@ test_that("rainfall JSON contains mutation and kataegis records", {
 test_that("rainfall display arguments validate", {
   maf <- brca_maf()
 
-  expect_error(mutglyph_rainfall_plot(maf, savePlot = TRUE), "Save as SVG")
-  expect_error(mutglyph_rainfall_plot(maf, savePlot = 1), "TRUE or FALSE")
+  expect_error(rainfallPlot(maf, savePlot = TRUE), "Save as SVG")
+  expect_error(rainfallPlot(maf, savePlot = 1), "TRUE or FALSE")
   for (value in list(0, -1, Inf, NA_real_, "1", c(1, 2))) {
     expect_error(
-      mutglyph_rainfall_plot(maf, fontSize = value),
+      rainfallPlot(maf, fontSize = value),
       "finite positive"
     )
     expect_error(
-      mutglyph_rainfall_plot(maf, pointSize = value),
+      rainfallPlot(maf, pointSize = value),
       "finite positive"
     )
   }

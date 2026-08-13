@@ -15,17 +15,17 @@ publication-quality SVG export.
 
 ## Almost a drop-in replacement
 
-`mutglyph_oncoplot()` deliberately imitates `maftools::oncoplot()`. It accepts
+`oncoplot()` deliberately imitates `maftools::oncoplot()`. It accepts
 the same MAF objects, preserves familiar argument names and behavior where
 practical, and reproduces the standard oncoplot composition. For common calls,
-switching to interactive GenomeSpy output is often just a function-name change:
+switching to interactive GenomeSpy output requires only changing the namespace:
 
 ```r
 # Static maftools plot
 maftools::oncoplot(maf = laml, top = 10)
 
 # Interactive MutGlyph plot
-mutglyph_oncoplot(maf = laml, top = 10)
+MutGlyph::oncoplot(maf = laml, top = 10)
 ```
 
 MutGlyph is not a complete clone of every maftools option. Its focused API
@@ -41,7 +41,7 @@ brca <- maftools::read.maf(
   verbose = FALSE
 )
 
-mutglyph_rainfall_plot(
+rainfallPlot(
   maf = brca,
   detectChangePoints = TRUE
 )
@@ -62,14 +62,14 @@ flt3_domains <- data.frame(
   protein_length = 993
 )
 
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
   domains = flt3_domains
 )
 
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
@@ -108,7 +108,7 @@ laml <- maftools::read.maf(
   )
 )
 
-mutglyph_oncoplot(laml, top = 10)
+oncoplot(laml, top = 10)
 ```
 
 Scroll or pinch over the plot to zoom and pan the shared sample axis. Hovering
@@ -139,7 +139,7 @@ specification. Retrieve a portable JSON representation for inspection or
 experimentation in the GenomeSpy Playground:
 
 ```r
-plot <- mutglyph_oncoplot(laml, top = 10)
+plot <- oncoplot(laml, top = 10)
 json <- as_json(plot)
 ```
 

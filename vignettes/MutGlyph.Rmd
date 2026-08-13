@@ -21,10 +21,10 @@ MutGlyph builds interactive cancer-genomics plots from
 them with [GenomeSpy](https://genomespy.app/). Oncoplots, protein lollipops, and
 rainfall plots support tooltips, zooming, and SVG export.
 
-`mutglyph_oncoplot()` deliberately imitates `maftools::oncoplot()`: it accepts
+`oncoplot()` deliberately imitates `maftools::oncoplot()`: it accepts
 the same MAF objects and follows familiar argument names, ordering behavior,
 and plot composition. It is therefore an almost drop-in replacement in common
-workflows, often requiring only a change of function name. MutGlyph does not
+workflows, often requiring only a namespace change. MutGlyph does not
 attempt to reproduce every maftools option.
 
 ## Start with a familiar oncoplot
@@ -49,7 +49,7 @@ laml <- maftools::read.maf(
 ```
 
 ```{r basic-oncoplot}
-mutglyph_oncoplot(maf = laml, top = 10)
+oncoplot(maf = laml, top = 10)
 ```
 
 The columns share one sample scale. Scroll or pinch over the plot to zoom and
@@ -73,7 +73,7 @@ used in the browser. `as_json()` creates a portable copy for inspection,
 versioning, or experimentation in the GenomeSpy Playground.
 
 ```{r specification}
-plot <- mutglyph_oncoplot(laml, top = 10)
+plot <- oncoplot(laml, top = 10)
 spec_json <- as_json(plot, pretty = TRUE)
 cat(substr(spec_json, 1, 160), "...\n")
 ```

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-`mutglyph_rainfall_plot()` is the interactive counterpart of
+`rainfallPlot()` is the interactive counterpart of
 `maftools::rainfallPlot()`. It defaults to the most mutated sample and plots
 chromosome-local inter-event distances for SNPs, including synonymous
 variants. Scroll or pinch to inspect dense genomic regions.
@@ -37,7 +37,7 @@ brca <- maftools::read.maf(
 ```
 
 ```{r rainfall}
-mutglyph_rainfall_plot(
+rainfallPlot(
   brca,
   detectChangePoints = TRUE,
   pointSize = 0.5,
@@ -49,6 +49,6 @@ Detected loci remain available in the returned specification without writing a
 TSV file:
 
 ```{r rainfall-data, eval = FALSE}
-rainfall <- mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
+rainfall <- rainfallPlot(brca, detectChangePoints = TRUE)
 rainfall$x$spec$datasets$kataegis
 ```

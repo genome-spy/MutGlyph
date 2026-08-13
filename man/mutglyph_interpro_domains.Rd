@@ -32,7 +32,7 @@ A data frame with \code{start}, \code{end}, \code{label}, \code{description},
 }
 \description{
 Queries the InterPro API for a UniProt protein and returns a plain domain
-table accepted by \code{\link[=mutglyph_lollipop_plot]{mutglyph_lollipop_plot()}}. Results are cached outside the
+table accepted by \code{\link[=lollipopPlot]{lollipopPlot()}}. Results are cached outside the
 installed package so subsequent calls can work offline.
 }
 \details{
@@ -46,7 +46,7 @@ returned. A discontinuous match produces one row for each fragment.
 \examples{
 \dontrun{
 flt3_domains <- mutglyph_interpro_domains("P36888")
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   domains = flt3_domains

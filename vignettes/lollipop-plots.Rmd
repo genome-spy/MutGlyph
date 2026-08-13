@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-`mutglyph_lollipop_plot()` follows the familiar `maftools::lollipopPlot()` data
+`lollipopPlot()` follows the familiar `maftools::lollipopPlot()` data
 conventions but uses a cleaner interactive composition. Mutation events stay
 at their true amino-acid positions, and domains are an ordinary data frame that
 can be inspected, edited, or replaced.
@@ -60,7 +60,7 @@ flt3_domains <- data.frame(
 ```
 
 ```{r lollipop-basic}
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
@@ -77,7 +77,7 @@ visible beside dominant hotspots. Singletons are omitted by default; set
 `minCount = 1` to include them.
 
 ```{r lollipop-displaced}
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
@@ -130,7 +130,7 @@ pik3ca_domains <- data.frame(
 ```
 
 ```{r lollipop-custom-data}
-mutglyph_lollipop_plot(
+lollipopPlot(
   pik3ca_tcga_brca,
   gene = "PIK3CA",
   domains = pik3ca_domains,

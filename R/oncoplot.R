@@ -1,7 +1,7 @@
 #' Draw an interactive oncoplot
 #'
 #' Creates a GenomeSpy oncoplot from a `maftools` MAF object.
-#' `mutglyph_oncoplot()` deliberately imitates the layout, ordering rules, and
+#' `oncoplot()` deliberately imitates the layout, ordering rules, and
 #' commonly used argument names of `maftools::oncoplot()`, making it an almost
 #' drop-in interactive replacement for common workflows. It is not intended to
 #' provide complete API compatibility with every maftools option.
@@ -63,42 +63,42 @@
 #'       package = "maftools"
 #'     )
 #'   )
-#'   mutglyph_oncoplot(laml, top = 10)
+#'   oncoplot(laml, top = 10)
 #' }
 #' @export
-mutglyph_oncoplot <- function(maf,
-                              top = 20,
-                              minMut = NULL,
-                              altered = FALSE,
-                              genes = NULL,
-                              genesToIgnore = NULL,
-                              colors = NULL,
-                              keepGeneOrder = FALSE,
-                              sampleOrder = NULL,
-                              removeNonMutated = FALSE,
-                              clinicalFeatures = NULL,
-                              annotationColor = NULL,
-                              sortByAnnotation = FALSE,
-                              annotationOrder = NULL,
-                              topBarData = NULL,
-                              topBarLims = NULL,
-                              leftBarData = NULL,
-                              leftBarLims = NULL,
-                              rightBarData = NULL,
-                              rightBarLims = NULL,
-                              draw_titv = FALSE,
-                              titv_col = NULL,
-                              includeColBarCN = TRUE,
-                              showTumorSampleBarcodes = FALSE,
-                              rowHeight = 24,
-                              drawRowBar = TRUE,
-                              drawColBar = TRUE,
-                              showPct = TRUE,
-                              showTitle = TRUE,
-                              titleText = NULL,
-                              width = NULL,
-                              height = NULL,
-                              elementId = NULL) {
+oncoplot <- function(maf,
+                     top = 20,
+                     minMut = NULL,
+                     altered = FALSE,
+                     genes = NULL,
+                     genesToIgnore = NULL,
+                     colors = NULL,
+                     keepGeneOrder = FALSE,
+                     sampleOrder = NULL,
+                     removeNonMutated = FALSE,
+                     clinicalFeatures = NULL,
+                     annotationColor = NULL,
+                     sortByAnnotation = FALSE,
+                     annotationOrder = NULL,
+                     topBarData = NULL,
+                     topBarLims = NULL,
+                     leftBarData = NULL,
+                     leftBarLims = NULL,
+                     rightBarData = NULL,
+                     rightBarLims = NULL,
+                     draw_titv = FALSE,
+                     titv_col = NULL,
+                     includeColBarCN = TRUE,
+                     showTumorSampleBarcodes = FALSE,
+                     rowHeight = 24,
+                     drawRowBar = TRUE,
+                     drawColBar = TRUE,
+                     showPct = TRUE,
+                     showTitle = TRUE,
+                     titleText = NULL,
+                     width = NULL,
+                     height = NULL,
+                     elementId = NULL) {
   oncoplot_flag(includeColBarCN, "includeColBarCN")
   oncoplot_flag(showTumorSampleBarcodes, "showTumorSampleBarcodes")
   oncoplot_flag(altered, "altered")

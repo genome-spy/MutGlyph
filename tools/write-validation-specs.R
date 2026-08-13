@@ -45,7 +45,7 @@ laml <- maftools::read.maf(
   verbose = FALSE
 )
 writeLines(
-  as_json(mutglyph_oncoplot(laml, top = 10)),
+  as_json(oncoplot(laml, top = 10)),
   file.path(output_dir, "oncoplot.json"),
   useBytes = TRUE
 )
@@ -53,7 +53,7 @@ reference <- oncoplot_data(laml, top = 10)
 option_genes <- reference$genes$gene
 option_samples <- reference$samples$sample
 writeLines(
-  as_json(mutglyph_oncoplot(
+  as_json(oncoplot(
     laml,
     top = 10,
     colors = c(Missense_Mutation = "#00897B", Multi_Hit = "#D81B60"),
@@ -100,7 +100,7 @@ laml_gistic <- maftools::read.maf(
   verbose = FALSE
 )
 writeLines(
-  as_json(mutglyph_oncoplot(laml_gistic, top = 10)),
+  as_json(oncoplot(laml_gistic, top = 10)),
   file.path(output_dir, "oncoplot-gistic.json"),
   useBytes = TRUE
 )
@@ -110,13 +110,13 @@ brca <- maftools::read.maf(
   verbose = FALSE
 )
 writeLines(
-  as_json(mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)),
+  as_json(rainfallPlot(brca, detectChangePoints = TRUE)),
   file.path(output_dir, "rainfall.json"),
   useBytes = TRUE
 )
 
 writeLines(
-  as_json(suppressWarnings(mutglyph_lollipop_plot(
+  as_json(suppressWarnings(lollipopPlot(
     laml,
     gene = "NRAS",
     AACol = "Protein_Change"
@@ -125,7 +125,7 @@ writeLines(
   useBytes = TRUE
 )
 writeLines(
-  as_json(suppressWarnings(mutglyph_lollipop_plot(
+  as_json(suppressWarnings(lollipopPlot(
     laml,
     gene = "NRAS",
     AACol = "Protein_Change",
@@ -144,7 +144,7 @@ pik3ca_domains <- data.frame(
   protein_length = 1068
 )
 writeLines(
-  as_json(mutglyph_lollipop_plot(
+  as_json(lollipopPlot(
     pik3ca_tcga_brca,
     gene = "PIK3CA",
     domains = pik3ca_domains,

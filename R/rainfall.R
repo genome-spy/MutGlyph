@@ -32,7 +32,7 @@
 #' `plot$x$spec$datasets$kataegis` and no files are written as a side effect.
 #'
 #' @return A MutGlyph htmlwidget.
-#' @seealso [mutglyph_oncoplot()] and [as_json()].
+#' @seealso [oncoplot()] and [as_json()].
 #'
 #' @examples
 #' if (interactive()) {
@@ -40,20 +40,20 @@
 #'     maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
 #'     verbose = FALSE
 #'   )
-#'   mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
+#'   rainfallPlot(brca, detectChangePoints = TRUE)
 #' }
 #' @export
-mutglyph_rainfall_plot <- function(maf,
-                                   tsb = NULL,
-                                   detectChangePoints = FALSE,
-                                   ref.build = "hg19",
-                                   color = NULL,
-                                   savePlot = FALSE,
-                                   width = NULL,
-                                   height = NULL,
-                                   fontSize = 1.2,
-                                   pointSize = 0.4,
-                                   elementId = NULL) {
+rainfallPlot <- function(maf,
+                         tsb = NULL,
+                         detectChangePoints = FALSE,
+                         ref.build = "hg19",
+                         color = NULL,
+                         savePlot = FALSE,
+                         width = NULL,
+                         height = NULL,
+                         fontSize = 1.2,
+                         pointSize = 0.4,
+                         elementId = NULL) {
   mutglyph_flag(savePlot, "savePlot")
   if (savePlot) {
     stop(

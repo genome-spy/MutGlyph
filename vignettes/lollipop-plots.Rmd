@@ -77,6 +77,47 @@ lollipopPlot(
 )
 ```
 
+## Compare two cohorts
+
+`lollipopPlot2()` is the interactive counterpart to
+`maftools::lollipopPlot2()`. It mirrors two cohorts around one shared protein
+model while scaling their recurrence axes independently. Common maftools calls
+therefore need little more than a namespace change.
+
+```{r apl-data}
+primary <- maftools::read.maf(
+  system.file("extdata", "APL_primary.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+relapse <- maftools::read.maf(
+  system.file("extdata", "APL_relapse.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+```
+
+```{r lollipop-two-cohort}
+lollipopPlot2(
+  m1 = primary,
+  m2 = relapse,
+  gene = "FLT3",
+  AACol1 = "amino_acid_change",
+  AACol2 = "amino_acid_change",
+  m1_name = "Primary",
+  m2_name = "Relapse",
+  m1_label = 835,
+  m2_label = 835,
+  domains = flt3_domains,
+  height = 350
+)
+```
+
+Both stem sets extend to the center of the protein track, where the protein is
+intended to cover their ends. The joins currently look somewhat ugly because
+the bundled GenomeSpy 0.84 cannot z-order complete children of a vertical
+concatenation: the later lower cohort draws its stems over the protein. A future
+GenomeSpy version with broader `zindex` support will render the intended
+layering cleanly without changing the plot geometry.
+
 ## Annotate selected mutations
 
 `labelPos` accepts amino-acid positions or `"all"`. As in maftools, changes at
@@ -114,7 +155,7 @@ lollipopPlot(
   domains = flt3_domains,
   layout = "displaced",
   count = "samples",
-  height = 450
+  height = 400
 )
 ```
 
@@ -166,6 +207,6 @@ lollipopPlot(
   domains = pik3ca_domains,
   count = "samples",
   layout = "displaced",
-  height = 450
+  height = 420
 )
 ```

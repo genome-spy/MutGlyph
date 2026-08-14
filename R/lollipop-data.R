@@ -11,6 +11,8 @@
 #' @param proteinLength Optional protein length in amino acids.
 #' @param count Count mutation events or distinct samples.
 #' @param colors Optional mutation-class color overrides.
+#' @param allowEmpty Return an empty mutation table instead of failing. Used by
+#'   two-cohort plots, where maftools permits one cohort to have no mutations.
 #'
 #' @return Prepared mutation, domain, transcript, and color data.
 #' @keywords internal
@@ -22,7 +24,8 @@ lollipop_data <- function(maf,
                           domains = NULL,
                           proteinLength = NULL,
                           count = c("events", "samples"),
-                          colors = NULL) {
+                          colors = NULL,
+                          allowEmpty = FALSE) {
   count <- match.arg(count)
   is_maf <- inherits(maf, "MAF")
   if (!is_maf && !is.data.frame(maf)) {
@@ -39,7 +42,8 @@ lollipop_data <- function(maf,
       domains = domains,
       proteinLength = proteinLength,
       count = count,
-      colors = colors
+      colors = colors,
+      allowEmpty = allowEmpty
     ))
   }
 
@@ -74,7 +78,7 @@ lollipop_data <- function(maf,
     query = "Variant_Type != 'CNV'",
     mafObj = FALSE
   ))
-  if (nrow(variants) == 0L) {
+  if (nrow(variants) == 0L && !allowEmpty) {
     stop(sprintf("No protein-altering mutations were found for `%s`.", gene), call. = FALSE)
   }
   protein_change <- lollipop_protein_change(variants[[AACol]])
@@ -92,24 +96,28 @@ lollipop_data <- function(maf,
   variants <- variants[valid, , drop = FALSE]
   protein_change <- protein_change[valid]
   protein_position <- protein_position[valid]
-  if (nrow(variants) == 0L) {
+  if (nrow(variants) == 0L && !allowEmpty) {
     stop(sprintf("No plottable protein changes were found for `%s`.", gene), call. = FALSE)
   }
 
-  mutations <- lollipop_aggregate_mutations(
-    variants,
-    gene = gene,
-    protein_change = protein_change,
-    protein_position = protein_position,
-    count = count
-  )
+  mutations <- if (nrow(variants)) {
+    lollipop_aggregate_mutations(
+      variants,
+      gene = gene,
+      protein_change = protein_change,
+      protein_position = protein_position,
+      count = count
+    )
+  } else {
+    lollipop_empty_mutations()
+  }
   domain_data <- lollipop_domain_data(
     gene,
     refSeqID = refSeqID,
     proteinID = proteinID,
     domains = domains,
     proteinLength = proteinLength,
-    minimumLength = max(mutations$position)
+    minimumLength = if (nrow(mutations)) max(mutations$position) else 1
   )
   isoforms <- lollipop_check_isoforms(
     variants,
@@ -158,7 +166,8 @@ lollipop_dataframe_data <- function(data,
                                      domains = NULL,
                                      proteinLength = NULL,
                                      count = c("events", "samples"),
-                                     colors = NULL) {
+                                     colors = NULL,
+                                     allowEmpty = FALSE) {
   count <- match.arg(count)
   data <- lollipop_normalize_dataframe_columns(data)
   if (!is.null(gene)) gene <- lollipop_string(gene, "gene")
@@ -176,7 +185,7 @@ lollipop_dataframe_data <- function(data,
     }
   }
   if (is.null(gene)) gene <- "Protein"
-  if (nrow(data) == 0L) {
+  if (nrow(data) == 0L && !allowEmpty) {
     stop(sprintf("No mutations were found for `%s`.", gene), call. = FALSE)
   }
 
@@ -217,7 +226,7 @@ lollipop_dataframe_data <- function(data,
   data <- data[valid, , drop = FALSE]
   mutation <- mutation[valid]
   position <- position[valid]
-  if (nrow(data) == 0L) {
+  if (nrow(data) == 0L && !allowEmpty) {
     stop("No plottable protein mutations remain after validation.", call. = FALSE)
   }
 
@@ -240,7 +249,7 @@ lollipop_dataframe_data <- function(data,
     stop("`data$count` must contain finite positive values.", call. = FALSE)
   }
   if (
-    count == "samples" && !preaggregated &&
+    nrow(data) > 0L && count == "samples" && !preaggregated &&
       all(is.na(sample) | !nzchar(sample))
   ) {
     stop(
@@ -254,22 +263,26 @@ lollipop_dataframe_data <- function(data,
     Tumor_Sample_Barcode = sample,
     stringsAsFactors = FALSE
   )
-  mutations <- lollipop_aggregate_mutations(
-    canonical,
-    gene = gene,
-    protein_change = mutation,
-    protein_position = position,
-    count = count,
-    weight = weight,
-    weight_type = if (preaggregated) count else "events"
-  )
+  mutations <- if (nrow(data)) {
+    lollipop_aggregate_mutations(
+      canonical,
+      gene = gene,
+      protein_change = mutation,
+      protein_position = position,
+      count = count,
+      weight = weight,
+      weight_type = if (preaggregated) count else "events"
+    )
+  } else {
+    lollipop_empty_mutations()
+  }
   domain_data <- lollipop_domain_data(
     gene,
     refSeqID = refSeqID,
     proteinID = proteinID,
     domains = domains,
     proteinLength = proteinLength,
-    minimumLength = max(mutations$position),
+    minimumLength = if (nrow(mutations)) max(mutations$position) else 1,
     useMafDomains = FALSE
   )
   isoforms <- lollipop_check_isoforms(
@@ -369,6 +382,19 @@ lollipop_aggregate_mutations <- function(variants,
   result <- result[order(result$position, result$mutation, result$variant_class), ]
   rownames(result) <- NULL
   result
+}
+
+lollipop_empty_mutations <- function() {
+  data.frame(
+    gene = character(),
+    position = numeric(),
+    mutation = character(),
+    variant_class = character(),
+    event_count = numeric(),
+    sample_count = numeric(),
+    count = numeric(),
+    stringsAsFactors = FALSE
+  )
 }
 
 lollipop_protein_change <- function(value) {

@@ -68,3 +68,31 @@ brca_maf <- local({
     value
   }
 })
+
+apl_primary_maf <- local({
+  value <- NULL
+
+  function() {
+    if (is.null(value)) {
+      value <<- maftools::read.maf(
+        maf = system.file("extdata", "APL_primary.maf.gz", package = "maftools"),
+        verbose = FALSE
+      )
+    }
+    value
+  }
+})
+
+apl_relapse_maf <- local({
+  value <- NULL
+
+  function() {
+    if (is.null(value)) {
+      value <<- maftools::read.maf(
+        maf = system.file("extdata", "APL_relapse.maf.gz", package = "maftools"),
+        verbose = FALSE
+      )
+    }
+    value
+  }
+})

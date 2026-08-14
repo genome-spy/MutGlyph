@@ -14,6 +14,9 @@ source("R/lollipop-protein-data.R")
 source("R/lollipop-data.R")
 source("R/lollipop-spec.R")
 source("R/lollipop.R")
+source("R/lollipop2-data.R")
+source("R/lollipop2-spec.R")
+source("R/lollipop2.R")
 source("R/gistic-data.R")
 source("R/gistic-spec.R")
 source("R/gistic.R")
@@ -132,6 +135,30 @@ writeLines(
     AACol = "Protein_Change"
   ))),
   file.path(output_dir, "lollipop-basic.json"),
+  useBytes = TRUE
+)
+
+apl_primary <- maftools::read.maf(
+  system.file("extdata", "APL_primary.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+apl_relapse <- maftools::read.maf(
+  system.file("extdata", "APL_relapse.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+writeLines(
+  as_json(suppressWarnings(lollipopPlot2(
+    m1 = apl_primary,
+    m2 = apl_relapse,
+    gene = "FLT3",
+    AACol1 = "amino_acid_change",
+    AACol2 = "amino_acid_change",
+    m1_name = "Primary",
+    m2_name = "Relapse",
+    m1_label = 835,
+    m2_label = 835
+  ))),
+  file.path(output_dir, "lollipop-two-cohort.json"),
   useBytes = TRUE
 )
 writeLines(

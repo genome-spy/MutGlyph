@@ -2,7 +2,8 @@ test_that("established plotting names are the public API", {
   exports <- getNamespaceExports("MutGlyph")
 
   expect_true(all(c(
-    "oncoplot", "rainfallPlot", "lollipopPlot", "gisticChromPlot"
+    "oncoplot", "rainfallPlot", "lollipopPlot", "lollipopPlot2",
+    "gisticChromPlot"
   ) %in% exports))
   expect_false(any(c(
     "mutglyph_oncoplot",
@@ -42,6 +43,15 @@ test_that("common maftools arguments retain their names and defaults", {
       "maf", "data", "gene", "AACol", "labelPos", "showMutationRate",
       "showDomainLabel", "refSeqID", "proteinID", "showLegend", "pointSize",
       "labPosSize", "collapsePosLabel", "labPosAngle"
+    )
+  )
+  compare_defaults(
+    lollipopPlot2,
+    maftools::lollipopPlot2,
+    c(
+      "m1", "m2", "gene", "AACol1", "AACol2", "m1_name", "m2_name",
+      "m1_label", "m2_label", "refSeqID", "proteinID", "labPosAngle",
+      "labPosSize", "colors", "pointSize", "showDomainLabel"
     )
   )
   compare_defaults(
@@ -87,6 +97,20 @@ test_that("representative maftools calls work after a namespace swap", {
       gene = "PIK3CA",
       proteinLength = 1068
     ),
+    "mutglyph"
+  )
+  expect_s3_class(
+    suppressWarnings(lollipopPlot2(
+      m1 = apl_primary_maf(),
+      m2 = apl_relapse_maf(),
+      gene = "FLT3",
+      AACol1 = "amino_acid_change",
+      AACol2 = "amino_acid_change",
+      m1_name = "Primary",
+      m2_name = "Relapse",
+      m1_label = 835,
+      m2_label = 835
+    )),
     "mutglyph"
   )
   expect_s3_class(

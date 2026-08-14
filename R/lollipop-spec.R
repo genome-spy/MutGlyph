@@ -5,8 +5,9 @@ lollipop_protein_height <- 56
 lollipop_protein_padding_top <- -5
 # maftools passes pointSize to base graphics as `cex`, which scales linear
 # dimensions. GenomeSpy's point size is area, so its base areas are multiplied
-# by pointSize squared.
-lollipop_basic_point_area <- 64
+# by pointSize squared. The 52 px² baseline keeps default markers compact while
+# leaving clustered mutation outlines distinguishable.
+lollipop_basic_point_area <- 52
 lollipop_displaced_point_area <- 260 / 1.5^2
 
 lollipop_spec <- function(data,

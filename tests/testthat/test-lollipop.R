@@ -41,7 +41,7 @@ test_that("basic lollipop uses true-position vertical stems", {
   expect_identical(stem$mark$clip, "never")
   expect_null(stem$mark$color)
   expect_identical(point$mark$type, "point")
-  expect_equal(point$mark$size, 144)
+  expect_equal(point$mark$size, 52 * 1.5^2)
   expect_false(point$mark$filled)
   expect_null(point$mark[["color"]])
   expect_null(point$mark[["fill"]])
@@ -209,8 +209,8 @@ test_that("pointSize follows maftools linear cex semantics", {
   ))$x$spec
   point <- spec$vconcat[[1]]$layer[[2]]$mark
 
-  expect_equal(point$size, 64 * 0.8^2)
-  expect_equal(sqrt(point$size), 8 * 0.8)
+  expect_equal(point$size, 52 * 0.8^2)
+  expect_equal(sqrt(point$size), sqrt(52) * 0.8)
 })
 
 test_that("lollipop display arguments validate", {

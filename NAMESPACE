@@ -3,6 +3,7 @@
 export(as_json)
 export(gisticChromPlot)
 export(lollipopPlot)
+export(lollipopPlot2)
 export(mutglyph_interpro_domains)
 export(oncoplot)
 export(rainfallPlot)

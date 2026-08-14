@@ -221,12 +221,12 @@ gistic_profile_view <- function(event_type,
       # the lower edge as in the refractory comparison specification.
       list(
         text = title,
-        style = "overlay",
+        style = "overlay-title",
         orient = "bottom",
         baseline = "bottom"
       )
     } else {
-      list(text = title, style = "overlay")
+      list(text = title, style = "overlay-title")
     },
     width = "container",
     height = list(grow = 1, minPx = 90),

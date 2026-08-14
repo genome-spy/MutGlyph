@@ -13,7 +13,8 @@ lollipop_data(
   domains = NULL,
   proteinLength = NULL,
   count = c("events", "samples"),
-  colors = NULL
+  colors = NULL,
+  allowEmpty = FALSE
 )
 }
 \arguments{
@@ -35,6 +36,9 @@ against the selected model and warns about mixed or mismatching isoforms.}
 \item{count}{Count mutation events or distinct samples.}
 
 \item{colors}{Optional mutation-class color overrides.}
+
+\item{allowEmpty}{Return an empty mutation table instead of failing. Used by
+two-cohort plots, where maftools permits one cohort to have no mutations.}
 }
 \value{
 Prepared mutation, domain, transcript, and color data.

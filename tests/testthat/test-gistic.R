@@ -37,7 +37,7 @@ test_that("GISTIC chromosome plot uses mirrored responsive profiles", {
     del$title,
     list(
       text = "Deletions",
-      style = "overlay",
+      style = "overlay-title",
       orient = "bottom",
       baseline = "bottom"
     )

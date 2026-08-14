@@ -2,21 +2,24 @@
 
 MutGlyph creates opinionated interactive cancer genomics plots from
 `maftools` mutation data.
-[`mutglyph_oncoplot()`](https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.md)
+[`oncoplot()`](https://genomespy.app/MutGlyph/reference/oncoplot.md)
 deliberately imitates the familiar
 [`maftools::oncoplot()`](https://rdrr.io/pkg/maftools/man/oncoplot.html)
 API and composition, making it an almost drop-in interactive replacement
 for common workflows.
-[`mutglyph_rainfall_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_rainfall_plot.md)
+[`rainfallPlot()`](https://genomespy.app/MutGlyph/reference/rainfallPlot.md)
 similarly follows
 [`maftools::rainfallPlot()`](https://rdrr.io/pkg/maftools/man/rainfallPlot.html)
 and can annotate potential kataegis loci.
-[`mutglyph_lollipop_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.md)
+[`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md)
 provides both a familiar protein lollipop and a collision-aware
 displaced layout, accepts ordinary mutation and domain tables, and can
 use annotations from
 [`mutglyph_interpro_domains()`](https://genomespy.app/MutGlyph/reference/mutglyph_interpro_domains.md).
-GenomeSpy owns rendering and interaction in the browser.
+[`gisticChromPlot()`](https://genomespy.app/MutGlyph/reference/gisticChromPlot.md)
+renders maftools GISTIC objects as mirrored, zoomable amplification and
+deletion landscapes. GenomeSpy owns rendering and interaction in the
+browser.
 
 ## See also
 
@@ -30,8 +33,10 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Kari Lavikka <kari@karilavikka.fi> \[copyright holder\]
+**Maintainer**: Kari Lavikka <kari@karilavikka.fi>
+([ORCID](https://orcid.org/0000-0002-4163-4945)) \[copyright holder\]
 
 Authors:
 
-- Kari Lavikka <kari@karilavikka.fi> \[copyright holder\]
+- Kari Lavikka <kari@karilavikka.fi>
+  ([ORCID](https://orcid.org/0000-0002-4163-4945)) \[copyright holder\]

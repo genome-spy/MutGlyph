@@ -1,11 +1,18 @@
 # Protein lollipop plots
 
-[`mutglyph_lollipop_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.md)
+[`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md)
 follows the familiar
 [`maftools::lollipopPlot()`](https://rdrr.io/pkg/maftools/man/lollipopPlot.html)
 data conventions but uses a cleaner interactive composition. Mutation
 events stay at their true amino-acid positions, and domains are an
 ordinary data frame that can be inspected, edited, or replaced.
+
+As in maftools, `refSeqID` and `proteinID` select the protein-domain
+model, and the longest bundled protein is used when neither is supplied.
+MutGlyph shows the selected transcript and protein identifiers below the
+plot title. If the mutation input contains compatible RefSeq metadata,
+it warns when the mutations contain mixed isoforms or disagree with the
+domain model. Such mutations are not silently removed.
 
 ``` r
 
@@ -23,7 +30,8 @@ The small table below is a frozen, offline snapshot derived from
 InterPro’s representative-domain matches for UniProt P36888 (FLT3),
 retrieved 2026-08-13. Current annotations can instead be requested
 explicitly with `mutglyph_interpro_domains("P36888")`; plotting itself
-never requires network access.
+never requires network access. The retrieval and selection workflow is
+retained under `data-raw/protein-domains/` in the source repository.
 
 ``` r
 
@@ -49,12 +57,81 @@ flt3_domains <- data.frame(
 
 ``` r
 
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
   domains = flt3_domains,
-  height = 420
+  height = 350
+)
+```
+
+## Compare two cohorts
+
+[`lollipopPlot2()`](https://genomespy.app/MutGlyph/reference/lollipopPlot2.md)
+is the interactive counterpart to
+[`maftools::lollipopPlot2()`](https://rdrr.io/pkg/maftools/man/lollipopPlot2.html).
+It mirrors two cohorts around one shared protein model while scaling
+their recurrence axes independently. Common maftools calls therefore
+need little more than a namespace change.
+
+``` r
+
+primary <- maftools::read.maf(
+  system.file("extdata", "APL_primary.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+relapse <- maftools::read.maf(
+  system.file("extdata", "APL_relapse.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+```
+
+``` r
+
+lollipopPlot2(
+  m1 = primary,
+  m2 = relapse,
+  gene = "FLT3",
+  AACol1 = "amino_acid_change",
+  AACol2 = "amino_acid_change",
+  m1_name = "Primary",
+  m2_name = "Relapse",
+  m1_label = 835,
+  m2_label = 835,
+  domains = flt3_domains,
+  height = 350
+)
+```
+
+Both stem sets extend to the center of the protein track, where the
+protein is intended to cover their ends. The joins currently look
+somewhat ugly because the bundled GenomeSpy 0.84 cannot z-order complete
+children of a vertical concatenation: the later lower cohort draws its
+stems over the protein. A future GenomeSpy version with broader `zindex`
+support will render the intended layering cleanly without changing the
+plot geometry.
+
+## Annotate selected mutations
+
+`labelPos` accepts amino-acid positions or `"all"`. As in maftools,
+changes at the same residue are collapsed by default: the FLT3
+substitutions at residue 835 become one label such as `D835E/H/Y`,
+anchored above the tallest lollipop at that position. Set
+`collapsePosLabel = FALSE` when each change needs its own label.
+
+``` r
+
+lollipopPlot(
+  laml,
+  gene = "FLT3",
+  AACol = "Protein_Change",
+  domains = flt3_domains,
+  labelPos = c(599, 835),
+  labPosSize = 0.9,
+  labPosAngle = 35,
+  collapsePosLabel = TRUE,
+  height = 350
 )
 ```
 
@@ -67,21 +144,20 @@ Singletons are omitted by default; set `minCount = 1` to include them.
 
 ``` r
 
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   AACol = "Protein_Change",
   domains = flt3_domains,
   layout = "displaced",
   count = "samples",
-  height = 500
+  height = 400
 )
 ```
 
-Set `labelPos` to selected residues in the basic view. Both
-mutation-event and distinct-sample counts remain available in tooltips
-and in the generated specification. The mutation input can also be a
-regular data frame containing `position` and optional `mutation`,
+Both mutation-event and distinct-sample counts remain available in
+tooltips and in the generated specification. The mutation input can also
+be a regular data frame containing `position` and optional `mutation`,
 `variant_class`, `sample`, and `count` columns, so custom and
 pre-aggregated analyses use the same renderer.
 
@@ -99,7 +175,8 @@ by distinct tumor sample. Its preparation is an R script under
 
 The five-row domain table is deliberately inline: domains are just data
 and can be edited or replaced. These regions are a frozen snapshot of
-the main domain features in reviewed UniProt entry P42336.
+the main domain features in reviewed UniProt entry P42336. The same
+provenance workflow records how these features were selected.
 
 ``` r
 
@@ -123,12 +200,12 @@ pik3ca_domains <- data.frame(
 
 ``` r
 
-mutglyph_lollipop_plot(
-  pik3ca_tcga_brca,
+lollipopPlot(
+  data = pik3ca_tcga_brca,
   gene = "PIK3CA",
   domains = pik3ca_domains,
   count = "samples",
   layout = "displaced",
-  height = 500
+  height = 420
 )
 ```

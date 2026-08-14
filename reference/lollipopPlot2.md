@@ -1,0 +1,159 @@
+# Compare two cohorts with an interactive protein lollipop plot
+
+Creates a mirrored GenomeSpy lollipop plot corresponding to
+[`maftools::lollipopPlot2()`](https://rdrr.io/pkg/maftools/man/lollipopPlot2.html).
+Mutations from `m1` are drawn above a shared protein model and mutations
+from `m2` below it.
+
+## Usage
+
+``` r
+lollipopPlot2(
+  m1,
+  m2,
+  gene = NULL,
+  AACol1 = NULL,
+  AACol2 = NULL,
+  m1_name = NULL,
+  m2_name = NULL,
+  m1_label = NULL,
+  m2_label = NULL,
+  refSeqID = NULL,
+  proteinID = NULL,
+  labPosAngle = 0,
+  labPosSize = 0.9,
+  colors = NULL,
+  pointSize = 1.2,
+  showDomainLabel = TRUE,
+  domains = NULL,
+  proteinLength = NULL,
+  count = c("events", "samples"),
+  showLegend = TRUE,
+  width = NULL,
+  height = NULL,
+  elementId = NULL
+)
+```
+
+## Arguments
+
+- m1, m2:
+
+  maftools `MAF` objects or ordinary mutation data frames.
+
+- gene:
+
+  One gene symbol.
+
+- AACol1, AACol2:
+
+  Optional protein-change columns for `m1` and `m2`.
+
+- m1_name, m2_name:
+
+  Optional cohort names.
+
+- m1_label, m2_label:
+
+  Amino-acid positions to label for each cohort, or `"all"`.
+
+- refSeqID, proteinID:
+
+  Optional RefSeq transcript or protein identifier selecting the shared
+  protein model.
+
+- labPosAngle:
+
+  Mutation-label angle in degrees. Positive values rotate
+  counterclockwise, as in maftools.
+
+- labPosSize:
+
+  Relative mutation-label size, matching maftools' `cex` semantics.
+
+- colors:
+
+  Optional named character vector overriding mutation-class colors.
+
+- pointSize:
+
+  Relative marker-size multiplier, matching maftools' linear `cex`
+  semantics.
+
+- showDomainLabel:
+
+  Draw ranged labels inside protein domains.
+
+- domains:
+
+  Optional custom domain data frame with `start`, `end`, and `label`
+  columns.
+
+- proteinLength:
+
+  Optional protein length in amino acids.
+
+- count:
+
+  Use mutation `"events"` (the maftools convention) or distinct tumor
+  `"samples"` for recurrence heights.
+
+- showLegend:
+
+  Show the mutation-class legend.
+
+- width, height:
+
+  Widget dimensions.
+
+- elementId:
+
+  Optional element ID.
+
+## Value
+
+A MutGlyph htmlwidget.
+
+## Details
+
+Both cohorts use one protein coordinate system and independently scaled
+recurrence axes. One cohort may contain no mutations for the selected
+gene.
+
+Both stem sets extend to the center of the shared protein track, where
+the protein should cover their ends. GenomeSpy 0.84 cannot z-order
+complete children of a `vconcat`, so the later lower cohort currently
+draws its stems over the protein and looks somewhat ugly. A future
+GenomeSpy version with broader `zindex` support will render the intended
+layering without changing the plot geometry.
+
+## See also
+
+[`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md),
+[`maftools::lollipopPlot2()`](https://rdrr.io/pkg/maftools/man/lollipopPlot2.html)
+
+## Examples
+
+``` r
+if (interactive()) {
+  primary <- maftools::read.maf(
+    system.file("extdata", "APL_primary.maf.gz", package = "maftools"),
+    verbose = FALSE
+  )
+  relapse <- maftools::read.maf(
+    system.file("extdata", "APL_relapse.maf.gz", package = "maftools"),
+    verbose = FALSE
+  )
+  lollipopPlot2(
+    m1 = primary,
+    m2 = relapse,
+    gene = "FLT3",
+    AACol1 = "amino_acid_change",
+    AACol2 = "amino_acid_change",
+    m1_name = "Primary",
+    m2_name = "Relapse",
+    m1_label = 835,
+    m2_label = 835
+  )
+}
+```

@@ -1,92 +1,23 @@
 # MutGlyph
 
-MutGlyph creates interactive oncoplots, protein lollipop plots, and
-rainfall plots from
-[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects;
-lollipop plots also accept ordinary mutation and domain tables. It uses
-[GenomeSpy](https://genomespy.app/) for linked exploration, tooltips,
-and publication-quality SVG export.
+MutGlyph is an R package focused exclusively on cancer-genomics
+visualization. It provides interactive,
+[GenomeSpy](https://genomespy.app/)-based counterparts to established
+[`maftools`](https://bioconductor.org/packages/maftools/) plots,
+including oncoplots, protein lollipop plots, rainfall plots, and GISTIC
+copy-number landscapes.
+
+MutGlyph does not call variants or replace the general analysis and
+data-processing functionality of maftools. Its own transformations and
+summaries are limited to constructing visualizations. It turns existing
+MAF and GISTIC objects—plus ordinary data frames where appropriate—into
+responsive htmlwidgets with tooltips, zooming, panning, fullscreen
+viewing, and PNG or SVG export.
 
 ![An interactive MutGlyph oncoplot of the maftools LAML example
 data](reference/figures/oncoplot.png)
 
 An interactive MutGlyph oncoplot of the maftools LAML example data
-
-## Almost a drop-in replacement
-
-[`mutglyph_oncoplot()`](https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.md)
-deliberately imitates
-[`maftools::oncoplot()`](https://rdrr.io/pkg/maftools/man/oncoplot.html).
-It accepts the same MAF objects, preserves familiar argument names and
-behavior where practical, and reproduces the standard oncoplot
-composition. For common calls, switching to interactive GenomeSpy output
-is often just a function-name change:
-
-``` r
-
-# Static maftools plot
-maftools::oncoplot(maf = laml, top = 10)
-
-# Interactive MutGlyph plot
-mutglyph_oncoplot(maf = laml, top = 10)
-```
-
-MutGlyph is not a complete clone of every maftools option. Its focused
-API covers the common oncoplot workflow while adding linked navigation,
-tooltips, clinical tracks, and SVG export.
-
-Rainfall plots follow the same approach. Potential kataegis loci can be
-detected and annotated interactively:
-
-``` r
-
-brca <- maftools::read.maf(
-  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
-  verbose = FALSE
-)
-
-mutglyph_rainfall_plot(
-  maf = brca,
-  detectChangePoints = TRUE
-)
-```
-
-Protein lollipops have two layouts. The basic layout stays close to
-maftools, while the displaced layout separates recurrent hotspots and
-connects every displayed marker back to its true residue. Singletons are
-omitted from the displaced layout by default:
-
-``` r
-
-# Frozen InterPro representative-domain matches for FLT3 (UniProt P36888).
-# Fetch current annotations with mutglyph_interpro_domains("P36888").
-flt3_domains <- data.frame(
-  start = c(246, 438, 564, 756),
-  end = c(357, 531, 695, 958),
-  label = c("Ig-like", "Ig-like", "Kinase N", "Kinase C"),
-  protein_length = 993
-)
-
-mutglyph_lollipop_plot(
-  laml,
-  gene = "FLT3",
-  AACol = "Protein_Change",
-  domains = flt3_domains
-)
-
-mutglyph_lollipop_plot(
-  laml,
-  gene = "FLT3",
-  AACol = "Protein_Change",
-  domains = flt3_domains,
-  layout = "displaced"
-)
-```
-
-The same function accepts a regular mutation data frame, making custom
-and pre-aggregated inputs composable with either custom or InterPro
-domains. The bundled `pik3ca_tcga_brca` table provides a compact
-real-data example.
 
 ## Installation
 
@@ -99,14 +30,11 @@ install.packages("pak")
 pak::pak("genome-spy/MutGlyph")
 ```
 
-## Basic usage
+## Quick start
 
-The maftools package includes a small TCGA acute myeloid leukemia data
-set:
+The maftools package includes a small TCGA acute myeloid leukemia MAF:
 
 ``` r
-
-library(MutGlyph)
 
 laml <- maftools::read.maf(
   maf = system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
@@ -114,52 +42,104 @@ laml <- maftools::read.maf(
     "extdata",
     "tcga_laml_annot.tsv",
     package = "maftools"
-  )
+  ),
+  verbose = FALSE
 )
-
-mutglyph_oncoplot(laml, top = 10)
 ```
 
-Scroll or pinch over the plot to zoom and pan the shared sample axis.
-Hovering shows biological details, and **Save as SVG** exports the
-visible composition.
-
-## What can be customized?
-
-- Gene and sample selection, ordering, and filtering
-- Mutation-class colors and GenomeSpy/Vega categorical schemes
-- Categorical and numeric clinical annotation tracks
-- GISTIC amplification and deletion calls
-- Transition/transversion contributions
-- Row height, labels, title, percentages, and summary-track visibility
-- Custom sample- and gene-level summary bars
-- Basic and collision-aware protein lollipop plots
-- Custom and InterPro protein-domain annotations
-- Interactive rainfall plots with optional kataegis detection
-
-See the [getting-started
-article](https://genomespy.app/MutGlyph/articles/MutGlyph.html) for
-runnable examples, or browse the [function
-reference](https://genomespy.app/MutGlyph/reference/index.html).
-
-## GenomeSpy specification
-
-The returned object is an htmlwidget containing the complete GenomeSpy
-specification. Retrieve a portable JSON representation for inspection or
-experimentation in the GenomeSpy Playground:
+[`MutGlyph::oncoplot()`](https://genomespy.app/MutGlyph/reference/oncoplot.md)
+deliberately follows the familiar
+[`maftools::oncoplot()`](https://rdrr.io/pkg/maftools/man/oncoplot.html)
+API. For a common call, switching to interactive output requires only
+changing the namespace:
 
 ``` r
 
-plot <- mutglyph_oncoplot(laml, top = 10)
-json <- as_json(plot)
+# Static plot
+maftools::oncoplot(maf = laml, top = 10)
+
+# Interactive GenomeSpy widget
+MutGlyph::oncoplot(maf = laml, top = 10)
 ```
+
+Scroll or pinch over the matrix to navigate the shared sample scale and
+hover over marks for details. Hovering over the widget also reveals
+controls for fullscreen viewing, PNG or SVG image export, and
+downloading the generated GenomeSpy specification.
+
+## Familiar visualization APIs
+
+MutGlyph uses established names and common argument semantics so
+existing visualization calls are easy to recognize and adapt. For
+supported common calls, they are designed as almost drop-in
+visualization replacements. The goal is to preserve the familiar plots
+while adding basic interactivity—zooming, panning, and tooltips—and
+cleaner, deliberately opinionated visual defaults that aim for a
+subjectively prettier result.
+
+| Static maftools function | Interactive MutGlyph counterpart |
+|----|----|
+| [`maftools::oncoplot()`](https://rdrr.io/pkg/maftools/man/oncoplot.html) | [`MutGlyph::oncoplot()`](https://genomespy.app/MutGlyph/reference/oncoplot.md) |
+| [`maftools::rainfallPlot()`](https://rdrr.io/pkg/maftools/man/rainfallPlot.html) | [`MutGlyph::rainfallPlot()`](https://genomespy.app/MutGlyph/reference/rainfallPlot.md) |
+| [`maftools::lollipopPlot()`](https://rdrr.io/pkg/maftools/man/lollipopPlot.html) | [`MutGlyph::lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md) |
+| [`maftools::lollipopPlot2()`](https://rdrr.io/pkg/maftools/man/lollipopPlot2.html) | [`MutGlyph::lollipopPlot2()`](https://genomespy.app/MutGlyph/reference/lollipopPlot2.md) |
+| [`maftools::gisticChromPlot()`](https://rdrr.io/pkg/maftools/man/gisticChromPlot.html) | [`MutGlyph::gisticChromPlot()`](https://genomespy.app/MutGlyph/reference/gisticChromPlot.md) |
+
+Compatibility is semantic rather than exhaustive. MutGlyph preserves
+familiar inputs, meanings, and defaults where they fit an interactive
+visualization, but does not reproduce obscure styling or static-layout
+arguments that do not make sense in GenomeSpy.
+
+## Composable visualization inputs
+
+The plotting functions accept standard maftools MAF and GISTIC objects.
+Protein lollipop plots additionally accept ordinary mutation tables and
+custom domain tables, making it straightforward to combine
+pre-aggregated data with local annotations or domains fetched from
+InterPro. Rainfall and GISTIC plots accept genomic regions, and the plot
+builders expose focused data-frame inputs for custom annotations and
+summary tracks.
+
+Every plotting function returns an htmlwidget containing the complete
+GenomeSpy specification. Retrieve a portable JSON representation for
+inspection, versioning, or experimentation in the GenomeSpy Playground:
+
+``` r
+
+plot <- MutGlyph::oncoplot(laml, top = 10)
+json <- MutGlyph::as_json(plot)
+```
+
+## Documentation
+
+- [Get started](https://genomespy.app/MutGlyph/articles/MutGlyph.html)
+  with a complete first oncoplot and the shared widget controls.
+- [Oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.html)
+  covers selection, clinical tracks, summaries, colors, and GISTIC
+  calls.
+- [Protein lollipop
+  plots](https://genomespy.app/MutGlyph/articles/lollipop-plots.html)
+  covers single- and two-cohort plots, labels, layouts, and protein
+  domains.
+- [Rainfall plots and
+  kataegis](https://genomespy.app/MutGlyph/articles/rainfall-plots.html)
+  covers mutation clustering, detected loci, and genomic regions.
+- [GISTIC copy-number
+  landscapes](https://genomespy.app/MutGlyph/articles/gistic-plots.html)
+  covers chromosome-wide profiles, significance, annotations, and close
+  zooms.
+- The [function
+  reference](https://genomespy.app/MutGlyph/reference/index.html)
+  documents every public function and data set.
 
 ## Development
 
-The committed browser bundle is the only JavaScript needed at package
-runtime. Installing and checking the R package does not require Node.js
-or network access. When changing the specification builder or upgrading
-GenomeSpy, run:
+MutGlyph also provides a working example of embedding GenomeSpy in an R
+package: R code constructs the specifications, an htmlwidgets binding
+hosts the visualization, and a committed browser bundle supplies the
+runtime. Installing, using, and checking the R package therefore
+requires neither Node.js nor network access. When changing the browser
+binding or upgrading GenomeSpy, run:
 
 ``` sh
 npm install
@@ -176,22 +156,32 @@ bundled and adapted work.
 
 ## AI-assisted development
 
-OpenAI Codex was used extensively during the development of MutGlyph,
-including for code implementation and refactoring, tests, documentation,
-and examples. The package authors reviewed and accepted the AI-assisted
-contributions and remain responsible for the package’s content,
-correctness, licensing, and maintenance.
+OpenAI Codex was used extensively in developing MutGlyph. It assisted
+with researching existing solutions, prioritizing and planning features,
+bootstrapping the project, refining public APIs, adapting GenomeSpy
+example specifications for dynamic generation in R, and producing code,
+tests, documentation, and examples.
+
+Development was an iterative human-in-the-loop process. The author
+defined the goals and constraints, evaluated alternatives, reviewed and
+edited changes, inspected visual output, and verified the implementation
+through tests. The author remains responsible for the package’s design,
+correctness, licensing, maintenance, and scientific use.
 
 # Package index
 
 ## Plotting
 
-- [`mutglyph_oncoplot()`](https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.md)
-  : Draw an interactive oncoplot
-- [`mutglyph_lollipop_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.md)
+- [`oncoplot()`](https://genomespy.app/MutGlyph/reference/oncoplot.md) :
+  Draw an interactive oncoplot
+- [`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md)
   : Draw an interactive protein lollipop plot
-- [`mutglyph_rainfall_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_rainfall_plot.md)
+- [`lollipopPlot2()`](https://genomespy.app/MutGlyph/reference/lollipopPlot2.md)
+  : Compare two cohorts with an interactive protein lollipop plot
+- [`rainfallPlot()`](https://genomespy.app/MutGlyph/reference/rainfallPlot.md)
   : Draw an interactive rainfall plot
+- [`gisticChromPlot()`](https://genomespy.app/MutGlyph/reference/gisticChromPlot.md)
+  : Plot GISTIC scores across the genome
 
 ## GenomeSpy specification
 
@@ -212,14 +202,15 @@ correctness, licensing, and maintenance.
 
 ### Get started
 
-- [Introduction to
+- [Get started with
   MutGlyph](https://genomespy.app/MutGlyph/articles/MutGlyph.md):
 
 ### Plot guides
 
-- [Customizing
-  oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.md):
+- [Oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.md):
 - [Protein lollipop
   plots](https://genomespy.app/MutGlyph/articles/lollipop-plots.md):
 - [Rainfall plots and
   kataegis](https://genomespy.app/MutGlyph/articles/rainfall-plots.md):
+- [GISTIC copy-number
+  landscapes](https://genomespy.app/MutGlyph/articles/gistic-plots.md):

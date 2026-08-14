@@ -1,6 +1,6 @@
-# Customizing oncoplots
+# Oncoplots
 
-This article builds on the [basic
+This guide builds on the [basic
 oncoplot](https://genomespy.app/MutGlyph/articles/MutGlyph.md) and
 covers the main ways to select, annotate, and summarize a cohort. The
 examples use the bundled TCGA acute myeloid leukemia data.
@@ -28,12 +28,13 @@ pattern works for a selected and ordered set of samples.
 
 ``` r
 
-mutglyph_oncoplot(
+oncoplot(
   laml,
   genes = c("NPM1", "FLT3", "DNMT3A", "IDH1", "IDH2"),
   keepGeneOrder = TRUE,
   sampleOrder = c("TCGA-AB-2945", "TCGA-AB-2965"),
-  removeNonMutated = TRUE
+  removeNonMutated = TRUE,
+  height = 550
 )
 ```
 
@@ -43,7 +44,7 @@ or more is a sample count.
 
 ``` r
 
-mutglyph_oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN")
+oncoplot(laml, minMut = 0.05, genesToIgnore = "TTN", height = 500)
 ```
 
 ## Add clinical and sequence context
@@ -56,7 +57,7 @@ variants.
 
 ``` r
 
-mutglyph_oncoplot(
+oncoplot(
   laml,
   top = 10,
   rowHeight = 28,
@@ -70,22 +71,28 @@ mutglyph_oncoplot(
   ),
   draw_titv = TRUE,
   showTumorSampleBarcodes = TRUE,
-  titleText = "TCGA acute myeloid leukemia"
+  titleText = "TCGA acute myeloid leukemia",
+  height = 550
 )
 ```
+
+With `showTumorSampleBarcodes = TRUE`, TCGA barcodes appear after
+zooming in far enough for the columns to provide readable horizontal
+space. Ranged text keeps them hidden in the dense whole-cohort view.
 
 Mutation-class colors are partial overrides, so a plot can emphasize a
 few classes without redefining the whole palette.
 
 ``` r
 
-mutglyph_oncoplot(
+oncoplot(
   laml,
   top = 10,
   colors = c(
     Missense_Mutation = "#00897B",
     Multi_Hit = "#D81B60"
-  )
+  ),
+  height = 520
 )
 ```
 
@@ -114,14 +121,15 @@ names(mean_vaf) <- c("gene", "Mean VAF (%)")
 
 ``` r
 
-mutglyph_oncoplot(
+oncoplot(
   laml,
   genes = genes,
   keepGeneOrder = TRUE,
   topBarData = "days_to_last_followup",
   leftBarData = mean_vaf,
   leftBarLims = c(0, 100),
-  titleText = "Follow-up and mean variant allele frequency"
+  titleText = "Follow-up and mean variant allele frequency",
+  height = 440
 )
 ```
 
@@ -152,10 +160,11 @@ laml_gistic <- maftools::read.maf(
   verbose = FALSE
 )
 
-mutglyph_oncoplot(
+oncoplot(
   laml_gistic,
   top = 10,
-  titleText = "Sequence mutations and GISTIC calls"
+  titleText = "Sequence mutations and GISTIC calls",
+  height = 440
 )
 ```
 

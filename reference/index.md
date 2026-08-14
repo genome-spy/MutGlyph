@@ -2,12 +2,16 @@
 
 ## Plotting
 
-- [`mutglyph_oncoplot()`](https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.md)
-  : Draw an interactive oncoplot
-- [`mutglyph_lollipop_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.md)
+- [`oncoplot()`](https://genomespy.app/MutGlyph/reference/oncoplot.md) :
+  Draw an interactive oncoplot
+- [`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md)
   : Draw an interactive protein lollipop plot
-- [`mutglyph_rainfall_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_rainfall_plot.md)
+- [`lollipopPlot2()`](https://genomespy.app/MutGlyph/reference/lollipopPlot2.md)
+  : Compare two cohorts with an interactive protein lollipop plot
+- [`rainfallPlot()`](https://genomespy.app/MutGlyph/reference/rainfallPlot.md)
   : Draw an interactive rainfall plot
+- [`gisticChromPlot()`](https://genomespy.app/MutGlyph/reference/gisticChromPlot.md)
+  : Plot GISTIC scores across the genome
 
 ## GenomeSpy specification
 

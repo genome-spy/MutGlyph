@@ -1,31 +1,20 @@
-# Introduction to MutGlyph
+# Get started with MutGlyph
 
-MutGlyph builds interactive cancer-genomics plots from
-[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects
-and renders them with [GenomeSpy](https://genomespy.app/). Oncoplots,
-protein lollipops, and rainfall plots support tooltips, zooming, and SVG
-export.
-
-[`mutglyph_oncoplot()`](https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.md)
-deliberately imitates
-[`maftools::oncoplot()`](https://rdrr.io/pkg/maftools/man/oncoplot.html):
-it accepts the same MAF objects and follows familiar argument names,
-ordering behavior, and plot composition. It is therefore an almost
-drop-in replacement in common workflows, often requiring only a change
-of function name. MutGlyph does not attempt to reproduce every maftools
-option.
+This page takes an existing MAF object to a first interactive MutGlyph
+plot. MutGlyph is exclusively a visualization package: use maftools or
+another analysis workflow to prepare and analyze variants, then use
+MutGlyph to render the results with an embedded
+[GenomeSpy](https://genomespy.app/).
 
 ## Start with a familiar oncoplot
 
-The bundled TCGA acute myeloid leukemia data makes a convenient small
-example. This starting point deliberately corresponds to the [basic
-top-ten
+The TCGA acute myeloid leukemia data bundled with maftools makes a
+convenient small example. This starting point deliberately corresponds
+to the [basic top-ten
 oncoplot](https://www.bioconductor.org/packages/release/bioc/vignettes/maftools/inst/doc/maftools.html#721_Drawing_oncoplots)
 in the maftools introduction, but uses MutGlyph for rendering.
 
 ``` r
-
-library(MutGlyph)
 
 laml <- maftools::read.maf(
   maf = system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
@@ -40,21 +29,21 @@ laml <- maftools::read.maf(
 
 ``` r
 
-mutglyph_oncoplot(maf = laml, top = 10)
+MutGlyph::oncoplot(maf = laml, top = 10, height = 500)
 ```
 
 The columns share one sample scale. Scroll or pinch over the plot to
 zoom and pan, and hover over marks for details. Sample labels can be
 enabled even for a dense cohort: ranged text keeps them hidden until the
-columns are wide enough. The **Save as SVG** button exports the current
-composition.
+columns are wide enough. Hover over the widget to reveal controls for
+fullscreen viewing, PNG or SVG image export, and downloading the
+generated GenomeSpy specification.
 
 ## Continue with the plot guides
 
-- [Customize
-  oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.md) with
-  clinical tracks, TiTv, summary bars, colors, selection, and GISTIC
-  calls.
+- [Oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.md)
+  covers clinical tracks, TiTv, summary bars, colors, selection, and
+  GISTIC calls.
 - [Map mutations onto
   proteins](https://genomespy.app/MutGlyph/articles/lollipop-plots.md)
   using MAF objects or ordinary data frames and composable domain
@@ -62,6 +51,9 @@ composition.
 - [Explore mutation
   clustering](https://genomespy.app/MutGlyph/articles/rainfall-plots.md)
   with rainfall plots and optional kataegis detection.
+- [Browse GISTIC copy-number
+  landscapes](https://genomespy.app/MutGlyph/articles/gistic-plots.md)
+  with mirrored amplification and deletion profiles.
 
 ## Use the generated specification
 
@@ -73,15 +65,14 @@ in the GenomeSpy Playground.
 
 ``` r
 
-plot <- mutglyph_oncoplot(laml, top = 10)
-spec_json <- as_json(plot, pretty = TRUE)
+plot <- MutGlyph::oncoplot(laml, top = 10, height = 500)
+spec_json <- MutGlyph::as_json(plot, pretty = TRUE)
 cat(substr(spec_json, 1, 160), "...\n")
 #> {
 #>   "$schema": "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
 #>   "name": "mutglyph-oncoplot",
 #>   "background": "white",
-#>   "datasets": {
-#>     "ge ...
+#>   "width": "container", ...
 ```
 
 Widget width is responsive by default. Set `height` when embedding the
@@ -116,18 +107,15 @@ sessionInfo()
 #> attached base packages:
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
-#> other attached packages:
-#> [1] MutGlyph_0.0.0.9000
-#> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6          knitr_1.51         rlang_1.3.0        xfun_0.60         
-#>  [5] otel_0.2.0         textshaping_1.0.5  data.table_1.18.4  jsonlite_2.0.0    
+#>  [5] otel_0.2.0         textshaping_1.0.5  jsonlite_2.0.0     data.table_1.18.4 
 #>  [9] htmltools_0.5.9    ragg_1.5.2         sass_0.4.10        rmarkdown_2.31    
 #> [13] grid_4.6.1         evaluate_1.0.5     jquerylib_0.1.4    fastmap_1.2.0     
 #> [17] yaml_2.3.12        lifecycle_1.0.5    maftools_2.28.0    DNAcopy_1.86.0    
 #> [21] compiler_4.6.1     fs_2.1.0           RColorBrewer_1.1-3 htmlwidgets_1.6.4 
-#> [25] R.oo_1.27.1        R.utils_2.13.0     lattice_0.22-9     systemfonts_1.3.2 
-#> [29] digest_0.6.39      R6_2.6.1           splines_4.6.1      R.methodsS3_1.8.2 
-#> [33] Matrix_1.7-5       bslib_0.12.0       tools_4.6.1        survival_3.8-6    
-#> [37] pkgdown_2.2.1      cachem_1.1.0       desc_1.4.3
+#> [25] MutGlyph_0.1.0     R.oo_1.27.1        R.utils_2.13.0     lattice_0.22-9    
+#> [29] systemfonts_1.3.2  digest_0.6.39      R6_2.6.1           splines_4.6.1     
+#> [33] R.methodsS3_1.8.2  Matrix_1.7-5       bslib_0.12.0       tools_4.6.1       
+#> [37] survival_3.8-6     pkgdown_2.2.1      cachem_1.1.0       desc_1.4.3
 ```

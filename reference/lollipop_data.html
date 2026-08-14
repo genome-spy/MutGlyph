@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MutGlyph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,10 +19,12 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/oncoplots.html">Customizing oncoplots</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/oncoplots.html">Oncoplots</a></li>
     <li><a class="dropdown-item" href="../articles/lollipop-plots.html">Protein lollipop plots</a></li>
     <li><a class="dropdown-item" href="../articles/rainfall-plots.html">Rainfall plots and kataegis</a></li>
+    <li><a class="dropdown-item" href="../articles/gistic-plots.html">GISTIC copy-number landscapes</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/genome-spy/MutGlyph/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -54,7 +56,8 @@
 <span>  domains <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  proteinLength <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"events"</span>, <span class="st">"samples"</span><span class="op">)</span>,</span>
-<span>  colors <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  allowEmpty <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -75,7 +78,10 @@
 
 
 <dt id="arg-refseqid-proteinid">refSeqID, proteinID<a class="anchor" aria-label="anchor" href="#arg-refseqid-proteinid"></a></dt>
-<dd><p>Optional RefSeq transcript or protein identifier.</p></dd>
+<dd><p>Optional RefSeq transcript or protein identifier.
+These select the domain model, as in <code><a href="https://rdrr.io/pkg/maftools/man/lollipopPlot.html" class="external-link">maftools::lollipopPlot()</a></code>. When the
+mutation input contains compatible RefSeq metadata, MutGlyph checks it
+against the selected model and warns about mixed or mismatching isoforms.</p></dd>
 
 
 <dt id="arg-domains">domains<a class="anchor" aria-label="anchor" href="#arg-domains"></a></dt>
@@ -92,6 +98,11 @@
 
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
 <dd><p>Optional mutation-class color overrides.</p></dd>
+
+
+<dt id="arg-allowempty">allowEmpty<a class="anchor" aria-label="anchor" href="#arg-allowempty"></a></dt>
+<dd><p>Return an empty mutation table instead of failing. Used by
+two-cohort plots, where maftools permits one cohort to have no mutations.</p></dd>
 
 </dl></div>
     <div class="section level2">

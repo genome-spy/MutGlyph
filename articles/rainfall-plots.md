@@ -1,6 +1,6 @@
 # Rainfall plots and kataegis
 
-[`mutglyph_rainfall_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_rainfall_plot.md)
+[`rainfallPlot()`](https://genomespy.app/MutGlyph/reference/rainfallPlot.md)
 is the interactive counterpart of
 [`maftools::rainfallPlot()`](https://rdrr.io/pkg/maftools/man/rainfallPlot.html).
 It defaults to the most mutated sample and plots chromosome-local
@@ -25,7 +25,7 @@ brca <- maftools::read.maf(
 
 ``` r
 
-mutglyph_rainfall_plot(
+rainfallPlot(
   brca,
   detectChangePoints = TRUE,
   pointSize = 0.5,
@@ -38,6 +38,20 @@ writing a TSV file:
 
 ``` r
 
-rainfall <- mutglyph_rainfall_plot(brca, detectChangePoints = TRUE)
+rainfall <- rainfallPlot(brca, detectChangePoints = TRUE)
 rainfall$x$spec$datasets$kataegis
+```
+
+Pass `region` to open the interactive plot directly at a locus of
+interest. Coordinate separators are optional, and the plot remains
+zoomable.
+
+``` r
+
+rainfallPlot(
+  brca,
+  detectChangePoints = TRUE,
+  region = "chr8:98,000,000-98,500,000",
+  height = 360
+)
 ```

@@ -1,25 +1,30 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://genomespy.app/MutGlyph/404.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/AGENTS.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/LICENSE-text.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/LICENSE.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/articles/MutGlyph.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/articles/gistic-plots.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/articles/index.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/articles/lollipop-plots.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/articles/oncoplots.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/articles/rainfall-plots.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/authors.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/index.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/news/index.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/MutGlyph-package.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/as_json.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/reference/gisticChromPlot.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/index.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/reference/lollipopPlot.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/reference/lollipopPlot2.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/lollipop_data.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/mutglyph_interpro_domains.html</loc></url>
-<url><loc>https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.html</loc></url>
-<url><loc>https://genomespy.app/MutGlyph/reference/mutglyph_oncoplot.html</loc></url>
-<url><loc>https://genomespy.app/MutGlyph/reference/mutglyph_rainfall_plot.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/mutglyph_widget.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/reference/oncoplot.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/oncoplot_data.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/pik3ca_tcga_brca.html</loc></url>
+<url><loc>https://genomespy.app/MutGlyph/reference/rainfallPlot.html</loc></url>
 <url><loc>https://genomespy.app/MutGlyph/reference/rainfall_data.html</loc></url>
 </urlset>
 

@@ -2,7 +2,7 @@
 
 Queries the InterPro API for a UniProt protein and returns a plain
 domain table accepted by
-[`mutglyph_lollipop_plot()`](https://genomespy.app/MutGlyph/reference/mutglyph_lollipop_plot.md).
+[`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md).
 Results are cached outside the installed package so subsequent calls can
 work offline.
 
@@ -63,7 +63,7 @@ are returned. A discontinuous match produces one row for each fragment.
 ``` r
 if (FALSE) { # \dontrun{
 flt3_domains <- mutglyph_interpro_domains("P36888")
-mutglyph_lollipop_plot(
+lollipopPlot(
   laml,
   gene = "FLT3",
   domains = flt3_domains

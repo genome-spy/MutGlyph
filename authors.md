@@ -3,6 +3,7 @@
 ## Authors
 
 - **Kari Lavikka**. Author, maintainer, copyright holder.
+  [](https://orcid.org/0000-0002-4163-4945)
 
 ## Citation
 
@@ -10,12 +11,12 @@ Source:
 [`DESCRIPTION`](https://github.com/genome-spy/MutGlyph/blob/main/DESCRIPTION)
 
 Lavikka K (2026). *MutGlyph: Interactive Cancer Genomics Plots*. R
-package version 0.0.0.9000, <https://github.com/genome-spy/MutGlyph>.
+package version 0.1.0, <https://github.com/genome-spy/MutGlyph>.
 
     @Manual{,
       title = {MutGlyph: Interactive Cancer Genomics Plots},
       author = {Kari Lavikka},
       year = {2026},
-      note = {R package version 0.0.0.9000},
+      note = {R package version 0.1.0},
       url = {https://github.com/genome-spy/MutGlyph},
     }

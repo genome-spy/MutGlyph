@@ -14,7 +14,8 @@ lollipop_data(
   domains = NULL,
   proteinLength = NULL,
   count = c("events", "samples"),
-  colors = NULL
+  colors = NULL,
+  allowEmpty = FALSE
 )
 ```
 
@@ -34,7 +35,12 @@ lollipop_data(
 
 - refSeqID, proteinID:
 
-  Optional RefSeq transcript or protein identifier.
+  Optional RefSeq transcript or protein identifier. These select the
+  domain model, as in
+  [`maftools::lollipopPlot()`](https://rdrr.io/pkg/maftools/man/lollipopPlot.html).
+  When the mutation input contains compatible RefSeq metadata, MutGlyph
+  checks it against the selected model and warns about mixed or
+  mismatching isoforms.
 
 - domains:
 
@@ -51,6 +57,11 @@ lollipop_data(
 - colors:
 
   Optional mutation-class color overrides.
+
+- allowEmpty:
+
+  Return an empty mutation table instead of failing. Used by two-cohort
+  plots, where maftools permits one cohort to have no mutations.
 
 ## Value
 

@@ -5,9 +5,7 @@
 #' [maftools::lollipopPlot()], while the displaced layout separates dense
 #' hotspots and connects every marker back to its true protein position.
 #'
-#' @param maf A maftools `MAF` object. For backward compatibility during
-#'   development, a data frame is also accepted here; new code should use
-#'   `data` for ordinary tables.
+#' @param maf A maftools `MAF` object.
 #' @param data Optional mutation data frame, following `maftools::lollipopPlot()`.
 #'   MutGlyph accepts its two-column position/count convention as well as named
 #'   `position`, `mutation`, `variant_class` (or `classification`), `sample`,
@@ -27,6 +25,9 @@
 #' @param showMutationRate Include the mutated-sample fraction in the title.
 #' @param showDomainLabel Draw ranged labels inside protein domains.
 #' @param refSeqID,proteinID Optional RefSeq transcript or protein identifier.
+#'   These retain maftools' domain-selection semantics. If compatible RefSeq
+#'   metadata is present in the mutation input, MutGlyph warns about mixed or
+#'   mismatching isoforms without silently filtering mutations.
 #' @param colors Optional named character vector overriding mutation-class
 #'   colors.
 #' @param domains Optional custom domain data frame with `start`, `end`, and
@@ -52,6 +53,9 @@
 #' bundled `protein_domains.RDs` snapshot. Custom data without domains is drawn
 #' against a plain protein backbone. [mutglyph_interpro_domains()] returns a
 #' compatible domain table when online InterPro annotations are desired.
+#' When no identifier is supplied, MutGlyph follows maftools by selecting the
+#' longest bundled protein model (and the first transcript when lengths tie).
+#' Selected transcript and protein identifiers are shown below the plot title.
 #'
 #' Mutation event and distinct-sample counts are both retained in
 #' `plot$x$spec$datasets$mutations`, irrespective of which one is plotted.
@@ -82,7 +86,7 @@
 #'   )
 #' }
 #' @export
-lollipopPlot <- function(maf = NULL,
+lollipopPlot <- function(maf,
                          data = NULL,
                          gene = NULL,
                          AACol = NULL,
@@ -106,10 +110,18 @@ lollipopPlot <- function(maf = NULL,
                          width = NULL,
                          height = NULL,
                          elementId = NULL) {
-  if (!is.null(maf) && !is.null(data)) {
-    stop("Supply only one of `maf` and `data`.", call. = FALSE)
+  has_maf <- !missing(maf) && !is.null(maf)
+  has_data <- !is.null(data)
+  if (has_maf == has_data) {
+    stop("Supply exactly one of `maf` and `data`.", call. = FALSE)
   }
-  if (is.null(maf)) maf <- data
+  if (has_maf && !inherits(maf, "MAF")) {
+    stop("`maf` must be a maftools MAF object; use `data` for a data frame.", call. = FALSE)
+  }
+  if (has_data && !is.data.frame(data)) {
+    stop("`data` must be a data frame.", call. = FALSE)
+  }
+  input <- if (has_maf) maf else data
   layout <- match.arg(layout)
   count <- match.arg(count)
   if (!is.null(yScale)) yScale <- match.arg(yScale, c("linear", "log"))
@@ -126,7 +138,7 @@ lollipopPlot <- function(maf = NULL,
   }
   mutglyph_positive_number(pointSize, "pointSize")
   data <- lollipop_data(
-    maf,
+    input,
     gene = gene,
     AACol = AACol,
     refSeqID = refSeqID,
@@ -211,9 +223,9 @@ lollipop_labels <- function(mutations,
     return(labels)
   }
 
-  # maftools collapses changes at a shared residue into one label. Attach that
-  # label to the tallest lollipop so its vertical position clears every point
-  # in the group.
+  # maftools 2.26.0 collapses changes at a shared residue into one label.
+  # Attach it to the tallest lollipop so its vertical position clears every
+  # point while preserving the same user-facing label semantics.
   for (position in unique(mutations$position[selected])) {
     indices <- which(selected & mutations$position == position)
     anchor <- indices[which.max(mutations$count[indices])]
@@ -229,15 +241,20 @@ lollipop_collapse_position_labels <- function(labels) {
   if (length(labels) == 1L) {
     return(lollipop_abbreviate_labels(labels))
   }
+  # Keep the first complete change and remove the shared residue prefix from
+  # subsequent changes, falling back to the original label when it has no
+  # recognizable amino-acid/position prefix.
   suffixes <- sub("^[[:alpha:]*]+[[:digit:]]+", "", labels[-1L])
   suffixes[!nzchar(suffixes)] <- labels[-1L][!nzchar(suffixes)]
   lollipop_abbreviate_labels(paste(c(labels[1L], suffixes), collapse = "/"))
 }
 
 lollipop_abbreviate_labels <- function(labels, maximum = 18L) {
+  # Keep labels within the fixed displaced-label gutter. ASCII dots render in
+  # GenomeSpy's limited font atlas more reliably than a Unicode ellipsis.
   ifelse(
     nchar(labels) <= maximum,
     labels,
-    paste0(substr(labels, 1L, maximum - 1L), "\u2026")
+    paste0(substr(labels, 1L, maximum - 3L), "...")
   )
 }

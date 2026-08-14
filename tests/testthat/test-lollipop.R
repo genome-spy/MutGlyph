@@ -9,6 +9,11 @@ test_that("basic lollipop uses true-position vertical stems", {
 
   expect_s3_class(plot, "mutglyph")
   expect_identical(spec$name, "mutglyph-lollipop-plot")
+  expect_identical(
+    spec$title$text,
+    "FLT3 mutations - 52/193 samples (26.9%)"
+  )
+  expect_identical(spec$title$subtitle, "NM_004119 - NP_004110")
   expect_identical(spec$width, "container")
   expect_identical(spec$height, "container")
   expect_named(spec$datasets, c("mutations", "domains"))
@@ -156,6 +161,10 @@ test_that("basic mutation annotations collapse shared positions", {
 
   expect_identical(collapsed, c("D835Y/H", "", "N842K"))
   expect_identical(separate, c("D835Y", "D835H", ""))
+  expect_identical(
+    lollipop_abbreviate_labels("ABCDEFGHIJKLMNOPQRST", maximum = 10),
+    "ABCDEFG..."
+  )
 })
 
 test_that("lollipop scales leave headroom and use GenomeSpy colors by default", {
@@ -275,8 +284,12 @@ test_that("lollipop accepts exactly one mutation input", {
 
   expect_error(lollipopPlot(), "maf.*data")
   expect_error(
+    lollipopPlot(maf = mutation_data),
+    "MAF object.*use `data`"
+  )
+  expect_error(
     lollipopPlot(maf = mutation_data, data = mutation_data),
-    "only one"
+    "exactly one"
   )
 })
 
@@ -289,7 +302,7 @@ test_that("pre-aggregated PIK3CA sample counts plot directly", {
     protein_length = 1068
   )
   spec <- lollipopPlot(
-    pik3ca_tcga_brca,
+    data = pik3ca_tcga_brca,
     gene = "PIK3CA",
     domains = domains,
     count = "samples",

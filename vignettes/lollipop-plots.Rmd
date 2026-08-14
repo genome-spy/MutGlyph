@@ -21,6 +21,13 @@ conventions but uses a cleaner interactive composition. Mutation events stay
 at their true amino-acid positions, and domains are an ordinary data frame that
 can be inspected, edited, or replaced.
 
+As in maftools, `refSeqID` and `proteinID` select the protein-domain model, and
+the longest bundled protein is used when neither is supplied. MutGlyph shows
+the selected transcript and protein identifiers below the plot title. If the
+mutation input contains compatible RefSeq metadata, it warns when the mutations
+contain mixed isoforms or disagree with the domain model. Such mutations are
+not silently removed.
+
 ```{r data}
 library(MutGlyph)
 

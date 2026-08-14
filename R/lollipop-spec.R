@@ -1,3 +1,6 @@
+# The fixed protein track only contains a backbone and domain labels. Its
+# negative top padding slightly overlaps the flexible mutation panel so stems
+# can reach the backbone without leaving a layout gap.
 lollipop_protein_height <- 56
 lollipop_protein_padding_top <- -5
 # maftools passes pointSize to base graphics as `cex`, which scales linear
@@ -44,13 +47,22 @@ lollipop_spec <- function(data,
       is.finite(data$sample_count) && is.finite(data$mutation_rate)
   ) {
     title <- sprintf(
-      "%s \u00b7 %d/%d samples (%.1f%%)",
+      "%s - %d/%d samples (%.1f%%)",
       title,
       data$mutated_samples,
       data$sample_count,
       data$mutation_rate
     )
   }
+
+  plot_title <- list(
+    text = title,
+    anchor = "middle",
+    fontSize = 14,
+    fontWeight = "normal"
+  )
+  isoform <- lollipop_isoform_label(data$refseq_id, data$protein_id)
+  if (!is.na(isoform)) plot_title$subtitle <- isoform
 
   list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
@@ -62,12 +74,7 @@ lollipop_spec <- function(data,
     } else {
       sprintf("Protein mutation recurrence for %s.", data$gene)
     },
-    title = list(
-      text = title,
-      anchor = "middle",
-      fontSize = 14,
-      fontWeight = "normal"
-    ),
+    title = plot_title,
     width = "container",
     height = "container",
     padding = 10,
@@ -203,9 +210,13 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
       list(
         type = "displace1d",
         pos = "position",
+        # The transform works in screen pixels. This length follows the marker
+        # diameter and leaves a small gap between neighboring points.
         length = 12 * pointSize,
         positionFactor = list(expr = "pixelsPerResidue"),
         extent = list(
+          # Express a 25 px right margin in residues so endpoint markers and
+          # angled labels remain inside the view at every zoom level.
           expr = "[0.5, proteinLength + 0.5 - 25 / max(1, pixelsPerResidue)]"
         ),
         as = "xDisplacement"

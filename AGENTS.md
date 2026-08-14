@@ -12,11 +12,25 @@ compatibility shims, or dependencies until a concrete requirement justifies
 them. Remove accidental complexity when extending existing code rather than
 building around it.
 
+Prioritize issues demonstrated by supported inputs, upstream behavior,
+existing examples, or a plausible user workflow. Do not add validation,
+branches, configuration, or abstractions solely for contrived states with no
+realistic path into the package. Fix correctness problems that affect the
+documented contract, but otherwise record or defer theoretical edge cases
+until evidence makes them concrete.
+
 Keep features composable. Data preparation, annotation, ordering, and
 GenomeSpy specification construction should remain separable when that enables
 reuse or testing. Prefer ordinary data frames and small, inspectable
 intermediate structures over opaque objects. Make it straightforward to supply
 custom mutation data, annotations, and domains where those are natural inputs.
+
+Add a brief rationale comment beside non-obvious heuristics, workarounds,
+optimizations, compatibility behavior, and safety boundaries. Explain why the
+code exists, the assumption it relies on, or why the simpler-looking approach
+is unsuitable. Do not merely narrate the syntax, and do not add comments to
+obvious code. When a heuristic can be replaced by a small deterministic
+solution, prefer fixing it over documenting it.
 
 Composability does not mean making every internal detail configurable. Keep the
 common public API concise, provide sensible defaults, and expose extension
@@ -31,6 +45,14 @@ code.
 
 ## Compatibility and public API
 
+### Naming and semantics
+
+Familiar names and semantics make MutGlyph easy to discover and let users try
+an interactive replacement with minimal changes to existing analyses. Limiting
+compatibility to meaningful behavior keeps the API honest and avoids carrying
+implementation-specific complexity from static plotting systems into
+GenomeSpy.
+
 When MutGlyph intentionally provides an interactive counterpart to an
 established plot, use the established function name and exact casing. Current
 and anticipated examples include:
@@ -38,8 +60,6 @@ and anticipated examples include:
 - `MutGlyph::oncoplot()`, corresponding to `maftools::oncoplot()`
 - `MutGlyph::rainfallPlot()`, corresponding to `maftools::rainfallPlot()`
 - `MutGlyph::lollipopPlot()`, corresponding to `maftools::lollipopPlot()`
-- `MutGlyph::cnFreq()` and `MutGlyph::cnSpec()` if direct counterparts to the
-  GenVisR functions are implemented
 
 Use an established name only when the function is genuinely the same kind of
 plot. MutGlyph-specific helpers should have descriptive, unambiguous names.
@@ -55,19 +75,37 @@ Returning a GenomeSpy htmlwidget is an intentional difference. Interactive
 behavior, responsive composition, and a useful generated specification take
 priority over exact visual or return-value parity.
 
-Avoid broad imports and re-exports from maftools, GenVisR, or other source
-packages. Use explicit namespace-qualified calls internally. In documentation
-and examples where both packages are relevant, likewise prefer explicit calls
-such as `maftools::oncoplot()` and `MutGlyph::oncoplot()` instead of relying on
-package masking.
+### Upstream reuse
 
-### Rationale
+Checking upstream capabilities first avoids parallel implementations that can
+silently diverge as maftools evolves. Reusing stable public behavior reduces
+MutGlyph's correctness and maintenance burden; owning a local implementation
+is justified only when it provides a concrete benefit that upstream reuse
+cannot.
 
-Familiar names and semantics make MutGlyph easy to discover and let users try
-an interactive replacement with minimal changes to existing analyses. Limiting
-compatibility to meaningful behavior keeps the API honest and avoids carrying
-implementation-specific complexity from static plotting systems into
-GenomeSpy.
+Before implementing behavior that overlaps with maftools, inspect its current
+public API, documentation, and relevant implementation to determine whether it
+already provides the needed parsing, normalization, annotation, aggregation,
+or other functionality. Prefer explicit, namespace-qualified calls to stable
+public maftools functions and accessors when they meet MutGlyph's needs. Do not
+reimplement upstream functionality merely because it appears small: duplicate
+code adds correctness, compatibility, testing, and maintenance burdens.
+
+Implement equivalent behavior locally only when using maftools directly would
+conflict with MutGlyph's interactive or composable design, package constraints,
+performance needs, or documented correctness requirements. Keep such local
+implementations minimal, record the reason in a nearby rationale comment, and
+add compatibility or parity tests for the supported behavior. Avoid depending
+on undocumented maftools internals as a shortcut; if no suitable public API
+exists, prefer a small owned implementation with an explicit contract.
+
+### Namespace discipline
+
+Avoid broad imports and re-exports from maftools or other source packages. Use
+explicit namespace-qualified calls internally. In documentation and examples
+where both packages are relevant, likewise prefer explicit calls such as
+`maftools::oncoplot()` and `MutGlyph::oncoplot()` instead of relying on package
+masking.
 
 ## Code and idea provenance
 

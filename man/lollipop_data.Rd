@@ -23,7 +23,10 @@ lollipop_data(
 
 \item{AACol}{Optional MAF column containing protein changes.}
 
-\item{refSeqID, proteinID}{Optional RefSeq transcript or protein identifier.}
+\item{refSeqID, proteinID}{Optional RefSeq transcript or protein identifier.
+These select the domain model, as in \code{\link[maftools:lollipopPlot]{maftools::lollipopPlot()}}. When the
+mutation input contains compatible RefSeq metadata, MutGlyph checks it
+against the selected model and warns about mixed or mismatching isoforms.}
 
 \item{domains}{Optional custom protein-domain data frame.}
 

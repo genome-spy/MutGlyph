@@ -4,6 +4,9 @@
 #' @param gene One gene symbol. Optional for a data frame containing one `gene`.
 #' @param AACol Optional MAF column containing protein changes.
 #' @param refSeqID,proteinID Optional RefSeq transcript or protein identifier.
+#'   These select the domain model, as in [maftools::lollipopPlot()]. When the
+#'   mutation input contains compatible RefSeq metadata, MutGlyph checks it
+#'   against the selected model and warns about mixed or mismatching isoforms.
 #' @param domains Optional custom protein-domain data frame.
 #' @param proteinLength Optional protein length in amino acids.
 #' @param count Count mutation events or distinct samples.
@@ -61,10 +64,12 @@ lollipop_data <- function(maf,
     }
   }
 
+  # Keep optional annotations in this gene-level subset so isoform detection
+  # does not depend on guessed column names. Only the normalized mutation
+  # summary below is included in the generated specification.
   variants <- as.data.frame(maftools::subsetMaf(
     maf = maf,
     genes = gene,
-    fields = AACol,
     includeSyn = FALSE,
     query = "Variant_Type != 'CNV'",
     mafObj = FALSE
@@ -106,11 +111,13 @@ lollipop_data <- function(maf,
     proteinLength = proteinLength,
     minimumLength = max(mutations$position)
   )
-  classes <- unique(mutations$variant_class)
-  colors <- if (is.null(colors)) {
-    NULL
-  } else {
-    oncoplot_mutation_colors(classes, colors)
+  isoforms <- lollipop_check_isoforms(
+    variants,
+    refseq_id = domain_data$refseq_id,
+    protein_id = domain_data$protein_id
+  )
+  if (!is.null(colors)) {
+    colors <- oncoplot_mutation_colors(unique(mutations$variant_class), colors)
   }
   sample_count <- nrow(as.data.frame(maftools::getSampleSummary(maf)))
   gene_summary <- as.data.frame(maftools::getGeneSummary(maf))
@@ -132,6 +139,8 @@ lollipop_data <- function(maf,
     protein_length = domain_data$protein_length,
     refseq_id = domain_data$refseq_id,
     protein_id = domain_data$protein_id,
+    mutation_refseq_ids = isoforms$refseq_ids,
+    mutation_protein_ids = isoforms$protein_ids,
     mutated_samples = as.integer(mutated_samples),
     sample_count = sample_count,
     mutation_rate = 100 * mutated_samples / sample_count
@@ -263,11 +272,13 @@ lollipop_dataframe_data <- function(data,
     minimumLength = max(mutations$position),
     useMafDomains = FALSE
   )
-  classes <- unique(mutations$variant_class)
-  colors <- if (is.null(colors)) {
-    NULL
-  } else {
-    oncoplot_mutation_colors(classes, colors)
+  isoforms <- lollipop_check_isoforms(
+    data,
+    refseq_id = domain_data$refseq_id,
+    protein_id = domain_data$protein_id
+  )
+  if (!is.null(colors)) {
+    colors <- oncoplot_mutation_colors(unique(mutations$variant_class), colors)
   }
   samples <- unique(sample[!is.na(sample) & nzchar(sample)])
 
@@ -282,6 +293,8 @@ lollipop_dataframe_data <- function(data,
     protein_length = domain_data$protein_length,
     refseq_id = domain_data$refseq_id,
     protein_id = domain_data$protein_id,
+    mutation_refseq_ids = isoforms$refseq_ids,
+    mutation_protein_ids = isoforms$protein_ids,
     mutated_samples = if (length(samples)) length(samples) else NA_integer_,
     sample_count = NA_integer_,
     mutation_rate = NA_real_
@@ -292,6 +305,8 @@ lollipop_dataframe_data <- function(data,
 # while retaining MutGlyph's explicit column names for composable data frames.
 lollipop_normalize_dataframe_columns <- function(data) {
   if (ncol(data) < 1L) return(data)
+  # Require two numeric leading columns before applying maftools' positional
+  # convention, avoiding accidental relabeling of an ordinary named table.
   positional <- !"position" %in% names(data) && ncol(data) >= 2L &&
     nrow(data) > 0L && all(is.finite(suppressWarnings(as.numeric(
       as.character(data[[1]])
@@ -313,6 +328,10 @@ lollipop_normalize_dataframe_columns <- function(data) {
   data
 }
 
+# maftools 2.26.0 parses protein changes inside its plotting and summary
+# functions but exposes no public row-level normalizer. MutGlyph owns this
+# small parser and aggregator because it must retain both event and sample
+# counts and support ordinary data frames without invoking a static plot.
 lollipop_aggregate_mutations <- function(variants,
                                          gene,
                                          protein_change,
@@ -322,6 +341,8 @@ lollipop_aggregate_mutations <- function(variants,
                                          weight_type = "events") {
   variant_class <- as.character(variants$Variant_Classification)
   sample <- as.character(variants$Tumor_Sample_Barcode)
+  # A nonprinting separator avoids ambiguous concatenation without adding a
+  # grouping dependency; it cannot occur in supported mutation/class labels.
   key <- paste(protein_position, protein_change, variant_class, sep = "\034")
   groups <- split(seq_len(nrow(variants)), key)
   rows <- lapply(groups, function(indices) {
@@ -366,166 +387,4 @@ lollipop_protein_position <- function(value) {
     match[present] + match_length[present] - 1L
   ))
   position
-}
-
-lollipop_domain_data <- function(gene,
-                                 refSeqID = NULL,
-                                 proteinID = NULL,
-                                 domains = NULL,
-                                 proteinLength = NULL,
-                                 minimumLength = 1,
-                                 useMafDomains = TRUE) {
-  if (!is.null(refSeqID)) refSeqID <- lollipop_string(refSeqID, "refSeqID")
-  if (!is.null(proteinID)) proteinID <- lollipop_string(proteinID, "proteinID")
-  if (!is.null(refSeqID) && !is.null(proteinID)) {
-    stop("Supply only one of `refSeqID` and `proteinID`.", call. = FALSE)
-  }
-  if (!is.null(proteinLength)) {
-    mutglyph_positive_number(proteinLength, "proteinLength")
-  }
-
-  if (is.null(domains) && useMafDomains) {
-    path <- system.file("extdata", "protein_domains.RDs", package = "maftools")
-    if (!nzchar(path)) {
-      stop("The maftools protein-domain table could not be found.", call. = FALSE)
-    }
-    source <- as.data.frame(readRDS(path), stringsAsFactors = FALSE)
-    required <- c(
-      "HGNC", "refseq.ID", "protein.ID", "aa.length", "Start", "End", "Label"
-    )
-    missing <- setdiff(required, names(source))
-    if (length(missing) > 0L) {
-      stop(
-        sprintf(
-          "The maftools protein-domain table is missing: %s.",
-          paste(missing, collapse = ", ")
-        ),
-        call. = FALSE
-      )
-    }
-    source <- source[as.character(source$HGNC) == gene, , drop = FALSE]
-    if (nrow(source) == 0L) {
-      stop(sprintf("No bundled protein domains were found for `%s`.", gene), call. = FALSE)
-    }
-    if (!is.null(refSeqID)) {
-      source <- source[as.character(source$refseq.ID) == refSeqID, , drop = FALSE]
-    } else if (!is.null(proteinID)) {
-      source <- source[as.character(source$protein.ID) == proteinID, , drop = FALSE]
-    } else {
-      longest <- max(as.numeric(source$aa.length), na.rm = TRUE)
-      source <- source[as.numeric(source$aa.length) == longest, , drop = FALSE]
-      selected <- as.character(source$refseq.ID)[1]
-      source <- source[as.character(source$refseq.ID) == selected, , drop = FALSE]
-    }
-    if (nrow(source) == 0L) {
-      id <- if (!is.null(refSeqID)) refSeqID else proteinID
-      stop(sprintf("Protein transcript `%s` was not found for `%s`.", id, gene), call. = FALSE)
-    }
-    description <- if ("Description" %in% names(source)) {
-      as.character(source[["Description"]])
-    } else {
-      rep(NA_character_, nrow(source))
-    }
-    result <- data.frame(
-      start = as.numeric(source$Start),
-      end = as.numeric(source$End),
-      label = as.character(source$Label),
-      description = description,
-      stringsAsFactors = FALSE
-    )
-    inferred_length <- max(as.numeric(source$aa.length), na.rm = TRUE)
-    refseq_id <- as.character(source$refseq.ID)[1]
-    protein_id <- as.character(source$protein.ID)[1]
-  } else if (!is.null(domains)) {
-    if (!is.data.frame(domains)) {
-      stop("`domains` must be a data frame.", call. = FALSE)
-    }
-    start_name <- lollipop_domain_column(domains, c("start", "Start"), "start")
-    end_name <- lollipop_domain_column(domains, c("end", "End"), "end")
-    label_name <- lollipop_domain_column(domains, c("label", "Label"), "label")
-    description_name <- intersect(c("description", "Description"), names(domains))[1]
-    result <- data.frame(
-      start = suppressWarnings(as.numeric(as.character(domains[[start_name]]))),
-      end = suppressWarnings(as.numeric(as.character(domains[[end_name]]))),
-      label = as.character(domains[[label_name]]),
-      description = if (is.na(description_name)) {
-        as.character(domains[[label_name]])
-      } else {
-        as.character(domains[[description_name]])
-      },
-      stringsAsFactors = FALSE
-    )
-    # Preserve common provenance fields returned by InterPro and custom
-    # annotation pipelines. The renderer only relies on the four fields above.
-    for (name in c(
-      "accession", "interpro_accession", "source_database", "type",
-      "representative", "protein_id"
-    )) {
-      if (name %in% names(domains)) result[[name]] <- domains[[name]]
-    }
-    length_name <- intersect(c("protein_length", "proteinLength", "aa.length"), names(domains))[1]
-    length_values <- if (is.na(length_name)) numeric() else suppressWarnings(
-      as.numeric(as.character(domains[[length_name]]))
-    )
-    length_values <- length_values[is.finite(length_values) & length_values > 0]
-    inferred_length <- max(c(result$end, length_values))
-    refseq_id <- if (is.null(refSeqID)) NA_character_ else refSeqID
-    protein_id <- if (!is.null(proteinID)) {
-      proteinID
-    } else if ("protein_id" %in% names(domains)) {
-      unique(as.character(domains$protein_id))[1]
-    } else {
-      NA_character_
-    }
-  } else {
-    # A custom mutation table can be plotted without domain annotations. The
-    # protein backbone still uses the supplied or inferred protein length.
-    result <- data.frame(
-      start = numeric(),
-      end = numeric(),
-      label = character(),
-      description = character(),
-      stringsAsFactors = FALSE
-    )
-    inferred_length <- minimumLength
-    refseq_id <- if (is.null(refSeqID)) NA_character_ else refSeqID
-    protein_id <- if (is.null(proteinID)) NA_character_ else proteinID
-  }
-
-  valid <- is.finite(result$start) & is.finite(result$end) &
-    result$start >= 1 & result$end >= result$start &
-    !is.na(result$label) & nzchar(result$label)
-  result <- result[valid, , drop = FALSE]
-  if (nrow(result) == 0L && (!is.null(domains) || useMafDomains)) {
-    stop("No valid protein domains remain after validation.", call. = FALSE)
-  }
-  result$domain_id <- seq_len(nrow(result))
-  result <- result[order(result$start, result$end), ]
-  rownames(result) <- NULL
-  final_length <- if (is.null(proteinLength)) inferred_length else proteinLength
-  domain_maximum <- if (nrow(result)) max(result$end) else 1
-  final_length <- max(final_length, minimumLength, domain_maximum)
-  list(
-    domains = result,
-    protein_length = as.numeric(final_length),
-    refseq_id = refseq_id,
-    protein_id = protein_id
-  )
-}
-
-lollipop_domain_column <- function(data, candidates, label) {
-  column <- intersect(candidates, names(data))[1]
-  if (is.na(column)) {
-    stop(sprintf("`domains` must contain a `%s` column.", label), call. = FALSE)
-  }
-  column
-}
-
-lollipop_string <- function(value, name) {
-  if (
-    length(value) != 1L || !is.character(value) || is.na(value) || !nzchar(value)
-  ) {
-    stop(sprintf("`%s` must be one non-empty string.", name), call. = FALSE)
-  }
-  value
 }

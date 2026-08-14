@@ -39,7 +39,7 @@ test_that("common maftools arguments retain their names and defaults", {
     lollipopPlot,
     maftools::lollipopPlot,
     c(
-      "data", "gene", "AACol", "labelPos", "showMutationRate",
+      "maf", "data", "gene", "AACol", "labelPos", "showMutationRate",
       "showDomainLabel", "refSeqID", "proteinID", "showLegend", "pointSize",
       "labPosSize", "collapsePosLabel", "labPosAngle"
     )

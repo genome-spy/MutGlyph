@@ -5,7 +5,7 @@
 \title{Draw an interactive protein lollipop plot}
 \usage{
 lollipopPlot(
-  maf = NULL,
+  maf,
   data = NULL,
   gene = NULL,
   AACol = NULL,
@@ -32,9 +32,7 @@ lollipopPlot(
 )
 }
 \arguments{
-\item{maf}{A maftools \code{MAF} object. For backward compatibility during
-development, a data frame is also accepted here; new code should use
-\code{data} for ordinary tables.}
+\item{maf}{A maftools \code{MAF} object.}
 
 \item{data}{Optional mutation data frame, following \code{maftools::lollipopPlot()}.
 MutGlyph accepts its two-column position/count convention as well as named
@@ -57,7 +55,10 @@ semantics.}
 
 \item{showDomainLabel}{Draw ranged labels inside protein domains.}
 
-\item{refSeqID, proteinID}{Optional RefSeq transcript or protein identifier.}
+\item{refSeqID, proteinID}{Optional RefSeq transcript or protein identifier.
+These retain maftools' domain-selection semantics. If compatible RefSeq
+metadata is present in the mutation input, MutGlyph warns about mixed or
+mismatching isoforms without silently filtering mutations.}
 
 \item{colors}{Optional named character vector overriding mutation-class
 colors.}
@@ -109,6 +110,9 @@ With MAF input and no \code{domains}, protein domains are read from maftools'
 bundled \code{protein_domains.RDs} snapshot. Custom data without domains is drawn
 against a plain protein backbone. \code{\link[=mutglyph_interpro_domains]{mutglyph_interpro_domains()}} returns a
 compatible domain table when online InterPro annotations are desired.
+When no identifier is supplied, MutGlyph follows maftools by selecting the
+longest bundled protein model (and the first transcript when lengths tie).
+Selected transcript and protein identifiers are shown below the plot title.
 
 Mutation event and distinct-sample counts are both retained in
 \code{plot$x$spec$datasets$mutations}, irrespective of which one is plotted.

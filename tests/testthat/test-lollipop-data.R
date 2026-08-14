@@ -12,6 +12,8 @@ test_that("lollipop data reproduces FLT3 recurrence and domains", {
   expect_equal(data$protein_length, 993)
   expect_identical(data$refseq_id, "NM_004119")
   expect_identical(data$protein_id, "NP_004110")
+  expect_identical(data$mutation_refseq_ids, "NM_004119")
+  expect_length(data$mutation_protein_ids, 0)
   expect_equal(data$mutated_samples, 52)
   expect_equal(data$sample_count, 193)
   expect_equal(data$mutation_rate, 100 * 52 / 193)
@@ -23,17 +25,85 @@ test_that("lollipop data reproduces FLT3 recurrence and domains", {
   expect_equal(d835y$sample_count, 10)
 })
 
+test_that("lollipop isoform checks are compatible but detect unsafe inputs", {
+  domains <- data.frame(
+    start = 1,
+    end = 20,
+    label = "Domain",
+    protein_length = 30
+  )
+  matching <- data.frame(
+    position = 10,
+    mutation = "A10T",
+    tx = "NM_000001.3"
+  )
+  expect_no_warning(data <- suppressMessages(lollipop_data(
+    matching,
+    gene = "GENE",
+    refSeqID = "NM_000001",
+    domains = domains
+  )))
+  expect_identical(data$mutation_refseq_ids, "NM_000001")
+
+  mismatching <- matching
+  mismatching$tx <- "NM_000002.1"
+  expect_warning(
+    suppressMessages(lollipop_data(
+      mismatching,
+      gene = "GENE",
+      refSeqID = "NM_000001",
+      domains = domains
+    )),
+    "NM_000002.*NM_000001.*not filtered"
+  )
+
+  expect_warning(
+    lollipop_check_isoforms(
+      data.frame(HGVSp = "NP_000002.1:p.A10T"),
+      protein_id = "NP_000001"
+    ),
+    "NP_000002.*NP_000001.*not filtered"
+  )
+
+  mixed <- rbind(matching, transform(matching, tx = "NM_000002.1"))
+  expect_warning(
+    suppressMessages(lollipop_data(
+      mixed,
+      gene = "GENE",
+      refSeqID = "NM_000001",
+      domains = domains
+    )),
+    "multiple RefSeq transcripts.*not filtered"
+  )
+  retained <- suppressWarnings(suppressMessages(lollipop_data(
+    mixed,
+    gene = "GENE",
+    refSeqID = "NM_000001",
+    domains = domains
+  )))
+  expect_equal(retained$mutations$event_count, 2)
+})
+
 test_that("protein-change columns and positions are normalized", {
   data <- suppressWarnings(lollipop_data(laml_maf(), gene = "FLT3"))
 
   expect_identical(data$aa_column, "Protein_Change")
   expect_identical(
-    lollipop_protein_change(c("p.D835Y", "NP_1.p.G12D", "600_601insA")),
-    c("D835Y", "G12D", "600_601insA")
+    lollipop_protein_change(c(
+      "p.D835Y", "NP_004110.2:p.Asp835Tyr", "600_601insA",
+      "p.Leu2195ProfsTer30", "p.L2195Pfs*30", 835
+    )),
+    c(
+      "D835Y", "Asp835Tyr", "600_601insA",
+      "Leu2195ProfsTer30", "L2195Pfs*30", "835"
+    )
   )
   expect_equal(
-    lollipop_protein_position(c("D835Y", "G12D", "unknown")),
-    c(835, 12, NA)
+    lollipop_protein_position(c(
+      "D835Y", "Asp835Tyr", "600_601insA",
+      "Leu2195ProfsTer30", "L2195Pfs*30", "835", "unknown"
+    )),
+    c(835, 835, 600, 2195, 2195, 835, NA)
   )
 })
 
@@ -83,6 +153,18 @@ test_that("custom domains provide a reproducible override", {
   expect_identical(data$domains$label, c("A", "B"))
   expect_identical(data$domains$description, c("First", "Second"))
   expect_true(is.na(data$refseq_id))
+
+  partly_invalid <- lollipop_data(
+    data.frame(position = 10),
+    gene = "GENE",
+    domains = data.frame(
+      start = c(1, NA),
+      end = c(40, NA),
+      label = c("Domain", "Invalid")
+    )
+  )
+  expect_equal(partly_invalid$protein_length, 40)
+  expect_identical(partly_invalid$domains$label, "Domain")
 })
 
 test_that("lollipop data validates its input and domain surface", {

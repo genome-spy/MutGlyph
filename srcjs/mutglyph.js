@@ -80,6 +80,7 @@ const TOOLBAR_RULES = `
   }
   .mutglyph-export-popover {
     position: fixed;
+    z-index: 2;
     inset: auto;
     display: grid;
     min-width: 132px;
@@ -183,6 +184,12 @@ function createControlButton(icon, title) {
   return button;
 }
 
+function releasePointerFocus(button, event) {
+  // Mouse clicks should not leave the subdued toolbar fully opaque. Keyboard
+  // activation retains focus so the controls remain accessible without hover.
+  if (event.detail > 0) queueMicrotask(() => button.blur());
+}
+
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -204,8 +211,8 @@ function createImageExportOption(api, format, closeMenu) {
   button.setAttribute("role", "menuitem");
   button.textContent = title;
 
-  button.addEventListener("click", async () => {
-    closeMenu();
+  button.addEventListener("click", async (event) => {
+    closeMenu(event.detail > 0);
     button.disabled = true;
 
     try {
@@ -262,8 +269,25 @@ function createImageExportMenu(api) {
   let dispose = () => {};
   let closeMenu;
   if (nativePopover) {
-    closeMenu = () => {
+    toggle.addEventListener("click", (event) => {
+      if (event.detail > 0) {
+        // The popover toggle runs as the button's default action. Check its
+        // final state on the next task and release focus only when it closed.
+        setTimeout(() => {
+          if (!menu.matches(":popover-open")) toggle.blur();
+        });
+      }
+    });
+    closeMenu = (releaseFocus = false) => {
       if (menu.matches(":popover-open")) menu.hidePopover();
+      if (releaseFocus) {
+        // Native popovers may restore focus to their invoker when hidden, so
+        // wait until that restoration has completed before removing it.
+        setTimeout(() => {
+          const active = document.activeElement;
+          if (active === toggle || menu.contains(active)) active.blur();
+        });
+      }
     };
     menu.addEventListener("toggle", (event) => {
       const open = event.newState === "open";
@@ -276,18 +300,22 @@ function createImageExportMenu(api) {
     toggle.removeAttribute("popovertarget");
     menu.removeAttribute("popover");
     menu.hidden = true;
-    closeMenu = () => {
+    closeMenu = (releaseFocus = false) => {
       menu.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
+      if (releaseFocus) setTimeout(() => toggle.blur());
     };
-    toggle.addEventListener("click", () => {
+    toggle.addEventListener("click", (event) => {
       const open = menu.hidden;
       menu.hidden = !open;
       toggle.setAttribute("aria-expanded", String(open));
       if (open) positionImageExportPopover(toggle, menu);
+      else releasePointerFocus(toggle, event);
     });
     const closeOnOutsideClick = (event) => {
-      if (!wrapper.contains(event.target)) closeMenu();
+      if (!wrapper.contains(event.target) && !menu.contains(event.target)) {
+        closeMenu();
+      }
     };
     document.addEventListener("click", closeOnOutsideClick);
     dispose = () => document.removeEventListener("click", closeOnOutsideClick);
@@ -297,16 +325,17 @@ function createImageExportMenu(api) {
     createImageExportOption(api, "PNG", closeMenu),
     createImageExportOption(api, "SVG", closeMenu),
   );
-  wrapper.append(toggle, menu);
+  wrapper.append(toggle);
 
-  return { element: wrapper, dispose };
+  return { element: wrapper, popover: menu, dispose };
 }
 
 function createSpecButton(spec) {
   const button = createControlButton("code", "Download GenomeSpy specification");
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (event) => {
     const json = JSON.stringify(spec, null, 2) + "\n";
     downloadBlob(new Blob([json], { type: "application/json" }), "mutglyph-spec.json");
+    releasePointerFocus(button, event);
   });
   return button;
 }
@@ -319,7 +348,8 @@ function createFullscreenButton(el) {
     return button;
   }
 
-  button.addEventListener("click", async () => {
+  button.addEventListener("click", async (event) => {
+    releasePointerFocus(button, event);
     try {
       if (document.fullscreenElement === el) {
         await document.exitFullscreen();
@@ -346,6 +376,7 @@ function createControls(api, el, spec) {
 
   return {
     element: controls,
+    popover: imageExport.popover,
     dispose: imageExport.dispose,
   };
 }
@@ -395,7 +426,10 @@ HTMLWidgets.widget({
           const controls = createControls(api, el, spec);
           disposeControls = controls.dispose;
           fullscreenButton = controls.element.firstElementChild;
-          el.append(createWidgetStyle(), controls.element);
+          // Keep the popover outside the fading toolbar. A top-layer popover
+          // nested under its opacity and pointer-event rules can oscillate
+          // between interactive and non-interactive states during clicks.
+          el.append(createWidgetStyle(), controls.element, controls.popover);
         } else {
           nextApi.finalize();
           container.remove();

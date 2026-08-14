@@ -1,8 +1,8 @@
 ---
-title: "Customizing oncoplots"
+title: "Oncoplots"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Customizing oncoplots}
+  %\VignetteIndexEntry{Oncoplots}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This article builds on the [basic oncoplot](MutGlyph.html) and covers the main
+This guide builds on the [basic oncoplot](MutGlyph.html) and covers the main
 ways to select, annotate, and summarize a cohort. The examples use the bundled
 TCGA acute myeloid leukemia data.
 
@@ -85,6 +85,10 @@ oncoplot(
   height = 550
 )
 ```
+
+With `showTumorSampleBarcodes = TRUE`, TCGA barcodes appear after zooming in
+far enough for the columns to provide readable horizontal space. Ranged text
+keeps them hidden in the dense whole-cohort view.
 
 Mutation-class colors are partial overrides, so a plot can emphasize a few
 classes without redefining the whole palette.

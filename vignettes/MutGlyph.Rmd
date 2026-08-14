@@ -1,8 +1,8 @@
 ---
-title: "Introduction to MutGlyph"
+title: "Get started with MutGlyph"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to MutGlyph}
+  %\VignetteIndexEntry{Get started with MutGlyph}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,28 +16,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-MutGlyph builds interactive cancer-genomics plots from
-[`maftools`](https://bioconductor.org/packages/maftools/) MAF objects and renders
-them with [GenomeSpy](https://genomespy.app/). Oncoplots, protein lollipops,
-rainfall plots, and GISTIC landscapes support tooltips, zooming, and SVG
-export.
-
-`oncoplot()` deliberately imitates `maftools::oncoplot()`: it accepts
-the same MAF objects and follows familiar argument names, ordering behavior,
-and plot composition. It is therefore an almost drop-in replacement in common
-workflows, often requiring only a namespace change. MutGlyph does not
-attempt to reproduce every maftools option.
+This page takes an existing MAF object to a first interactive MutGlyph plot.
+MutGlyph is exclusively a visualization package: use maftools or another
+analysis workflow to prepare and analyze variants, then use MutGlyph to render
+the results with an embedded [GenomeSpy](https://genomespy.app/).
 
 ## Start with a familiar oncoplot
 
-The bundled TCGA acute myeloid leukemia data makes a convenient small example.
+The TCGA acute myeloid leukemia data bundled with maftools makes a convenient
+small example.
 This starting point deliberately corresponds to the [basic top-ten
 oncoplot](https://www.bioconductor.org/packages/release/bioc/vignettes/maftools/inst/doc/maftools.html#721_Drawing_oncoplots)
 in the maftools introduction, but uses MutGlyph for rendering.
 
 ```{r data}
-library(MutGlyph)
-
 laml <- maftools::read.maf(
   maf = system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
   clinicalData = system.file(
@@ -50,17 +42,18 @@ laml <- maftools::read.maf(
 ```
 
 ```{r basic-oncoplot}
-oncoplot(maf = laml, top = 10, height = 500)
+MutGlyph::oncoplot(maf = laml, top = 10, height = 500)
 ```
 
 The columns share one sample scale. Scroll or pinch over the plot to zoom and
 pan, and hover over marks for details. Sample labels can be enabled even for a
 dense cohort: ranged text keeps them hidden until the columns are wide enough.
-The **Save as SVG** button exports the current composition.
+Hover over the widget to reveal controls for fullscreen viewing, PNG or SVG
+image export, and downloading the generated GenomeSpy specification.
 
 ## Continue with the plot guides
 
-- [Customize oncoplots](oncoplots.html) with clinical tracks, TiTv, summary
+- [Oncoplots](oncoplots.html) covers clinical tracks, TiTv, summary
   bars, colors, selection, and GISTIC calls.
 - [Map mutations onto proteins](lollipop-plots.html) using MAF objects or
   ordinary data frames and composable domain annotations.
@@ -76,8 +69,8 @@ used in the browser. `as_json()` creates a portable copy for inspection,
 versioning, or experimentation in the GenomeSpy Playground.
 
 ```{r specification}
-plot <- oncoplot(laml, top = 10, height = 500)
-spec_json <- as_json(plot, pretty = TRUE)
+plot <- MutGlyph::oncoplot(laml, top = 10, height = 500)
+spec_json <- MutGlyph::as_json(plot, pretty = TRUE)
 cat(substr(spec_json, 1, 160), "...\n")
 ```
 

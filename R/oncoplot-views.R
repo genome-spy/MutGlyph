@@ -494,7 +494,7 @@ oncoplot_sample_label_views <- function(showTumorSampleBarcodes,
     matrix = list(
       name = "sample-labels",
       width = matrix_width,
-      height = 80,
+      height = 70,
       overhang = oncoplot_track_overhang(),
       data = list(name = "samples"),
       resolve = list(scale = list(y = "excluded")),

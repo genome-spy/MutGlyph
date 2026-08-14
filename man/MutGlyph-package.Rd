@@ -28,11 +28,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Kari Lavikka \email{kari@karilavikka.fi} [copyright holder]
+\strong{Maintainer}: Kari Lavikka \email{kari@karilavikka.fi} (\href{https://orcid.org/0000-0002-4163-4945}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
-  \item Kari Lavikka \email{kari@karilavikka.fi} [copyright holder]
+  \item Kari Lavikka \email{kari@karilavikka.fi} (\href{https://orcid.org/0000-0002-4163-4945}{ORCID}) [copyright holder]
 }
 
 }

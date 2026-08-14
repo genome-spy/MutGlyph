@@ -98,7 +98,6 @@ gisticChromPlot(
   gistic,
   chromosomeTrack = "axis",
   region = "chr21:5,000,000-48,000,000",
-  annotations = gene_annotations,
   height = 300
 )
 ```

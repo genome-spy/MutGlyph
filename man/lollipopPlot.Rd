@@ -26,6 +26,7 @@ lollipopPlot(
   collapsePosLabel = TRUE,
   labPosAngle = 0,
   pointSize = 1.5,
+  topPadding = NULL,
   width = NULL,
   height = NULL,
   elementId = NULL
@@ -91,6 +92,10 @@ counterclockwise, as in maftools. Used by the basic layout.}
 
 \item{pointSize}{Relative marker-size multiplier, matching maftools' linear
 \code{cex} semantics.}
+
+\item{topPadding}{Vertical space in pixels reserved above the mutation panel
+for mutation labels. When \code{NULL}, the basic layout uses 10 pixels and the
+displaced layout uses 70 pixels.}
 
 \item{width, height}{Widget dimensions.}
 

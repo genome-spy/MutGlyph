@@ -17,7 +17,8 @@ lollipop_spec <- function(data,
                           showLegend = TRUE,
                           labPosSize = 0.9,
                           labPosAngle = 0,
-                          pointSize = 1.5) {
+                          pointSize = 1.5,
+                          topPadding = 10) {
   layout <- match.arg(layout)
   if (is.null(yScale)) {
     yScale <- if (layout == "basic") "linear" else "log"
@@ -36,10 +37,18 @@ lollipop_spec <- function(data,
       showLegend,
       labPosSize,
       labPosAngle,
-      pointSize
+      pointSize,
+      topPadding
     )
   } else {
-    lollipop_displaced_view(data, colors, yScale, showLegend, pointSize)
+    lollipop_displaced_view(
+      data,
+      colors,
+      yScale,
+      showLegend,
+      pointSize,
+      topPadding
+    )
   }
   title <- paste0(data$gene, " mutations")
   if (
@@ -79,7 +88,12 @@ lollipop_spec <- function(data,
     height = "container",
     padding = 10,
     spacing = 0,
-    resolve = list(scale = list(x = "shared")),
+    resolve = list(
+      scale = list(x = "shared"),
+      # Collect descendant legends here so a bottom-oriented legend is placed
+      # below both the mutation and protein tracks, not between them.
+      legend = list(color = "collected")
+    ),
     params = list(
       list(name = "proteinLength", value = data$protein_length),
       list(name = "lineWidth", value = 1),
@@ -106,9 +120,11 @@ lollipop_spec <- function(data,
         titleFontWeight = "normal"
       ),
       legend = list(
-        orient = "top",
+        orient = "bottom",
         direction = "horizontal",
-        symbolSize = 90
+        offset = 15,
+        symbolSize = 90,
+        layout = list(bottom = list(anchor = "middle"))
       ),
       mark = list(tooltip = FALSE)
     )
@@ -121,11 +137,13 @@ lollipop_basic_view <- function(data,
                                 showLegend,
                                 labPosSize,
                                 labPosAngle,
-                                pointSize) {
+                                pointSize,
+                                topPadding) {
   list(
     name = "mutations-basic",
     width = "container",
     height = "container",
+    padding = list(top = topPadding),
     data = list(name = "mutations"),
     encoding = list(
       x = lollipop_x_encoding(),
@@ -191,7 +209,12 @@ lollipop_basic_view <- function(data,
   )
 }
 
-lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize) {
+lollipop_displaced_view <- function(data,
+                                    colors,
+                                    yScale,
+                                    showLegend,
+                                    pointSize,
+                                    topPadding) {
   list(
     name = "mutations-displaced",
     width = "container",
@@ -233,8 +256,7 @@ lollipop_displaced_view <- function(data, colors, yScale, showLegend, pointSize)
     vconcat = list(
       list(
         name = "mutation-labels",
-        height = 82,
-        padding = list(top = 18),
+        height = topPadding,
         transform = list(list(type = "filter", expr = "datum.label != ''")),
         mark = list(
           type = "text",
@@ -468,7 +490,7 @@ lollipop_color_encoding <- function(colors, showLegend) {
   encoding <- list(
     field = "variant_class",
     type = "nominal",
-    legend = if (showLegend) list(title = "Variant class", orient = "top") else NULL
+    legend = if (showLegend) list(title = "Variant class", orient = "bottom") else NULL
   )
   if (!is.null(colors)) {
     # Lists force JSON arrays even when only one mutation class is present.

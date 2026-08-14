@@ -20,9 +20,15 @@ test_that("basic lollipop uses true-position vertical stems", {
   expect_identical(mutation_view$name, "mutations-basic")
   expect_identical(mutation_view$width, "container")
   expect_identical(mutation_view$height, "container")
+  expect_equal(mutation_view$padding$top, 10)
   expect_identical(mutation_view$encoding$x$field, "position")
   expect_true(mutation_view$encoding$x$scale$zoom)
   expect_identical(mutation_view$encoding$y$scale$type, "linear")
+  expect_identical(mutation_view$encoding$color$legend$orient, "bottom")
+  expect_identical(spec$resolve$legend$color, "collected")
+  expect_identical(spec$config$legend$direction, "horizontal")
+  expect_equal(spec$config$legend$offset, 15)
+  expect_identical(spec$config$legend$layout$bottom$anchor, "middle")
   stem <- mutation_view$layer[[1]]
   point <- mutation_view$layer[[2]]
   expect_identical(stem$mark$type, "rule")
@@ -64,7 +70,7 @@ test_that("displaced lollipop separates and reconnects dense markers", {
   expect_identical(mutation_view$height, "container")
   expect_identical(plot_view$width, "container")
   expect_identical(plot_view$height, "container")
-  expect_equal(mutation_view$vconcat[[1]]$height, 82)
+  expect_equal(mutation_view$vconcat[[1]]$height, 70)
   expect_equal(mutation_view$vconcat[[3]]$height, 22)
   expect_equal(spec$vconcat[[2]]$height, 56)
   expect_equal(nrow(spec$datasets$mutations), 3)
@@ -229,6 +235,13 @@ test_that("lollipop display arguments validate", {
   expect_error(call(collapsePosLabel = 1), "TRUE or FALSE")
   expect_error(call(showLegend = 1), "TRUE or FALSE")
   expect_error(call(pointSize = 0), "finite positive")
+  expect_error(call(topPadding = -1), "finite non-negative")
+  expect_error(call(topPadding = Inf), "finite non-negative")
+  expect_equal(call(topPadding = 0)$x$spec$vconcat[[1]]$padding$top, 0)
+  expect_equal(
+    call(layout = "displaced", topPadding = 42)$x$spec$vconcat[[1]]$vconcat[[1]]$height,
+    42
+  )
 })
 
 test_that("lollipop JSON retains both recurrence measures", {

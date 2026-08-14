@@ -45,6 +45,9 @@
 #' @param showLegend Show the mutation-class legend.
 #' @param pointSize Relative marker-size multiplier, matching maftools' linear
 #'   `cex` semantics.
+#' @param topPadding Vertical space in pixels reserved above the mutation panel
+#'   for mutation labels. When `NULL`, the basic layout uses 10 pixels and the
+#'   displaced layout uses 70 pixels.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
@@ -107,6 +110,7 @@ lollipopPlot <- function(maf,
                          collapsePosLabel = TRUE,
                          labPosAngle = 0,
                          pointSize = 1.5,
+                         topPadding = NULL,
                          width = NULL,
                          height = NULL,
                          elementId = NULL) {
@@ -137,6 +141,14 @@ lollipopPlot <- function(maf,
     stop("`labPosAngle` must be one finite number.", call. = FALSE)
   }
   mutglyph_positive_number(pointSize, "pointSize")
+  if (is.null(topPadding)) {
+    topPadding <- if (layout == "basic") 10 else 70
+  } else if (
+    length(topPadding) != 1L || !is.numeric(topPadding) ||
+      is.na(topPadding) || !is.finite(topPadding) || topPadding < 0
+  ) {
+    stop("`topPadding` must be one finite non-negative number or NULL.", call. = FALSE)
+  }
   data <- lollipop_data(
     input,
     gene = gene,
@@ -183,7 +195,8 @@ lollipopPlot <- function(maf,
       showLegend = showLegend,
       labPosSize = labPosSize,
       labPosAngle = labPosAngle,
-      pointSize = pointSize
+      pointSize = pointSize,
+      topPadding = topPadding
     ),
     width = width,
     height = height,

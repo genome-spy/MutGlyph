@@ -110,12 +110,21 @@ test_that("released packages do not include the development schema", {
   expect_length(schemas, 0)
 })
 
-test_that("the committed runtime bundle includes SVG export", {
+test_that("the committed runtime bundle includes PNG and SVG export", {
   bundle_path <- system.file("htmlwidgets", "mutglyph.js", package = "MutGlyph")
   bundle <- paste(readLines(bundle_path, warn = FALSE), collapse = "\n")
 
+  expect_match(bundle, "Download PNG", fixed = TRUE)
   expect_match(bundle, "Download SVG", fixed = TRUE)
-  expect_match(bundle, "imageExport", fixed = TRUE)
+  expect_match(bundle, "imageExport.raster", fixed = TRUE)
+  expect_match(bundle, "imageExport.svg", fixed = TRUE)
+  expect_match(bundle, "mutglyph-export-popover", fixed = TRUE)
+  expect_match(bundle, "popovertarget", fixed = TRUE)
+  expect_match(bundle, "showPopover", fixed = TRUE)
+  expect_match(bundle, "hidePopover", fixed = TRUE)
+  expect_match(bundle, "aria-haspopup", fixed = TRUE)
+  expect_match(bundle, "position-area: bottom span-left", fixed = TRUE)
+  expect_match(bundle, "position-try-fallbacks", fixed = TRUE)
 })
 
 test_that("the committed runtime bundle includes fullscreen controls", {

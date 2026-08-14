@@ -24,6 +24,8 @@ const ICONS = {
   },
 };
 
+let nextExportPopoverId = 0;
+
 const TOOLBAR_RULES = `
   .mutglyph-toolbar {
     position: absolute;
@@ -49,8 +51,8 @@ const TOOLBAR_RULES = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     padding: 6px;
     border: 0;
     border-radius: 3px;
@@ -72,14 +74,72 @@ const TOOLBAR_RULES = `
     height: 100%;
     fill: currentColor;
   }
+  .mutglyph-export-menu {
+    position: relative;
+    display: flex;
+  }
+  .mutglyph-export-popover {
+    position: fixed;
+    inset: auto;
+    display: grid;
+    min-width: 132px;
+    margin: 0;
+    padding: 3px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    color: #333;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 12px;
+  }
+  .mutglyph-export-popover[hidden] {
+    display: none;
+  }
+  .mutglyph-export-popover[popover]:not(:popover-open) {
+    display: none;
+  }
+  @supports (position-area: bottom) {
+    .mutglyph-export-popover {
+      position-area: bottom span-left;
+      position-try-fallbacks:
+        flip-block,
+        flip-inline,
+        flip-block flip-inline;
+      justify-self: end;
+      align-self: start;
+      margin-top: 4px;
+    }
+  }
+  .mutglyph-export-option {
+    padding: 6px 9px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: #333;
+    font: inherit;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .mutglyph-export-option:hover,
+  .mutglyph-export-option:focus-visible {
+    background: #eee;
+    outline: none;
+  }
+  .mutglyph-export-option:disabled {
+    color: #888;
+    cursor: wait;
+  }
 `;
 
 function createWidgetStyle() {
   const style = document.createElement("style");
   if (typeof CSSScopeRule === "undefined") {
-    // Fallback for older RStudio Viewer Chromium versions.
+    // TODO: Remove this selector-prefix fallback once supported RStudio
+    // Viewer versions implement prelude-less @scope.
     style.textContent = TOOLBAR_RULES.replaceAll(":scope", ".mutglyph").replace(
-      /^(\s*)(\.mutglyph-(?:toolbar|control))/gm,
+      /^(\s*)(\.mutglyph-)/gm,
       "$1.mutglyph $2",
     );
   } else {
@@ -134,24 +194,112 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function createExportButton(api) {
-  const button = createControlButton("image", "Download SVG");
+function createImageExportOption(api, format, closeMenu) {
+  const isRaster = format === "PNG";
+  const title = isRaster ? "Download PNG" : "Download SVG";
+  const filename = isRaster ? "mutglyph.png" : "mutglyph.svg";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "mutglyph-export-option";
+  button.setAttribute("role", "menuitem");
+  button.textContent = title;
 
   button.addEventListener("click", async () => {
+    closeMenu();
     button.disabled = true;
 
     try {
-      const { blob, warnings } = await api.imageExport.svg();
-      warnings.forEach((warning) => console.warn(warning));
-      downloadBlob(blob, "mutglyph.svg");
+      const { blob, warnings = [] } = isRaster
+        ? await api.imageExport.raster()
+        : await api.imageExport.svg();
+      for (const warning of warnings) console.warn(warning);
+      downloadBlob(blob, filename);
     } catch (error) {
-      console.error("Unable to export MutGlyph as SVG.", error);
+      console.error(`Unable to export MutGlyph as ${format}.`, error);
     } finally {
       button.disabled = false;
     }
   });
 
   return button;
+}
+
+function positionImageExportPopover(toggle, menu) {
+  // TODO: Remove this coordinate fallback once supported RStudio Viewer
+  // versions implement CSS anchor positioning.
+  const gap = 4;
+  const margin = 4;
+  const anchor = toggle.getBoundingClientRect();
+  const left = Math.min(
+    anchor.right - menu.offsetWidth,
+    window.innerWidth - menu.offsetWidth - margin,
+  );
+  let top = anchor.bottom + gap;
+  if (top + menu.offsetHeight > window.innerHeight - margin) {
+    top = anchor.top - menu.offsetHeight - gap;
+  }
+  menu.style.left = `${Math.max(margin, left)}px`;
+  menu.style.top = `${Math.max(margin, top)}px`;
+}
+
+function createImageExportMenu(api) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "mutglyph-export-menu";
+
+  const toggle = createControlButton("image", "Download image");
+  toggle.setAttribute("aria-haspopup", "menu");
+  toggle.setAttribute("aria-expanded", "false");
+
+  const menu = document.createElement("div");
+  menu.className = "mutglyph-export-popover";
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("popover", "auto");
+  menu.id = `mutglyph-image-export-${++nextExportPopoverId}`;
+  toggle.setAttribute("popovertarget", menu.id);
+
+  const nativePopover = typeof menu.showPopover === "function";
+  const anchorPositioning = CSS.supports?.("position-area", "bottom") ?? false;
+  let dispose = () => {};
+  let closeMenu;
+  if (nativePopover) {
+    closeMenu = () => {
+      if (menu.matches(":popover-open")) menu.hidePopover();
+    };
+    menu.addEventListener("toggle", (event) => {
+      const open = event.newState === "open";
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open && !anchorPositioning) positionImageExportPopover(toggle, menu);
+    });
+  } else {
+    // Older RStudio Viewer Chromium versions lack the Popover API. Preserve
+    // the same menu behavior without changing the native path above.
+    toggle.removeAttribute("popovertarget");
+    menu.removeAttribute("popover");
+    menu.hidden = true;
+    closeMenu = () => {
+      menu.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+    };
+    toggle.addEventListener("click", () => {
+      const open = menu.hidden;
+      menu.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open) positionImageExportPopover(toggle, menu);
+    });
+    const closeOnOutsideClick = (event) => {
+      if (!wrapper.contains(event.target)) closeMenu();
+    };
+    document.addEventListener("click", closeOnOutsideClick);
+    dispose = () => document.removeEventListener("click", closeOnOutsideClick);
+  }
+
+  menu.append(
+    createImageExportOption(api, "PNG", closeMenu),
+    createImageExportOption(api, "SVG", closeMenu),
+  );
+  wrapper.append(toggle, menu);
+
+  return { element: wrapper, dispose };
 }
 
 function createSpecButton(spec) {
@@ -189,12 +337,17 @@ function createFullscreenButton(el) {
 function createControls(api, el, spec) {
   const controls = document.createElement("div");
   controls.className = "mutglyph-toolbar";
+  const imageExport = createImageExportMenu(api);
   controls.append(
     createFullscreenButton(el),
-    createExportButton(api),
+    imageExport.element,
     createSpecButton(spec),
   );
-  return controls;
+
+  return {
+    element: controls,
+    dispose: imageExport.dispose,
+  };
 }
 
 HTMLWidgets.widget({
@@ -204,6 +357,7 @@ HTMLWidgets.widget({
   factory(el) {
     let api;
     let fullscreenButton;
+    let disposeControls;
     let renderId = 0;
 
     el.style.position = "relative";
@@ -223,6 +377,8 @@ HTMLWidgets.widget({
         const currentRenderId = ++renderId;
         const spec = decodeMutGlyphTransport(x.spec);
 
+        disposeControls?.();
+        disposeControls = undefined;
         api?.finalize();
         api = undefined;
 
@@ -237,8 +393,9 @@ HTMLWidgets.widget({
         if (currentRenderId === renderId) {
           api = nextApi;
           const controls = createControls(api, el, spec);
-          fullscreenButton = controls.firstElementChild;
-          el.append(createWidgetStyle(), controls);
+          disposeControls = controls.dispose;
+          fullscreenButton = controls.element.firstElementChild;
+          el.append(createWidgetStyle(), controls.element);
         } else {
           nextApi.finalize();
           container.remove();

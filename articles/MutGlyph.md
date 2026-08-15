@@ -1,10 +1,10 @@
-# Get started with MutGlyph
+# Get started with interactive cancer genomics in R
 
 This page takes an existing MAF object to a first interactive MutGlyph
 plot. MutGlyph is exclusively a visualization package: use maftools or
 another analysis workflow to prepare and analyze variants, then use
-MutGlyph to render the results with an embedded
-[GenomeSpy](https://genomespy.app/).
+MutGlyph to render the results with an embedded [GenomeSpy interactive
+genomic visualization](https://genomespy.app/).
 
 ## Start with a familiar oncoplot
 

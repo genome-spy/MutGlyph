@@ -1,9 +1,11 @@
-# Oncoplots
+# Interactive oncoplots in R
 
 This guide builds on the [basic
 oncoplot](https://genomespy.app/MutGlyph/articles/MutGlyph.md) and
 covers the main ways to select, annotate, and summarize a cohort. The
-examples use the bundled TCGA acute myeloid leukemia data.
+interactive composition keeps mutation, clinical, and summary tracks
+aligned while the sample axis is zoomed or panned. The examples use the
+bundled TCGA acute myeloid leukemia data.
 
 ``` r
 
@@ -75,6 +77,9 @@ oncoplot(
   height = 550
 )
 ```
+
+**Try the plot:** Scroll or pinch over the matrix to zoom, drag to pan,
+and hover over mutations, clinical tracks, or summary bars for details.
 
 With `showTumorSampleBarcodes = TRUE`, TCGA barcodes appear after
 zooming in far enough for the columns to provide readable horizontal

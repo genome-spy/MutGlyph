@@ -1,4 +1,4 @@
-# Protein lollipop plots
+# Interactive protein lollipop plots in R
 
 [`lollipopPlot()`](https://genomespy.app/MutGlyph/reference/lollipopPlot.md)
 follows the familiar
@@ -65,6 +65,10 @@ lollipopPlot(
   height = 350
 )
 ```
+
+**Try the plot:** Zoom and pan along the protein coordinate scale, and
+hover over mutation markers or domains for recurrence and annotation
+details.
 
 ## Compare two cohorts
 

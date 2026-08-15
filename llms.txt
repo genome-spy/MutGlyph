@@ -1,11 +1,11 @@
 # MutGlyph
 
-MutGlyph is an R package focused exclusively on cancer-genomics
-visualization. It provides interactive,
-[GenomeSpy](https://genomespy.app/)-based counterparts to established
-[`maftools`](https://bioconductor.org/packages/maftools/) plots,
-including oncoplots, protein lollipop plots, rainfall plots, and GISTIC
-copy-number landscapes.
+MutGlyph creates interactive cancer-genomics visualizations in R. It
+provides responsive counterparts to established
+[`maftools`](https://bioconductor.org/packages/maftools/) plots using
+the [GenomeSpy interactive genomic visualization
+grammar](https://genomespy.app/), including oncoplots, protein lollipop
+plots, rainfall plots, and GISTIC copy-number landscapes.
 
 MutGlyph does not call variants or replace the general analysis and
 data-processing functionality of maftools. Its own transformations and
@@ -13,6 +13,11 @@ summaries are limited to constructing visualizations. It turns existing
 MAF and GISTIC objects—plus ordinary data frames where appropriate—into
 responsive htmlwidgets with tooltips, zooming, panning, fullscreen
 viewing, and PNG or SVG export.
+
+Interaction is particularly useful for dense genomic views. Rainfall
+plots can move from a whole-genome overview into candidate kataegis
+loci, while GISTIC landscapes can zoom from chromosome-wide copy-number
+patterns into individual amplification or deletion peaks.
 
 ![An interactive MutGlyph oncoplot of the maftools LAML example
 data](reference/figures/oncoplot.png)
@@ -202,15 +207,38 @@ correctness, licensing, maintenance, and scientific use.
 
 ### Get started
 
-- [Get started with
-  MutGlyph](https://genomespy.app/MutGlyph/articles/MutGlyph.md):
+- [Get started with interactive cancer genomics in
+  R](https://genomespy.app/MutGlyph/articles/MutGlyph.md):
+
+  Create an interactive oncoplot in R from a maftools MAF object and
+  explore the zooming, panning, tooltips, and export controls provided
+  by MutGlyph.
 
 ### Plot guides
 
-- [Oncoplots](https://genomespy.app/MutGlyph/articles/oncoplots.md):
-- [Protein lollipop
-  plots](https://genomespy.app/MutGlyph/articles/lollipop-plots.md):
-- [Rainfall plots and
-  kataegis](https://genomespy.app/MutGlyph/articles/rainfall-plots.md):
-- [GISTIC copy-number
-  landscapes](https://genomespy.app/MutGlyph/articles/gistic-plots.md):
+- [Interactive oncoplots in
+  R](https://genomespy.app/MutGlyph/articles/oncoplots.md):
+
+  Create interactive, maftools-compatible oncoplots in R with zooming,
+  tooltips, clinical annotations, TiTv tracks, summaries, and GISTIC
+  calls.
+
+- [Interactive protein lollipop plots in
+  R](https://genomespy.app/MutGlyph/articles/lollipop-plots.md):
+
+  Explore protein mutations with interactive lollipop plots in R using
+  MAF objects or data frames, custom domains, labels, and cohort
+  comparisons.
+
+- [Interactive, zoomable rainfall plots and kataegis in
+  R](https://genomespy.app/MutGlyph/articles/rainfall-plots.md):
+
+  Explore mutation spacing with interactive rainfall plots in R, zoom
+  into dense genomic regions, and highlight candidate kataegis loci.
+
+- [Interactive, zoomable GISTIC copy-number landscapes in
+  R](https://genomespy.app/MutGlyph/articles/gistic-plots.md):
+
+  Explore GISTIC amplification and deletion peaks with an interactive,
+  zoomable copy-number landscape in R, including significance and
+  annotations.

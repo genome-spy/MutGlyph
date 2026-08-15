@@ -1,11 +1,13 @@
-# GISTIC copy-number landscapes
+# Interactive, zoomable GISTIC copy-number landscapes in R
 
 [`gisticChromPlot()`](https://genomespy.app/MutGlyph/reference/gisticChromPlot.md)
 is an interactive counterpart to
 [`maftools::gisticChromPlot()`](https://rdrr.io/pkg/maftools/man/gisticChromPlot.html).
 Amplifications grow upward, deletions grow downward, and a compact
 chromosome strip keeps the two profiles aligned while the shared genomic
-scale is zoomed or panned.
+scale is zoomed or panned. This makes it possible to move from the
+genome-wide copy-number landscape into a narrow amplification or
+deletion peak without redrawing the plot.
 
 ## Read standard GISTIC output
 
@@ -29,6 +31,10 @@ gistic <- maftools::readGistic(
 
 gisticChromPlot(gistic, height = 300)
 ```
+
+**Try the plot:** Scroll or pinch to zoom into a GISTIC peak, drag to
+pan, and hover over intervals for genomic coordinates, G-scores,
+q-values, and alteration frequencies.
 
 The two profiles use the same G-score domain, making amplification and
 deletion magnitudes directly comparable. Intervals passing `fdrCutOff`

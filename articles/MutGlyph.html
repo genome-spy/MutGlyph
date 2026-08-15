@@ -5,12 +5,18 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Get started with MutGlyph • MutGlyph</title>
+<title>Get started with interactive cancer genomics in R • MutGlyph</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Get started with MutGlyph">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Get started with interactive cancer genomics in R">
+<meta name="description" content="Create an interactive oncoplot in R from a maftools MAF object and explore the zooming, panning, tooltips, and export controls provided by MutGlyph.
+">
+<meta property="og:description" content="Create an interactive oncoplot in R from a maftools MAF object and explore the zooming, panning, tooltips, and export controls provided by MutGlyph.
+">
+<meta property="og:image" content="https://genomespy.app/MutGlyph/reference/figures/oncoplot.png">
+<meta property="og:image:alt" content="An interactive MutGlyph oncoplot of a cancer cohort">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -35,9 +41,11 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/oncoplots.html">Oncoplots</a></li>
-    <li><a class="dropdown-item" href="../articles/lollipop-plots.html">Protein lollipop plots</a></li>
-    <li><a class="dropdown-item" href="../articles/rainfall-plots.html">Rainfall plots and kataegis</a></li>
-    <li><a class="dropdown-item" href="../articles/gistic-plots.html">GISTIC copy-number landscapes</a></li>
+    <li><a class="dropdown-item" href="../articles/lollipop-plots.html">Lollipop plots</a></li>
+    <li><a class="dropdown-item" href="../articles/rainfall-plots.html">Rainfall and kataegis</a></li>
+    <li><a class="dropdown-item" href="../articles/gistic-plots.html">GISTIC landscapes</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">All articles</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,10 +67,10 @@
 <script src="MutGlyph_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="MutGlyph_files/mutglyph-binding-0.1.0/mutglyph.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Get started with MutGlyph</h1>
+      <h1>Get started with interactive cancer genomics in R</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/genome-spy/MutGlyph/blob/v0.1.0/vignettes/MutGlyph.Rmd" class="external-link"><code>vignettes/MutGlyph.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/genome-spy/MutGlyph/blob/main/vignettes/MutGlyph.Rmd" class="external-link"><code>vignettes/MutGlyph.Rmd</code></a></small>
       <div class="d-none name"><code>MutGlyph.Rmd</code></div>
     </div>
 
@@ -71,7 +79,8 @@
 <p>This page takes an existing MAF object to a first interactive
 MutGlyph plot. MutGlyph is exclusively a visualization package: use
 maftools or another analysis workflow to prepare and analyze variants,
-then use MutGlyph to render the results with an embedded <a href="https://genomespy.app/" class="external-link">GenomeSpy</a>.</p>
+then use MutGlyph to render the results with an embedded <a href="https://genomespy.app/" class="external-link">GenomeSpy interactive genomic
+visualization</a>.</p>
 <div class="section level2">
 <h2 id="start-with-a-familiar-oncoplot">Start with a familiar oncoplot<a class="anchor" aria-label="anchor" href="#start-with-a-familiar-oncoplot"></a>
 </h2>

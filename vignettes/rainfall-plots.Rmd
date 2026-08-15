@@ -1,8 +1,11 @@
 ---
-title: "Rainfall plots and kataegis"
+title: "Interactive, zoomable rainfall plots and kataegis in R"
+description: >
+  Explore mutation spacing with interactive rainfall plots in R, zoom into
+  dense genomic regions, and highlight candidate kataegis loci.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Rainfall plots and kataegis}
+  %\VignetteIndexEntry{Interactive, zoomable rainfall plots and kataegis in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +22,8 @@ knitr::opts_chunk$set(
 `rainfallPlot()` is the interactive counterpart of
 `maftools::rainfallPlot()`. It defaults to the most mutated sample and plots
 chromosome-local inter-event distances for SNPs, including synonymous
-variants. Scroll or pinch to inspect dense genomic regions.
+variants. The zoomable genomic scale can move from a whole-genome overview into
+dense mutation clusters without generating a new plot.
 
 The bundled BRCA example contains several potential kataegis loci. With
 `detectChangePoints = TRUE`, MutGlyph applies the same operational criterion as
@@ -44,6 +48,9 @@ rainfallPlot(
   height = 360
 )
 ```
+
+**Try the plot:** Scroll or pinch to zoom, drag to pan across the genome, and
+hover over a mutation for its coordinates and intermutation distance.
 
 Detected loci remain available in the returned specification without writing a
 TSV file:

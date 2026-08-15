@@ -1,8 +1,11 @@
 ---
-title: "Protein lollipop plots"
+title: "Interactive protein lollipop plots in R"
+description: >
+  Explore protein mutations with interactive lollipop plots in R using MAF
+  objects or data frames, custom domains, labels, and cohort comparisons.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Protein lollipop plots}
+  %\VignetteIndexEntry{Interactive protein lollipop plots in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -76,6 +79,9 @@ lollipopPlot(
   height = 350
 )
 ```
+
+**Try the plot:** Zoom and pan along the protein coordinate scale, and hover
+over mutation markers or domains for recurrence and annotation details.
 
 ## Compare two cohorts
 

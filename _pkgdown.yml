@@ -1,7 +1,34 @@
 url: https://genomespy.app/MutGlyph/
 
+home:
+  title: "MutGlyph: Interactive Cancer Genomics Plots in R"
+  description: >
+    Create interactive, zoomable oncoplots, rainfall plots, protein lollipop
+    plots, and GISTIC copy-number landscapes in R with GenomeSpy.
+
 template:
   bootstrap: 5
+  opengraph:
+    image:
+      src: man/figures/oncoplot.png
+      alt: "An interactive MutGlyph oncoplot of a cancer cohort"
+
+navbar:
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Oncoplots
+        href: articles/oncoplots.html
+      - text: Lollipop plots
+        href: articles/lollipop-plots.html
+      - text: Rainfall and kataegis
+        href: articles/rainfall-plots.html
+      - text: GISTIC landscapes
+        href: articles/gistic-plots.html
+      - text: -------
+      - text: All articles
+        href: articles/index.html
 
 reference:
 - title: Plotting

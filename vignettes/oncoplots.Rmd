@@ -1,8 +1,11 @@
 ---
-title: "Oncoplots"
+title: "Interactive oncoplots in R"
+description: >
+  Create interactive, maftools-compatible oncoplots in R with zooming,
+  tooltips, clinical annotations, TiTv tracks, summaries, and GISTIC calls.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Oncoplots}
+  %\VignetteIndexEntry{Interactive oncoplots in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,8 +20,10 @@ knitr::opts_chunk$set(
 ```
 
 This guide builds on the [basic oncoplot](MutGlyph.html) and covers the main
-ways to select, annotate, and summarize a cohort. The examples use the bundled
-TCGA acute myeloid leukemia data.
+ways to select, annotate, and summarize a cohort. The interactive composition
+keeps mutation, clinical, and summary tracks aligned while the sample axis is
+zoomed or panned. The examples use the bundled TCGA acute myeloid leukemia
+data.
 
 ```{r data}
 library(MutGlyph)
@@ -85,6 +90,9 @@ oncoplot(
   height = 550
 )
 ```
+
+**Try the plot:** Scroll or pinch over the matrix to zoom, drag to pan, and
+hover over mutations, clinical tracks, or summary bars for details.
 
 With `showTumorSampleBarcodes = TRUE`, TCGA barcodes appear after zooming in
 far enough for the columns to provide readable horizontal space. Ranged text

@@ -5,10 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 <!-- badges: end -->
 
-MutGlyph is an R package focused exclusively on cancer-genomics
-visualization. It provides interactive,
-[GenomeSpy](https://genomespy.app/)-based counterparts to established
-[`maftools`](https://bioconductor.org/packages/maftools/) plots,
+MutGlyph creates interactive cancer-genomics visualizations in R. It provides
+responsive counterparts to established
+[`maftools`](https://bioconductor.org/packages/maftools/) plots using the
+[GenomeSpy interactive genomic visualization grammar](https://genomespy.app/),
 including oncoplots, protein lollipop plots, rainfall plots, and GISTIC
 copy-number landscapes.
 
@@ -18,6 +18,11 @@ summaries are limited to constructing visualizations. It turns existing MAF
 and GISTIC objects—plus ordinary data frames where appropriate—into responsive
 htmlwidgets with tooltips, zooming, panning, fullscreen viewing, and PNG or SVG
 export.
+
+Interaction is particularly useful for dense genomic views. Rainfall plots can
+move from a whole-genome overview into candidate kataegis loci, while GISTIC
+landscapes can zoom from chromosome-wide copy-number patterns into individual
+amplification or deletion peaks.
 
 ![An interactive MutGlyph oncoplot of the maftools LAML example data](man/figures/oncoplot.png)
 

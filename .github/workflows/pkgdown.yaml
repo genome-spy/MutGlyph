@@ -37,10 +37,17 @@ jobs:
         shell: Rscript {0}
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
 
+      # pkgdown renders every root-level Markdown file, including the
+      # development-only AGENTS.md policy.
+      - name: Remove development-only documentation
+        run: |
+          rm -f docs/AGENTS.html
+          sed -i '\|/AGENTS.html</loc>|d' docs/sitemap.xml
+
       - name: Deploy to GitHub Pages
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          clean: false
+          clean: true
           branch: gh-pages
           folder: docs

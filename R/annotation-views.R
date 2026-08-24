@@ -6,6 +6,7 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
       style = "arrow-block",
       color = "#555555",
       filled = TRUE,
+      yOffset = 5,
       minSize = 2,
       tooltip = list(handler = "default")
     )
@@ -24,12 +25,25 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
     title = list(text = track_name, anchor = "start", fontSize = 11),
     width = "container",
     height = list(step = 18),
-    scales = list(y = list(zero = FALSE, nice = FALSE)),
+    # This mirrors the MCCA gene track: strand-preferred lanes keep the two
+    # reading directions visually stable, while the third lane is a fallback.
+    # The index scale is discrete, so GenomeSpy can use the step height.
+    scales = list(
+      y = list(
+        type = "index",
+        align = 0,
+        paddingInner = 0.4,
+        paddingOuter = 0.2,
+        domain = c(0, 3),
+        reverse = TRUE,
+        zoom = FALSE
+      )
+    ),
     layer = list(
       list(
         name = paste0("annotation-bodies-", dataset_name),
         data = list(name = dataset_name),
-        transform = mutglyph_annotation_body_transforms(),
+        transform = mutglyph_annotation_body_transforms(stranded),
         opacity = list(
           unitsPerPixel = c(100000, 40000),
           values = c(0, 1)
@@ -56,7 +70,7 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
         name = paste0("annotation-labels-", dataset_name),
         data = list(name = dataset_name),
         transform = c(
-          mutglyph_annotation_body_transforms(),
+          mutglyph_annotation_body_transforms(stranded),
           list(
             list(
               type = "measureText",
@@ -79,17 +93,20 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
           type = "text",
           color = "#202020",
           dx = 2,
+          yOffset = -5,
           baseline = "middle",
           align = "left",
           clip = FALSE,
           tooltip = list(handler = "default")
         ),
         encoding = list(
-          x = list(chrom = "seqnames", pos = "start", type = "locus"),
+          # filterScoredLabels returns a midpoint in the shared linear locus;
+          # using it keeps symbols centered over their gene bodies.
+          x = list(field = "label_position", type = "locus", axis = list(title = "")),
           y = list(
-            expr = "datum.lane + 0.5",
-            type = "quantitative",
-            axis = NULL
+            field = "lane",
+            type = "index",
+            axis = list(title = "", labels = FALSE, ticks = FALSE)
           ),
           text = list(field = "label", type = "nominal"),
           tooltip = mutglyph_annotation_tooltip()
@@ -100,30 +117,40 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
   )
 }
 
-mutglyph_annotation_body_transforms <- function() {
-  list(
+mutglyph_annotation_body_transforms <- function(stranded = FALSE) {
+  pileup <- list(
+    type = "pileup",
+    start = "linear_start",
+    end = "linear_end",
+    as = "lane"
+  )
+  if (stranded) {
+    pileup$preference <- "strand"
+    pileup$preferredOrder <- c("-", "+")
+  }
+  c(
     list(
-      type = "linearizeGenomicCoordinate",
-      chrom = "seqnames",
-      pos = c("start", "end"),
-      offset = c(1, 0),
-      as = c("linear_start", "linear_end")
-    ),
-    # Pileup expects sorted zero-based half-open intervals. The explicit
-    # collector keeps lane assignment deterministic even if custom input was
-    # not ordered by the caller.
-    list(
-      type = "collect",
-      sort = list(
-        field = c("linear_start", "linear_end", "identifier", "label"),
-        order = c("ascending", "ascending", "ascending", "ascending")
-      )
-    ),
-    list(
-      type = "pileup",
-      start = "linear_start",
-      end = "linear_end",
-      as = "lane"
+      list(
+        type = "linearizeGenomicCoordinate",
+        chrom = "seqnames",
+        pos = c("start", "end"),
+        offset = c(1, 0),
+        as = c("linear_start", "linear_end")
+      ),
+      # Pileup expects sorted zero-based half-open intervals. The explicit
+      # collector keeps lane assignment deterministic even if custom input was
+      # not ordered by the caller.
+      list(
+        type = "collect",
+        sort = list(
+          field = c("linear_start", "linear_end", "identifier", "label"),
+          order = c("ascending", "ascending", "ascending", "ascending")
+        )
+      ),
+      pileup,
+      # Keep the annotation widget compact. The score still controls which
+      # symbols are labelled within these visible lanes.
+      list(type = "filter", expr = "datum.lane < 3")
     )
   )
 }
@@ -134,7 +161,11 @@ mutglyph_annotation_interval_encoding <- function(stranded) {
     x2 = list(chrom = "seqnames", pos = "end"),
     # Arrow marks must remain horizontal: a y2 channel makes the interval a
     # diagonal arrow, which GenomeSpy cannot render with arrow-block sizing.
-    y = list(field = "lane", type = "quantitative", axis = NULL)
+    y = list(
+      field = "lane",
+      type = "index",
+      axis = list(title = "", labels = FALSE, ticks = FALSE)
+    )
   )
   encoding
 }

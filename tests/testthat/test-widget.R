@@ -53,7 +53,7 @@ test_that("widget JSON uses a private columnar data-frame transport", {
   expect_null(payload$spec$encoding$tooltip)
 })
 
-test_that("widget transport dictionary-encodes only when smaller", {
+test_that("widget transport dictionary-encodes repetitive character columns", {
   data <- data.frame(
     repeated = rep(c("Amp", "Del"), 20),
     unique = sprintf("sample-%02d", seq_len(40)),
@@ -63,13 +63,11 @@ test_that("widget transport dictionary-encodes only when smaller", {
   )
   encoded <- mutglyph_encode_data_frame(data)
 
-  expect_identical(encoded$columns[[1]]$dictionary, list("Amp", "Del"))
-  expect_identical(encoded$columns[[1]]$codes[1:4], list(0L, 1L, 0L, 1L))
-  expect_type(encoded$columns[[2]], "list")
-  expect_null(encoded$columns[[2]]$dictionary)
-  expect_identical(encoded$columns[[2]], as.list(data$unique))
-  expect_identical(encoded$columns[[3]]$dictionary, list("A", "B"))
-  expect_identical(encoded$columns[[4]], as.list(data$count))
+  expect_identical(encoded$columns[[1]]$dictionary, c("Amp", "Del"))
+  expect_identical(encoded$columns[[1]]$codes[1:4], c(0L, 1L, 0L, 1L))
+  expect_identical(encoded$columns[[2]], data$unique)
+  expect_identical(encoded$columns[[3]]$dictionary, c("A", "B"))
+  expect_identical(encoded$columns[[4]], data$count)
 })
 
 test_that("widget transport preserves empty, missing, and one-row columns", {

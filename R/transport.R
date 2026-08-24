@@ -28,30 +28,32 @@ mutglyph_encode_column <- function(column) {
   if (is.factor(column)) {
     column <- as.character(column)
   }
-  values <- unname(as.list(column))
 
   if (!is.character(column) || length(column) == 0L) {
-    return(values)
+    # Keep atomic vectors intact. Converting every value to a one-element R
+    # list makes jsonlite walk large columns item by item.
+    return(if (length(column) == 1L) as.list(column) else unname(column))
   }
 
-  dictionary <- unique(column[!is.na(column)])
+  present <- !is.na(column)
+  present_count <- sum(present)
+  if (present_count == 0L || length(column) < 32L) {
+    return(if (length(column) == 1L) as.list(column) else unname(column))
+  }
+
+  dictionary <- unique(column[present])
+  # A dictionary is useful only for clearly repetitive values. This cheap
+  # cardinality test avoids serializing both candidate representations just to
+  # compare their sizes, which is costly for large annotation tracks.
+  if (length(dictionary) > 0.5 * present_count) {
+    return(if (length(column) == 1L) as.list(column) else unname(column))
+  }
+
   codes <- match(column, dictionary) - 1L
-  codes[is.na(column)] <- NA_integer_
+  codes[!present] <- NA_integer_
   encoded <- list(
-    dictionary = unname(as.list(dictionary)),
-    codes = unname(as.list(codes))
+    dictionary = unname(dictionary),
+    codes = unname(codes)
   )
-
-  # JSON's repeated strings are already cheap under HTTP compression, but the
-  # widget is often saved as a self-contained HTML file. Use a dictionary only
-  # when it makes that uncompressed transport representation smaller.
-  if (mutglyph_json_bytes(encoded) < mutglyph_json_bytes(values)) {
-    encoded
-  } else {
-    values
-  }
-}
-
-mutglyph_json_bytes <- function(x) {
-  nchar(mutglyph_to_json(x), type = "bytes")
+  encoded
 }

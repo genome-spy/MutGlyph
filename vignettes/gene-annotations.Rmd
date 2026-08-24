@@ -1,0 +1,130 @@
+---
+title: "Gene annotation tracks for genomic plots in R"
+description: >
+  Add scored, strand-aware gene-body annotations to interactive rainfall and
+  GISTIC plots with MutGlyph.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gene annotation tracks for genomic plots in R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+Gene annotation tracks provide genomic landmarks and local context. At a
+wide view, familiar gene symbols help orient navigation; at a close view,
+gene bodies show which genes are near a mutation cluster, copy-number peak,
+or other feature of interest.
+
+## The built-in scored gene track
+
+MutGlyph includes an offline gene-body annotation resource for hg18, hg19,
+and hg38:
+
+```{r load-genes}
+library(MutGlyph)
+
+genes <- mutglyph_gene_annotations("hg19")
+genes
+```
+
+The returned object is a `GRanges` object with the genomic sequence, 1-based
+closed coordinates, strand, gene symbol, identifier, and numeric score. The
+score is a label-priority heuristic: when several labels compete for space,
+higher-scoring genes are preferred. It does not represent biological
+importance, expression, or mutation significance.
+
+Gene bodies are rendered with strand-aware `arrow-block` marks. The annotation
+view uses at most three lanes, preferring stable lanes for the `-` and `+`
+strands and using the remaining lane as a fallback. Symbols are shown above
+their bodies. Exons are intentionally omitted so the track stays compact in
+embedded RMarkdown widgets.
+
+The label-scoring idea comes from the [HiGlass gene annotation track
+workflow](https://docs.higlass.io/data_preparation.html#gene-annotation-tracks).
+MutGlyph uses that idea for interactive label prioritization while keeping the
+annotation input and rendering composable in R.
+
+## Use annotations with rainfall plots
+
+The same named `annotationTracks` interface works with rainfall plots. This
+example opens at a mutation-dense region and shows the scored gene bodies
+below the rainfall panel.
+
+```{r rainfall-data}
+brca <- maftools::read.maf(
+  maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
+  verbose = FALSE
+)
+```
+
+```{r rainfall-genes}
+rainfallPlot(
+  brca,
+  detectChangePoints = TRUE,
+  region = "chr8:98,000,000-98,500,000",
+  annotationTracks = list(genes = genes),
+  height = 540
+)
+```
+
+Annotation tracks are generic named interval tracks, not a rainfall-specific
+gene argument. This means a plot can contain several tracks, each supplied as
+a `GRanges` object or data frame.
+
+## Use annotations with GISTIC plots
+
+GISTIC plots use the same interface. Here the gene track provides context for
+a narrow region containing amplification and deletion profiles.
+
+```{r gistic-data}
+gistic <- maftools::readGistic(
+  gisticDir = system.file("extdata", package = "maftools"),
+  isTCGA = TRUE,
+  verbose = FALSE
+)
+```
+
+```{r gistic-genes}
+gisticChromPlot(
+  gistic,
+  region = "chr21:39,000,000-41,000,000",
+  annotationTracks = list(genes = genes),
+  height = 540
+)
+```
+
+## Supply a custom annotation track
+
+Custom tracks must contain `seqnames`, `start`, `end`, and finite numeric
+`score` columns. `label`, `identifier`, and `strand` are optional; `strand`
+must be complete when supplied and use `+` or `-` values.
+
+```{r custom-track, eval = FALSE}
+custom_track <- data.frame(
+  seqnames = c("chr8", "chr8"),
+  start = c(98000000, 98200000),
+  end = c(98001000, 98202000),
+  label = c("FEATURE_A", "FEATURE_B"),
+  identifier = c("a", "b"),
+  strand = c("+", "-"),
+  score = c(10, 1)
+)
+
+rainfallPlot(
+  brca,
+  region = "chr8:98,000,000-98,500,000",
+  annotationTracks = list(features = custom_track)
+)
+```
+
+Coordinates must use the same assembly as the plot. `GRanges` inputs may carry
+assembly metadata, which MutGlyph checks before rendering.

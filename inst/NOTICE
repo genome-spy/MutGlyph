@@ -36,7 +36,7 @@ SOFTWARE.
 GenomeSpy
 ---------
 
-MutGlyph's committed JavaScript bundle contains @genome-spy/core 0.84.0 and
+MutGlyph's committed JavaScript bundle contains @genome-spy/core 0.85.0 and
 its transitive runtime dependencies. Their package-level license notices are
 reproduced in the installed JS-LICENSES file.
 

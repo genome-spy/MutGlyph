@@ -3,7 +3,7 @@ MutGlyph bundled JavaScript license notices
 
 This file is generated from the production dependency tree in
 package-lock.json by tools/generate-js-licenses.mjs.
-@genome-spy/core 0.84.0
+@genome-spy/core 0.85.0
 -----------------------
 License: MIT
 Source: github:genome-spy/genome-spy

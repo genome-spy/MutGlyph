@@ -58,11 +58,9 @@ test_that("lollipopPlot2 mirrors two cohorts around one protein model", {
   )
   expect_identical(spec$vconcat[[1]]$layer[[1]]$mark$clip, "never")
   expect_identical(spec$vconcat[[3]]$layer[[1]]$mark$clip, "never")
-
-  # GenomeSpy 0.84 rejects generic zindex on marks and vconcat children. The
-  # lower stems temporarily cover the protein until upstream gains broader
-  # z-ordering support, but the emitted specification must remain valid.
-  expect_false(grepl('"zindex"', as_json(widget), fixed = TRUE))
+  expect_null(spec$vconcat[[1]]$zindex)
+  expect_identical(spec$vconcat[[2]]$zindex, 1)
+  expect_null(spec$vconcat[[3]]$zindex)
 })
 
 test_that("lollipopPlot2 supports data frames and one empty cohort", {

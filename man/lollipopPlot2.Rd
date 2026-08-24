@@ -85,12 +85,8 @@ protein model and mutations from \code{m2} below it.
 Both cohorts use one protein coordinate system and independently scaled
 recurrence axes. One cohort may contain no mutations for the selected gene.
 
-Both stem sets extend to the center of the shared protein track, where the
-protein should cover their ends. GenomeSpy 0.84 cannot z-order complete
-children of a \code{vconcat}, so the later lower cohort currently draws its stems
-over the protein and looks somewhat ugly. A future GenomeSpy version with
-broader \code{zindex} support will render the intended layering without changing
-the plot geometry.
+Both stem sets extend to the center of the shared protein track, and the
+protein track is rendered above them at the overlap.
 }
 \examples{
 if (interactive()) {

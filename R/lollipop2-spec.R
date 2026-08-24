@@ -45,11 +45,6 @@ lollipop2_spec <- function(data,
       m2Mutations = data$m2$mutations,
       domains = data$domains
     ),
-    # Both stem sets extend to the center of the protein track, where the
-    # protein should cover their ends. GenomeSpy 0.84 cannot z-order vconcat
-    # children: the later lower cohort therefore draws its stems over the
-    # protein and looks a little ugly. Broader upstream zindex support will
-    # make the intended layering possible without changing this geometry.
     vconcat = list(
       lollipop2_cohort_view(
         data$m1,
@@ -290,6 +285,9 @@ lollipop2_protein_view <- function(data, showDomainLabel) {
   list(
     name = "protein",
     height = lollipop2_protein_height,
+    # GenomeSpy 0.85 supports z-ordering sibling views in a vconcat, so keep
+    # the shared protein track above both cohort views at their overlap.
+    zindex = 1,
     data = list(name = "domains"),
     encoding = list(
       x = list(field = "start", type = "index", axis = NULL),

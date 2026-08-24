@@ -36,6 +36,9 @@
 #'   `chromosome`, `start`, `end`, `label`, and `event_type`. Event type must be
 #'   `"Amp"` or `"Del"`. Labels are anchored to the highest overlapping
 #'   G-score interval.
+#' @param annotationTracks Optional named list of `GRanges` or data-frame
+#'   interval tracks to show below the GISTIC profiles. Scores prioritize
+#'   labels; the built-in [mutglyph_gene_annotations()] resource is one option.
 #' @param width,height Widget dimensions.
 #' @param elementId Optional element ID.
 #'
@@ -75,12 +78,15 @@ gisticChromPlot <- function(gistic = NULL,
                             region = NULL,
                             nonSignificantColor = NULL,
                             annotations = NULL,
+                            annotationTracks = NULL,
                             width = NULL,
                             height = NULL,
                             elementId = NULL) {
   mutglyph_positive_number(txtSize, "txtSize")
   mutglyph_positive_number(cytobandTxtSize, "cytobandTxtSize")
   chromosomeTrack <- match.arg(chromosomeTrack)
+  ref.build <- mutglyph_annotation_assembly(ref.build)
+  annotation_tracks <- mutglyph_normalize_annotation_tracks(annotationTracks, ref.build)
   data <- gistic_chrom_data(
     gistic,
     fdrCutOff = fdrCutOff,
@@ -97,7 +103,8 @@ gisticChromPlot <- function(gistic = NULL,
       txtSize = txtSize,
       cytobandTxtSize = cytobandTxtSize,
       chromosomeTrack = chromosomeTrack,
-      region = region
+      region = region,
+      annotation_tracks = annotation_tracks
     ),
     width = width,
     height = height,

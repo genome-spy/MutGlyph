@@ -6,7 +6,8 @@ gistic_chrom_spec <- function(data,
                               txtSize = 0.8,
                               cytobandTxtSize = 0.6,
                               chromosomeTrack = c("strip", "axis"),
-                              region = NULL) {
+                              region = NULL,
+                              annotation_tracks = NULL) {
   chromosomeTrack <- match.arg(chromosomeTrack)
   profiles <- list(
     gistic_profile_view(
@@ -40,7 +41,7 @@ gistic_chrom_spec <- function(data,
     )
   }
 
-  list(
+  default_spec <- list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
     name = "mutglyph-gistic-chrom-plot",
     description = "GISTIC amplification and deletion scores across the genome.",
@@ -85,6 +86,29 @@ gistic_chrom_spec <- function(data,
       mark = list(tooltip = FALSE)
     )
   )
+  if (is.null(annotation_tracks) || !length(annotation_tracks)) {
+    return(default_spec)
+  }
+
+  dataset_names <- paste0("annotation_track_", seq_along(annotation_tracks))
+  annotation_views <- Map(
+    function(track, track_name, dataset_name) {
+      mutglyph_annotation_view(track_name, dataset_name, track)
+    },
+    annotation_tracks,
+    names(annotation_tracks),
+    dataset_names
+  )
+  default_spec$description <- paste0(
+    default_spec$description,
+    " with genomic annotation context."
+  )
+  default_spec$datasets <- c(
+    default_spec$datasets,
+    stats::setNames(annotation_tracks, dataset_names)
+  )
+  default_spec$vconcat <- c(default_spec$vconcat, annotation_views)
+  default_spec
 }
 
 gistic_profile_view <- function(event_type,

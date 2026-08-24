@@ -68,6 +68,37 @@ test_that("custom annotations are rendered in their event profile", {
   expect_identical(amp$layer[[4]]$mark$fontWeight, "bold")
 })
 
+test_that("GISTIC plots accept arbitrary scored annotation tracks", {
+  genes <- data.frame(
+    seqnames = c("chr21", "chr21"),
+    start = c(39739183, 40000000),
+    end = c(39740183, 40001000),
+    label = c("GENE1", "GENE2"),
+    identifier = c("1", "2"),
+    strand = c("+", "-"),
+    score = c(10, 1)
+  )
+  spec <- gisticChromPlot(
+    laml_gistic(),
+    region = "chr21:39,000,000-41,000,000",
+    annotationTracks = list(genes = genes)
+  )$x$spec
+
+  annotation_view <- spec$vconcat[[length(spec$vconcat)]]
+  annotation_body <- annotation_view$layer[[1]]
+  expect_named(
+    spec$datasets,
+    c("scores", "bands", "annotations", "annotation_track_1")
+  )
+  expect_identical(annotation_view$name, "annotation-annotation_track_1")
+  expect_identical(annotation_body$data$name, "annotation_track_1")
+  expect_identical(annotation_body$mark$type, "arrow")
+  expect_identical(annotation_body$mark$style, "arrow-block")
+  expect_identical(annotation_body$encoding$direction$field, "strand")
+  expect_identical(spec$resolve$scale$x, "shared")
+  expect_identical(spec$resolve$scale$y, "independent")
+})
+
 test_that("a regular genomic axis can replace the chromosome strip", {
   spec <- gisticChromPlot(
     laml_gistic(),

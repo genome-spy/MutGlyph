@@ -89,9 +89,15 @@ lollipop_isoform_issue <- function(observed, selected, label) {
 }
 
 lollipop_isoform_label <- function(refseq_id, protein_id) {
-  identifiers <- c(refseq_id, protein_id)
-  identifiers <- identifiers[!is.na(identifiers) & nzchar(identifiers)]
-  if (!length(identifiers)) NA_character_ else paste(identifiers, collapse = " - ")
+  labels <- c(
+    if (!is.na(refseq_id) && nzchar(refseq_id)) {
+      paste0("Transcript: ", refseq_id)
+    },
+    if (!is.na(protein_id) && nzchar(protein_id)) {
+      paste0("Protein: ", protein_id)
+    }
+  )
+  if (!length(labels)) NA_character_ else paste(labels, collapse = "; ")
 }
 
 lollipop_domain_data <- function(gene,

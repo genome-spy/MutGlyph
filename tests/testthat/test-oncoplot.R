@@ -6,17 +6,18 @@ test_that("oncoplot retains a complete reference composition", {
   expect_identical(spec$name, "mutglyph-oncoplot")
   expect_identical(spec$width, "container")
   expect_identical(spec$height, "container")
-  expect_match(
-    spec$datasets$title$label,
-    "Altered in 141 \\(73.06%\\) of 193 samples"
+  expect_identical(
+    spec$title$text,
+    "Altered in 141 (73.06%) of 193 samples"
   )
   expect_named(
     spec$datasets,
-    c("genes", "samples", "events", "topBars", "rightBars", "title")
+    c("genes", "samples", "events", "topBars", "rightBars")
   )
   expect_equal(nrow(spec$datasets$samples), 193)
   expect_equal(nrow(spec$datasets$events), 247)
-  body <- spec$vconcat[[2]]
+  expect_length(spec$vconcat, 1)
+  body <- spec$vconcat[[1]]
   expect_identical(body$width, "container")
   expect_identical(body$height, "container")
   expect_true(body$scales$x$zoom)
@@ -110,7 +111,7 @@ test_that("optional clinical tracks and sample labels extend the shared grid", {
     showTumorSampleBarcodes = TRUE
   )
   spec <- plot$x$spec
-  body <- spec$vconcat[[2]]
+  body <- spec$vconcat[[1]]
   view_names <- vapply(
     body$concat,
     function(view) if (is.null(view$name)) "" else view$name,
@@ -163,7 +164,7 @@ test_that("mixed clinical tracks use independent typed scales", {
     clinicalFeatures = c("FAB_classification", "days_to_last_followup"),
     annotationColor = list(days_to_last_followup = "Blues")
   )$x$spec
-  body <- spec$vconcat[[2]]
+  body <- spec$vconcat[[1]]
   categorical <- body$concat[[10]]
   numeric <- body$concat[[14]]
 
@@ -175,7 +176,7 @@ test_that("mixed clinical tracks use independent typed scales", {
   expect_identical(numeric$layer[[2]]$encoding$color$legend$tickCount, 3)
   expect_identical(numeric$resolve$scale$color, "excluded")
   expect_named(spec$datasets, c(
-    "genes", "samples", "events", "topBars", "rightBars", "title",
+    "genes", "samples", "events", "topBars", "rightBars",
     "clinical1", "clinical2"
   ))
 })
@@ -187,7 +188,7 @@ test_that("categorical clinical schemes pass through to GenomeSpy", {
     clinicalFeatures = "FAB_classification",
     annotationColor = list(FAB_classification = "set2")
   )$x$spec
-  clinical <- spec$vconcat[[2]]$concat[[10]]
+  clinical <- spec$vconcat[[1]]$concat[[10]]
   scale <- clinical$layer[[2]]$encoding$color$scale
 
   expect_identical(scale$scheme, "set2")
@@ -203,7 +204,7 @@ test_that("the matrix grows while row height reserves preferred widget space", {
       rowHeight = row_height
     )
     spec <- plot$x$spec
-    body <- spec$vconcat[[2]]
+    body <- spec$vconcat[[1]]
     gene_views <- body$concat[5:8]
 
     expect_true(all(vapply(
@@ -232,6 +233,7 @@ test_that("basic display controls omit or collapse their views", {
   body <- spec$vconcat[[1]]
 
   expect_length(spec$vconcat, 1)
+  expect_null(spec$title)
   expect_false("title" %in% names(spec$datasets))
   expect_length(body$concat, 4)
   expect_identical(
@@ -255,7 +257,7 @@ test_that("custom title text replaces the generated summary", {
     titleText = "AML cohort"
   )$x$spec
 
-  expect_identical(spec$datasets$title$label, "AML cohort")
+  expect_identical(spec$title$text, "AML cohort")
 })
 
 test_that("custom mutation colors are shared by every event view", {
@@ -265,7 +267,7 @@ test_that("custom mutation colors are shared by every event view", {
     top = 10,
     colors = custom
   )$x$spec
-  body <- spec$vconcat[[2]]
+  body <- spec$vconcat[[1]]
   encodings <- list(
     body$concat[[2]]$encoding$color,
     body$concat[[6]]$layer[[2]]$encoding$color,
@@ -326,7 +328,7 @@ test_that("Ti/Tv adds one aligned row and an independent color scale", {
     draw_titv = TRUE,
     showTumorSampleBarcodes = TRUE
   )$x$spec
-  body <- spec$vconcat[[2]]
+  body <- spec$vconcat[[1]]
   titv_view <- body$concat[[14]]
 
   expect_true("titv" %in% names(spec$datasets))
@@ -411,7 +413,7 @@ test_that("custom summary bars replace defaults and expose their metrics", {
     draw_titv = TRUE,
     showTumorSampleBarcodes = TRUE
   )$x$spec
-  body <- spec$vconcat[[2]]
+  body <- spec$vconcat[[1]]
   names <- vapply(
     body$concat,
     function(view) if (is.null(view$name)) "" else view$name,
@@ -430,7 +432,7 @@ test_that("custom summary bars replace defaults and expose their metrics", {
   ) %in% names))
   expect_named(spec$datasets, c(
     "genes", "samples", "events", "customTopBar", "customRightBar",
-    "customLeftBar", "title", "clinical1", "titv"
+    "customLeftBar", "clinical1", "titv"
   ))
   expect_false(any(c("topBars", "rightBars") %in% names(spec$datasets)))
 
@@ -468,13 +470,13 @@ test_that("custom bars do not alter the default grid", {
     )
   )$x$spec
 
-  expect_identical(default$vconcat[[2]]$columns, 4L)
-  expect_identical(right_only$vconcat[[2]]$columns, 4L)
-  expect_length(default$vconcat[[2]]$concat, 8)
-  expect_length(right_only$vconcat[[2]]$concat, 8)
-  expect_identical(default$vconcat[[2]]$concat[[8]]$name, "gene-mutation-counts")
+  expect_identical(default$vconcat[[1]]$columns, 4L)
+  expect_identical(right_only$vconcat[[1]]$columns, 4L)
+  expect_length(default$vconcat[[1]]$concat, 8)
+  expect_length(right_only$vconcat[[1]]$concat, 8)
+  expect_identical(default$vconcat[[1]]$concat[[8]]$name, "gene-mutation-counts")
   expect_identical(
-    right_only$vconcat[[2]]$concat[[8]]$name,
+    right_only$vconcat[[1]]$concat[[8]]$name,
     "custom-gene-summary-right"
   )
 })

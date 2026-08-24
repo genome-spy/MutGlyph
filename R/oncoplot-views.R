@@ -1,26 +1,3 @@
-oncoplot_title_view <- function() {
-  list(
-    name = "cohort-summary",
-    width = "container",
-    height = 28,
-    data = list(name = "title"),
-    mark = list(
-      type = "text",
-      align = "center",
-      baseline = "middle",
-      size = 16,
-      fontWeight = "normal",
-      tooltip = FALSE
-    ),
-    encoding = list(
-      x = list(value = 0.5),
-      y = list(value = 0.5),
-      text = list(field = "label"),
-      color = list(value = "#333333")
-    )
-  )
-}
-
 oncoplot_grid_row <- function(has_left_bar,
                               left = NULL,
                               label = NULL,

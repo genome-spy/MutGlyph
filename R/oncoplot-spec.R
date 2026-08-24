@@ -20,9 +20,17 @@ oncoplot_spec <- function(data,
     showPct = showPct
   )
 
-  views <- list(body)
-  if (showTitle) {
-    views <- c(list(oncoplot_title_view()), views)
+  title_text <- if (showTitle) {
+    if (is.null(titleText)) {
+      sprintf(
+        "Altered in %d (%.2f%%) of %d samples",
+        data$title$altered_samples,
+        data$title$altered_percent,
+        data$title$total_samples
+      )
+    } else {
+      titleText
+    }
   }
 
   list(
@@ -31,16 +39,22 @@ oncoplot_spec <- function(data,
     background = "white",
     width = "container",
     height = "container",
+    title = if (showTitle) {
+      list(
+        text = title_text,
+        anchor = "middle",
+        fontSize = 16,
+        fontWeight = "normal"
+      )
+    },
     datasets = oncoplot_datasets(
       data,
       drawRowBar = drawRowBar,
       drawColBar = drawColBar,
-      showPct = showPct,
-      showTitle = showTitle,
-      titleText = titleText
+      showPct = showPct
     ),
     spacing = 4,
-    vconcat = views,
+    vconcat = list(body),
     config = oncoplot_config()
   )
 }
@@ -139,9 +153,7 @@ oncoplot_body <- function(data,
 oncoplot_datasets <- function(data,
                               drawRowBar,
                               drawColBar,
-                              showPct,
-                              showTitle,
-                              titleText) {
+                              showPct) {
   top_bar_name <- if (is.null(data$custom_top_bar)) "topBars" else "customTopBar"
   top_bar_data <- if (is.null(data$custom_top_bar)) {
     data$top_bars
@@ -179,19 +191,6 @@ oncoplot_datasets <- function(data,
     datasets$customLeftBar <- data$custom_left_bar$data
   }
 
-  if (showTitle) {
-    title_text <- if (is.null(titleText)) {
-      sprintf(
-        "Altered in %d (%.2f%%) of %d samples",
-        data$title$altered_samples,
-        data$title$altered_percent,
-        data$title$total_samples
-      )
-    } else {
-      titleText
-    }
-    datasets$title <- data.frame(label = title_text)
-  }
   if (length(data$clinical) > 0L) {
     for (index in seq_along(data$clinical)) {
       datasets[[paste0("clinical", index)]] <- data$clinical[[index]]$data

@@ -3,6 +3,7 @@ lollipop2_label_padding <- 10
 
 lollipop2_spec <- function(data,
                            showDomainLabel = TRUE,
+                           showTitle = TRUE,
                            showLegend = TRUE,
                            labPosSize = 0.9,
                            labPosAngle = 0,
@@ -25,7 +26,7 @@ lollipop2_spec <- function(data,
       data$m2$name,
       data$gene
     ),
-    title = plot_title,
+    title = if (showTitle) plot_title,
     width = "container",
     height = "container",
     padding = 10,

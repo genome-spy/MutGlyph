@@ -1,6 +1,7 @@
 rainfall_spec <- function(data,
                           fontSize = 1.2,
                           pointSize = 0.4,
+                          showTitle = TRUE,
                           region = NULL) {
   colors <- data$colors[substitution_classes()]
   x_encoding <- list(
@@ -36,12 +37,14 @@ rainfall_spec <- function(data,
     description = "Inter-event distances across one cancer genome.",
     assembly = data$assembly,
     background = "white",
-    title = list(
-      text = data$sample,
-      anchor = "middle",
-      fontSize = 12 * fontSize,
-      fontWeight = "normal"
-    ),
+    title = if (showTitle) {
+      list(
+        text = data$sample,
+        anchor = "middle",
+        fontSize = 12 * fontSize,
+        fontWeight = "normal"
+      )
+    },
     width = "container",
     height = "container",
     datasets = list(

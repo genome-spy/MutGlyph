@@ -1,5 +1,13 @@
 mutglyph_normalize_annotation_tracks <- function(annotationTracks, ref.build) {
   if (is.null(annotationTracks)) return(NULL)
+  # If per-track styling is added later, attach it to each named entry rather
+  # than introducing parallel option lists, e.g.:
+  # annotationTracks = list(
+  #   genes = list(data = genes, style = list(bodyColor = "#555555", maxLabels = 70)),
+  #   pathways = list(data = pathways, style = list(bodyColor = "#4C78A8"))
+  # )
+  # Keep bare GRanges/data-frame entries as the current API until that need is
+  # concrete; the normalizer is the natural place to accept both forms later.
   if (!is.list(annotationTracks)) {
     stop("`annotationTracks` must be NULL or a named list of tracks.", call. = FALSE)
   }

@@ -205,7 +205,7 @@ It should contain R scripts, a README, and a manifest. The workflow should:
 - download assembly-specific gene annotations and NCBI mapping tables;
 - parse gene-level features;
 - retain supported canonical sequences;
-- calculate citation counts from `gene2pubmed`;
+- calculate publication counts from NCBI GeneRIF's `generifs_basic`;
 - join scores through stable NCBI GeneIDs;
 - retain zero-score genes;
 - produce one range per gene;
@@ -214,13 +214,20 @@ It should contain R scripts, a README, and a manifest. The workflow should:
   decisions.
 
 Freeze the assembly-matched UCSC RefSeq `refGene` table for hg18, hg19, and
-hg38, together with the human NCBI `gene2refseq`, `gene_info`, and
-`gene2pubmed` snapshots. Strip RefSeq version suffixes before joining. Retain
-only `chr1`--`chr22`, `chrX`, `chrY`, and `chrM`. For each NCBI GeneID,
-join `refGene.name` to the RefSeq accession column in human `gene2refseq`
-to obtain GeneID, then join GeneID to `gene_info` for the symbol and to
-`gene2pubmed` for PubMed IDs. The manifest must record these source-column
-joins because the downloaded tables are positional rather than self-describing.
+hg38, together with the UCSC `ncbiRefSeqLink` mapping, human NCBI
+`gene_info`, and NCBI GeneRIF's `generifs_basic` snapshot. The live NCBI
+`gene2refseq` snapshot is currently multi-gigabyte and the live `gene2pubmed`
+path is unavailable, so these sources are the frozen, reproducible preparation
+contract rather than hidden fallbacks. Strip RefSeq version suffixes before
+joining. Retain only `chr1`--`chr22`, `chrX`, `chrY`, and `chrM`. For each NCBI
+GeneID, join `refGene.name` to the RefSeq RNA accession column in
+`ncbiRefSeqLink` (field 5) to obtain GeneID (field 7), then join GeneID to
+`gene_info` for the symbol and to `generifs_basic` for PubMed IDs. The manifest
+must record these source-column joins because the downloaded tables are
+positional rather than self-describing. The `hg19` `ncbiRefSeqLink` snapshot is
+the pinned common mapping used for hg18, hg19, and hg38 because UCSC does not
+publish that link table for hg18; the assembly-specific `refGene` table still
+controls every coordinate.
 combine all retained transcript records into one inclusive gene-body range
 using the minimum transcript start and maximum transcript end, and require a
 single consistent strand. Convert UCSC's 0-based half-open `txStart`/`txEnd`

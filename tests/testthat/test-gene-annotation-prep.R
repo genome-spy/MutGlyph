@@ -1,8 +1,5 @@
-source(
-  testthat::test_path(
-    "..", "..", "data-raw", "gene-annotations", "prepare-functions.R"
-  )
-)
+source_path <- testthat::test_path("..", "..", "R", "gene-annotation-prep.R")
+if (file.exists(source_path)) source(source_path)
 
 test_that("gene preparation collapses transcripts and scores unique citations", {
   refgene <- data.frame(

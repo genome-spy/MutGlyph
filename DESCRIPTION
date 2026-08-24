@@ -29,6 +29,8 @@ Imports:
     jsonlite,
     maftools
 Suggests:
+    GenomeInfoDb,
+    GenomicRanges,
     knitr,
     R.utils,
     rmarkdown,

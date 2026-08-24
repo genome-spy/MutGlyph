@@ -120,6 +120,9 @@ gistic_chrom_spec <- function(data,
     config = default_spec$config
   )
   default_spec$resolve$axis$x <- "independent"
+  # Keep GISTIC grid styling inside the main panel. Leaving it on the outer
+  # concat makes the inherited grid appear in annotation lanes as well.
+  default_spec$config <- NULL
   default_spec$vconcat <- c(list(main_view), annotation_views)
   default_spec
 }

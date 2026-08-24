@@ -41,7 +41,7 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
     ),
     # Annotation children align to the outer genomic scale but never claim an
     # x-axis; the main plot owns the axis above these tracks.
-    resolve = list(axis = list(x = "excluded")),
+    resolve = list(axis = list(x = "excluded", y = "excluded")),
     layer = list(
       list(
         name = paste0("annotation-bodies-", dataset_name),
@@ -109,14 +109,22 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
           y = list(
             field = "lane",
             type = "index",
-            axis = list(title = "", labels = FALSE, ticks = FALSE)
+            axis = NULL
           ),
           text = list(field = "label", type = "nominal"),
           tooltip = mutglyph_annotation_tooltip()
         )
       )
     ),
-    config = list(axis = list(labels = FALSE, ticks = FALSE, title = NULL))
+    # The shared GISTIC axis styling enables grids. Annotation lanes are
+    # categorical layout guides, so they should not inherit those grids.
+    config = list(axis = list(
+      grid = FALSE,
+      chromGrid = FALSE,
+      labels = FALSE,
+      ticks = FALSE,
+      title = NULL
+    ))
   )
 }
 
@@ -167,7 +175,7 @@ mutglyph_annotation_interval_encoding <- function(stranded) {
     y = list(
       field = "lane",
       type = "index",
-      axis = list(title = "", labels = FALSE, ticks = FALSE)
+      axis = NULL
     )
   )
   encoding

@@ -35,6 +35,8 @@ test_that("stranded annotation views use arrow-block and scored labels", {
   expect_identical(labels$encoding$y$type, "index")
   expect_identical(labels$encoding$x$field, "label_position")
   expect_null(labels$encoding$x$axis)
+  expect_identical(labels$mark$align, "center")
+  expect_null(labels$mark$dx)
   expect_null(labels$encoding$y$axis)
   expect_false(view$config$axis$grid)
   expect_identical(labels$mark$yOffset, -5)

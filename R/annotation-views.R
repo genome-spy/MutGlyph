@@ -95,10 +95,9 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
         mark = list(
           type = "text",
           color = "#202020",
-          dx = 2,
           yOffset = -5,
           baseline = "middle",
-          align = "left",
+          align = "center",
           clip = FALSE,
           tooltip = list(handler = "default")
         ),

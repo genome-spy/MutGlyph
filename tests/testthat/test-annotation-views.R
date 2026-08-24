@@ -21,6 +21,7 @@ test_that("stranded annotation views use arrow-block and scored labels", {
 
   expect_identical(view$height, list(step = 18))
   expect_identical(view$title$text, "genes")
+  expect_identical(view$resolve$axis$x, "excluded")
   expect_identical(view$scales$y$type, "index")
   expect_identical(view$scales$y$domain, c(0, 3))
   expect_true(view$scales$y$reverse)
@@ -32,7 +33,7 @@ test_that("stranded annotation views use arrow-block and scored labels", {
   expect_identical(body$encoding$y$axis$title, "")
   expect_identical(labels$encoding$y$type, "index")
   expect_identical(labels$encoding$x$field, "label_position")
-  expect_identical(labels$encoding$x$axis$title, "")
+  expect_null(labels$encoding$x$axis)
   expect_identical(labels$mark$yOffset, -5)
   expect_identical(body$encoding$direction$scale$range, c("forward", "reverse"))
   expect_identical(body$opacity, list(unitsPerPixel = c(100000, 40000), values = c(0, 1)))

@@ -39,6 +39,9 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
         zoom = FALSE
       )
     ),
+    # Annotation children align to the outer genomic scale but never claim an
+    # x-axis; the main plot owns the axis above these tracks.
+    resolve = list(axis = list(x = "excluded")),
     layer = list(
       list(
         name = paste0("annotation-bodies-", dataset_name),
@@ -102,7 +105,7 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
         encoding = list(
           # filterScoredLabels returns a midpoint in the shared linear locus;
           # using it keeps symbols centered over their gene bodies.
-          x = list(field = "label_position", type = "locus", axis = list(title = "")),
+          x = list(field = "label_position", type = "locus", axis = NULL),
           y = list(
             field = "lane",
             type = "index",
@@ -157,7 +160,7 @@ mutglyph_annotation_body_transforms <- function(stranded = FALSE) {
 
 mutglyph_annotation_interval_encoding <- function(stranded) {
   encoding <- list(
-    x = list(chrom = "seqnames", pos = "start", type = "locus"),
+    x = list(chrom = "seqnames", pos = "start", type = "locus", axis = NULL),
     x2 = list(chrom = "seqnames", pos = "end"),
     # Arrow marks must remain horizontal: a y2 channel makes the interval a
     # diagonal arrow, which GenomeSpy cannot render with arrow-block sizing.

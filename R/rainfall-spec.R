@@ -97,6 +97,9 @@ rainfall_spec <- function(data,
     width = "container",
     height = list(grow = 1, minPx = 180),
     scales = list(y = list(zero = TRUE, zoom = FALSE)),
+    # Keep the main rainfall layers together so their genomic x axes resolve
+    # to one axis at the bottom of this panel, above annotations.
+    resolve = list(axis = list(x = "shared")),
     layer = layers,
     config = default_spec$config
   )
@@ -119,7 +122,9 @@ rainfall_spec <- function(data,
     spacing = 4,
     resolve = list(
       scale = list(x = "shared", y = "independent"),
-      axis = list(x = "shared")
+      # The outer concat owns independent axis layout. Annotation children
+      # suppress their x axes, leaving the main panel's axis at its bottom.
+      axis = list(x = "independent")
     ),
     datasets = c(
       list(mutations = data$mutations, kataegis = data$kataegis),

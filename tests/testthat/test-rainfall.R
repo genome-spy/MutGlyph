@@ -114,12 +114,17 @@ test_that("rainfall plot accepts arbitrary scored annotation tracks", {
   expect_length(spec$vconcat, 2)
   expect_identical(spec$vconcat[[1]]$name, "rainfall-panel")
   expect_identical(annotation_view$name, "annotation-annotation_track_1")
+  expect_identical(annotation_view$resolve$axis$x, "excluded")
   expect_identical(annotation_body$data$name, "annotation_track_1")
   expect_identical(annotation_body$mark$type, "arrow")
   expect_identical(annotation_body$mark$style, "arrow-block")
+  expect_null(annotation_body$encoding$x$axis)
+  expect_null(annotation_view$layer[[2]]$encoding$x$axis)
   expect_identical(annotation_body$encoding$direction$field, "strand")
   expect_identical(spec$resolve$scale$x, "shared")
   expect_identical(spec$resolve$scale$y, "independent")
+  expect_identical(spec$resolve$axis$x, "independent")
+  expect_identical(spec$vconcat[[1]]$resolve$axis$x, "shared")
 })
 
 test_that("rainfall display arguments validate", {

@@ -107,7 +107,20 @@ gistic_chrom_spec <- function(data,
     default_spec$datasets,
     stats::setNames(annotation_tracks, dataset_names)
   )
-  default_spec$vconcat <- c(default_spec$vconcat, annotation_views)
+  main_view <- list(
+    name = "gistic-panel",
+    width = "container",
+    height = "container",
+    spacing = default_spec$spacing,
+    resolve = list(
+      scale = list(x = "shared", y = "independent"),
+      axis = list(x = "shared")
+    ),
+    vconcat = default_spec$vconcat,
+    config = default_spec$config
+  )
+  default_spec$resolve$axis$x <- "independent"
+  default_spec$vconcat <- c(list(main_view), annotation_views)
   default_spec
 }
 

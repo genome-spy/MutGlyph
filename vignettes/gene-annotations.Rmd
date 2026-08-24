@@ -32,13 +32,6 @@ the coordinates come from assembly-matched UCSC RefSeq `refGene` records,
 which are mapped to NCBI GeneIDs through `ncbiRefSeqLink`; gene symbols come
 from NCBI `gene_info`.
 
-```{r load-genes}
-library(MutGlyph)
-
-genes <- mutglyph_gene_annotations("hg19")
-genes
-```
-
 The returned object is a `GRanges` object with the genomic sequence, 1-based
 closed coordinates, strand, gene symbol, identifier, and numeric score. Each
 gene is represented by one inclusive body interval after transcript records

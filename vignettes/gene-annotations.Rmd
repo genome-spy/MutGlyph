@@ -24,7 +24,7 @@ wide view, familiar gene symbols help orient navigation; at a close view,
 gene bodies show which genes are near a mutation cluster, copy-number peak,
 or other feature of interest.
 
-## The built-in scored gene track
+## What is a gene annotation track?
 
 MutGlyph includes an offline gene-body annotation resource for hg18, hg19,
 and hg38. These packaged tracks are RefSeq/NCBI-derived, not GENCODE-derived:
@@ -68,6 +68,16 @@ workflow](https://docs.higlass.io/data_preparation.html#gene-annotation-tracks).
 MutGlyph uses that idea for interactive label prioritization while keeping the
 annotation input and rendering composable in R.
 
+For the current hg19 resource, the packaged track contains about 27,600 gene
+bodies. Including it makes the resulting RMarkdown HTML larger because the
+annotation rows are embedded in the widget specification. In a current
+measurement, the hg19 track added approximately 3.2 MB to a rainfall widget's
+serialized JSON (the compressed package resource itself is about 0.5 MB).
+The exact size varies with the plot and the number of tracks.
+
+The examples below show the usual workflow first. Details of the returned
+`GRanges` object are at the end of the article.
+
 ## Use annotations with rainfall plots
 
 The same named `annotationTracks` interface works with rainfall plots. This
@@ -75,6 +85,10 @@ example opens at a mutation-dense region and shows the scored gene bodies
 below the rainfall panel.
 
 ```{r rainfall-data}
+library(MutGlyph)
+
+genes <- mutglyph_gene_annotations("hg19")
+
 brca <- maftools::read.maf(
   maf = system.file("extdata", "brca.maf.gz", package = "maftools"),
   verbose = FALSE
@@ -143,3 +157,15 @@ rainfallPlot(
 
 Coordinates must use the same assembly as the plot. `GRanges` inputs may carry
 assembly metadata, which MutGlyph checks before rendering.
+
+## Inspect the packaged annotation object
+
+The built-in resource is a standard `GRanges` object. Its ranges are one
+inclusive gene-body interval per NCBI GeneID, with symbols, identifiers,
+strands, and popularity scores in the metadata columns. The full object is
+large, so a compact inspection is usually more useful in a vignette:
+
+```{r inspect-genes}
+head(genes)
+attr(genes, "mutglyph_annotation")
+```

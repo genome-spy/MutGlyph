@@ -1,8 +1,11 @@
 #' Load MutGlyph's scored gene-body annotation track
 #'
 #' Loads the offline, assembly-specific gene-body resource prepared from UCSC
-#' RefSeq and NCBI publication annotations. The score is a label-priority
-#' navigation heuristic, not a measure of biological importance.
+#' RefSeq and NCBI annotations. Coordinates come from UCSC RefSeq `refGene`
+#' records mapped through `ncbiRefSeqLink`; symbols come from NCBI `gene_info`.
+#' The score is a popularity score counting unique GeneID--PubMed pairs in
+#' NCBI GeneRIF `generifs_basic`. It is used only to prioritize labels, not as
+#' a measure of biological importance.
 #'
 #' @param ref.build Reference assembly: `"hg18"`, `"hg19"`, or `"hg38"`.
 #'

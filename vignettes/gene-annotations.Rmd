@@ -27,7 +27,10 @@ or other feature of interest.
 ## The built-in scored gene track
 
 MutGlyph includes an offline gene-body annotation resource for hg18, hg19,
-and hg38:
+and hg38. These packaged tracks are RefSeq/NCBI-derived, not GENCODE-derived:
+the coordinates come from assembly-matched UCSC RefSeq `refGene` records,
+which are mapped to NCBI GeneIDs through `ncbiRefSeqLink`; gene symbols come
+from NCBI `gene_info`.
 
 ```{r load-genes}
 library(MutGlyph)
@@ -37,10 +40,22 @@ genes
 ```
 
 The returned object is a `GRanges` object with the genomic sequence, 1-based
-closed coordinates, strand, gene symbol, identifier, and numeric score. The
-score is a label-priority heuristic: when several labels compete for space,
-higher-scoring genes are preferred. It does not represent biological
-importance, expression, or mutation significance.
+closed coordinates, strand, gene symbol, identifier, and numeric score. Each
+gene is represented by one inclusive body interval after transcript records
+are collapsed by NCBI GeneID.
+
+The score is a popularity score: it counts unique GeneID–PubMed pairs in the
+NCBI GeneRIF `generifs_basic` snapshot. When several labels compete for space,
+higher-popularity genes are preferred. This is a navigation and label-layout
+heuristic; it does not represent biological importance, expression, mutation
+significance, or evidence quality.
+
+The source snapshots are prepared and frozen with the package rather than
+downloaded when a plot is created. The upstream sources are [UCSC
+RefSeq](https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz),
+[UCSC `ncbiRefSeqLink`](https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeqLink.txt.gz),
+[NCBI `gene_info`](https://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz),
+and [NCBI GeneRIF `generifs_basic`](https://ftp.ncbi.nlm.nih.gov/gene/GeneRIF/generifs_basic.gz).
 
 Gene bodies are rendered with strand-aware `arrow-block` marks. The annotation
 view uses at most three lanes, preferring stable lanes for the `-` and `+`
@@ -48,7 +63,7 @@ strands and using the remaining lane as a fallback. Symbols are shown above
 their bodies. Exons are intentionally omitted so the track stays compact in
 embedded RMarkdown widgets.
 
-The label-scoring idea comes from the [HiGlass gene annotation track
+The popularity-based label-scoring idea comes from the [HiGlass gene annotation track
 workflow](https://docs.higlass.io/data_preparation.html#gene-annotation-tracks).
 MutGlyph uses that idea for interactive label prioritization while keeping the
 annotation input and rendering composable in R.

@@ -2,14 +2,15 @@
 
 This workflow creates one inclusive gene-body interval per NCBI GeneID for
 hg18, hg19, and hg38. It uses assembly-matched UCSC RefSeq `refGene` records,
-the UCSC `ncbiRefSeqLink` GeneID mapping, NCBI `gene_info`, and unique
-GeneID–PubMed pairs from NCBI `generifs_basic` for the label-priority score.
+the UCSC `ncbiRefSeqLink` GeneID mapping, and NCBI `gene_info` for the gene
+coordinates and symbols. The popularity score is the number of unique
+GeneID–PubMed pairs from NCBI `generifs_basic`.
 NCBI's current `gene2refseq` snapshot is too large for a routine
 package-preparation dependency, and the live `gene2pubmed` path is not
 currently available; both facts are recorded in the implementation plan.
 
-The score is a navigation heuristic inspired by the HiGlass gene annotation
-track workflow; it is not a measure of biological importance.
+The score is a popularity-based navigation heuristic inspired by the HiGlass
+gene annotation track workflow; it is not a measure of biological importance.
 
 Source snapshots are deliberately supplied by the maintainer rather than
 downloaded by package builds. Each snapshot must be tab-separated. The raw

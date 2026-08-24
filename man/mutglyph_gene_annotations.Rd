@@ -15,8 +15,11 @@ A \code{GenomicRanges::GRanges} object with \code{symbol}, \code{gene_id}, and
 }
 \description{
 Loads the offline, assembly-specific gene-body resource prepared from UCSC
-RefSeq and NCBI publication annotations. The score is a label-priority
-navigation heuristic, not a measure of biological importance.
+RefSeq and NCBI annotations. Coordinates come from UCSC RefSeq \code{refGene}
+records mapped through \code{ncbiRefSeqLink}; symbols come from NCBI \code{gene_info}.
+The score is a popularity score counting unique GeneID--PubMed pairs in
+NCBI GeneRIF \code{generifs_basic}. It is used only to prioritize labels, not as
+a measure of biological importance.
 }
 \examples{
 if (requireNamespace("GenomicRanges", quietly = TRUE) &&

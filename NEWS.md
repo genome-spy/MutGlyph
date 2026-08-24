@@ -6,11 +6,17 @@ Initial release.
 
 - Interactive, maftools-compatible `oncoplot()`, including mutation and CNV
   layers, clinical annotations, Ti/Tv, sample and gene summaries, and mean VAF.
-- `rainfallPlot()` with kataegis detection and regional views.
+- `rainfallPlot()` with kataegis detection, regional views, and generic scored
+  genomic annotation tracks.
 - `lollipopPlot()` and `lollipopPlot2()` for single- and two-cohort protein
   mutation landscapes, with custom domains and annotations.
 - `gisticChromPlot()` for chromosome-wide amplification and deletion
-  landscapes, custom annotations, and regional views.
+  landscapes, custom annotations, regional views, and generic scored genomic
+  annotation tracks.
+- Offline scored gene-body annotations for hg18, hg19, and hg38, prepared by
+  an included R workflow from UCSC RefSeq and NCBI GeneRIF data. The
+  label-priority scoring approach is inspired by HiGlass gene annotation
+  tracks; scores are navigation heuristics, not biological importance.
 
 ## Interaction and output
 

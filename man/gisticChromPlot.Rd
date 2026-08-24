@@ -19,7 +19,8 @@ gisticChromPlot(
   annotations = NULL,
   width = NULL,
   height = NULL,
-  elementId = NULL
+  elementId = NULL,
+  annotationTracks = NULL
 )
 }
 \arguments{
@@ -70,6 +71,10 @@ G-score interval.}
 \item{width, height}{Widget dimensions.}
 
 \item{elementId}{Optional element ID.}
+
+\item{annotationTracks}{Optional named list of \code{GRanges} or data-frame
+interval tracks to show below the GISTIC profiles. Scores prioritize
+labels; the built-in \code{\link[=mutglyph_gene_annotations]{mutglyph_gene_annotations()}} resource is one option.}
 }
 \value{
 A MutGlyph htmlwidget.

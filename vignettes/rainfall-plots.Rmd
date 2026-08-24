@@ -71,3 +71,30 @@ rainfallPlot(
   height = 360
 )
 ```
+
+## Add genomic context
+
+Annotation tracks are generic named interval tracks rather than a special
+rainfall-only gene argument. MutGlyph currently ships an offline scored
+gene-body track for hg18, hg19, and hg38; the score prioritizes labels when
+space is limited, while every gene body becomes visible when zoomed in.
+Gene bodies use strand-aware `arrow-block` marks and intentionally omit exons
+to keep embedded RMarkdown widgets compact.
+
+```{r rainfall-genes}
+genes <- mutglyph_gene_annotations("hg19")
+
+rainfallPlot(
+  brca,
+  detectChangePoints = TRUE,
+  region = "chr8:98,000,000-98,500,000",
+  annotationTracks = list(genes = genes),
+  height = 540
+)
+```
+
+The label-priority idea is inspired by the gene annotation workflow in
+[HiGlass](https://docs.higlass.io/data_preparation.html#gene-annotation-tracks).
+The public argument accepts additional named `GRanges` or data-frame tracks
+with `seqnames`, `start`, `end`, and finite `score` columns, plus optional
+`label`, `identifier`, and `strand` columns.

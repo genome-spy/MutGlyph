@@ -2,6 +2,10 @@ source("R/as-json.R")
 source("R/transport.R")
 source("R/widget.R")
 source("R/genomic-region.R")
+source("R/gene-annotation-prep.R")
+source("R/gene-annotations.R")
+source("R/annotation-tracks.R")
+source("R/annotation-views.R")
 source("R/substitution.R")
 source("R/oncoplot-data.R")
 source("R/oncoplot-views.R")
@@ -127,6 +131,25 @@ writeLines(
   file.path(output_dir, "rainfall.json"),
   useBytes = TRUE
 )
+gene_track <- data.frame(
+  seqnames = c("chr8", "chr8"),
+  start = c(98000000, 98200000),
+  end = c(98001000, 98202000),
+  label = c("GENE1", "GENE2"),
+  identifier = c("1", "2"),
+  strand = c("+", "-"),
+  score = c(10, 1)
+)
+writeLines(
+  as_json(rainfallPlot(
+    brca,
+    detectChangePoints = TRUE,
+    region = "chr8:98,000,000-98,500,000",
+    annotationTracks = list(genes = gene_track)
+  )),
+  file.path(output_dir, "rainfall-annotations.json"),
+  useBytes = TRUE
+)
 
 writeLines(
   as_json(suppressWarnings(lollipopPlot(
@@ -209,6 +232,15 @@ writeLines(
     )
   )),
   file.path(output_dir, "gistic-chrom.json"),
+  useBytes = TRUE
+)
+writeLines(
+  as_json(gisticChromPlot(
+    gistic,
+    region = "chr21:39,000,000-41,000,000",
+    annotationTracks = list(genes = gene_track)
+  )),
+  file.path(output_dir, "gistic-chrom-annotations.json"),
   useBytes = TRUE
 )
 writeLines(

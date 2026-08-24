@@ -78,10 +78,10 @@ gisticChromPlot <- function(gistic = NULL,
                             region = NULL,
                             nonSignificantColor = NULL,
                             annotations = NULL,
-                            annotationTracks = NULL,
                             width = NULL,
                             height = NULL,
-                            elementId = NULL) {
+                            elementId = NULL,
+                            annotationTracks = NULL) {
   mutglyph_positive_number(txtSize, "txtSize")
   mutglyph_positive_number(cytobandTxtSize, "cytobandTxtSize")
   chromosomeTrack <- match.arg(chromosomeTrack)

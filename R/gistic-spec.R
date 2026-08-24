@@ -91,14 +91,14 @@ gistic_chrom_spec <- function(data,
   }
 
   dataset_names <- paste0("annotation_track_", seq_along(annotation_tracks))
-  annotation_views <- Map(
+  annotation_views <- unname(Map(
     function(track, track_name, dataset_name) {
       mutglyph_annotation_view(track_name, dataset_name, track)
     },
     annotation_tracks,
     names(annotation_tracks),
     dataset_names
-  )
+  ))
   default_spec$description <- paste0(
     default_spec$description,
     " with genomic annotation context."

@@ -96,6 +96,30 @@ peak-level q-values and sample and gene counts. Only these compact score and
 summary fields are embedded; the large sample-level lesion matrix is omitted
 from the HTML widget.
 
+## Add a scored gene-body track
+
+The same generic `annotationTracks` interface can add genomic context below
+the mirrored GISTIC profiles. The bundled gene resource is assembly-specific,
+offline, and contains one range per gene. Its score is only a label-priority
+heuristic; it does not encode biological importance. Bodies use strand-aware
+`arrow-block` marks, and exons are omitted to keep RMarkdown widgets compact.
+
+```{r gistic-genes}
+genes <- mutglyph_gene_annotations("hg19")
+
+gisticChromPlot(
+  gistic,
+  region = "chr21:39,000,000-41,000,000",
+  annotationTracks = list(genes = genes),
+  height = 540
+)
+```
+
+The score-based label-selection idea is inspired by
+[HiGlass gene annotation tracks](https://docs.higlass.io/data_preparation.html#gene-annotation-tracks).
+Additional named `GRanges` or data-frame interval tracks can be supplied using
+the same `seqnames`, `start`, `end`, and finite `score` contract.
+
 ## Use a genomic axis at close zoom levels
 
 The chromosome strip gives useful whole-genome context but becomes less useful

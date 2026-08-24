@@ -68,6 +68,12 @@ test_that("widget transport dictionary-encodes repetitive character columns", {
   expect_identical(encoded$columns[[2]], data$unique)
   expect_identical(encoded$columns[[3]]$dictionary, c("A", "B"))
   expect_identical(encoded$columns[[4]], data$count)
+
+  single_value <- mutglyph_encode_data_frame(data.frame(
+    repeated = rep("same", 40),
+    stringsAsFactors = FALSE
+  ))
+  expect_identical(single_value$columns[[1]]$dictionary, list("same"))
 })
 
 test_that("widget transport preserves empty, missing, and one-row columns", {

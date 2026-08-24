@@ -41,6 +41,9 @@ reference:
 - title: GenomeSpy specification
   contents:
   - as_json
+- title: Genomic annotations
+  contents:
+  - mutglyph_gene_annotations
 - title: Protein annotation
   contents:
   - mutglyph_interpro_domains

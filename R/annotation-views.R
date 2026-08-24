@@ -132,8 +132,9 @@ mutglyph_annotation_interval_encoding <- function(stranded) {
   encoding <- list(
     x = list(chrom = "seqnames", pos = "start", type = "locus"),
     x2 = list(chrom = "seqnames", pos = "end"),
-    y = list(field = "lane", type = "quantitative", axis = NULL),
-    y2 = list(expr = "datum.lane + 1", type = "quantitative")
+    # Arrow marks must remain horizontal: a y2 channel makes the interval a
+    # diagonal arrow, which GenomeSpy cannot render with arrow-block sizing.
+    y = list(field = "lane", type = "quantitative", axis = NULL)
   )
   encoding
 }

@@ -23,6 +23,7 @@ test_that("stranded annotation views use arrow-block and scored labels", {
   expect_identical(view$title$text, "genes")
   expect_identical(body$mark$type, "arrow")
   expect_identical(body$mark$style, "arrow-block")
+  expect_null(body$encoding$y2)
   expect_identical(body$encoding$direction$scale$range, c("forward", "reverse"))
   expect_identical(body$opacity, list(unitsPerPixel = c(100000, 40000), values = c(0, 1)))
   expect_identical(labels$transform[[5L]]$type, "filterScoredLabels")

@@ -2,7 +2,8 @@ rainfall_spec <- function(data,
                           fontSize = 1.2,
                           pointSize = 0.4,
                           showTitle = TRUE,
-                          region = NULL) {
+                          region = NULL,
+                          annotation_tracks = NULL) {
   colors <- data$colors[substitution_classes()]
   x_encoding <- list(
     chrom = "chromosome",
@@ -25,13 +26,17 @@ rainfall_spec <- function(data,
     ),
     legend = list(title = NULL)
   )
-  layers <- list(rainfall_interval_layer(), rainfall_mutation_layer(
-    x_encoding,
-    color_encoding,
-    pointSize = pointSize
-  ), rainfall_arrow_layer())
+  layers <- list(
+    rainfall_interval_layer(),
+    rainfall_mutation_layer(
+      x_encoding,
+      color_encoding,
+      pointSize = pointSize
+    ),
+    rainfall_arrow_layer()
+  )
 
-  list(
+  default_spec <- list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
     name = "mutglyph-rainfall-plot",
     description = "Inter-event distances across one cancer genome.",
@@ -73,6 +78,56 @@ rainfall_spec <- function(data,
       ),
       mark = list(tooltip = FALSE)
     )
+  )
+  if (is.null(annotation_tracks) || !length(annotation_tracks)) {
+    return(default_spec)
+  }
+
+  dataset_names <- paste0("annotation_track_", seq_along(annotation_tracks))
+  annotation_views <- Map(
+    function(track, track_name, dataset_name) {
+      mutglyph_annotation_view(track_name, dataset_name, track)
+    },
+    annotation_tracks,
+    names(annotation_tracks),
+    dataset_names
+  )
+  rainfall_panel <- list(
+    name = "rainfall-panel",
+    width = "container",
+    height = list(grow = 1, minPx = 180),
+    scales = list(y = list(zero = TRUE, zoom = FALSE)),
+    layer = layers,
+    config = default_spec$config
+  )
+  list(
+    `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
+    name = "mutglyph-rainfall-plot",
+    description = "Inter-event distances across one cancer genome with genomic annotation context.",
+    assembly = data$assembly,
+    background = "white",
+    title = if (showTitle) {
+      list(
+        text = data$sample,
+        anchor = "middle",
+        fontSize = 12 * fontSize,
+        fontWeight = "normal"
+      )
+    },
+    width = "container",
+    height = "container",
+    spacing = 4,
+    resolve = list(
+      scale = list(x = "shared", y = "independent"),
+      axis = list(x = "shared")
+    ),
+    datasets = c(
+      list(mutations = data$mutations, kataegis = data$kataegis),
+      stats::setNames(annotation_tracks, dataset_names)
+    ),
+    scales = list(x = mutglyph_locus_scale(region)),
+    vconcat = c(list(rainfall_panel), annotation_views),
+    config = default_spec$config
   )
 }
 

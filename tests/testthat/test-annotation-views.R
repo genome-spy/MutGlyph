@@ -19,8 +19,8 @@ test_that("stranded annotation views use arrow-block and scored labels", {
   body <- view$layer[[1L]]
   labels <- view$layer[[2L]]
 
-  expect_identical(view$height, list(step = 18))
-  expect_identical(view$title$text, "genes")
+  expect_identical(view$height, list(step = 22))
+  expect_null(view$title)
   expect_identical(view$resolve$axis$x, "excluded")
   expect_identical(view$resolve$axis$y, "excluded")
   expect_identical(view$scales$y$type, "index")

@@ -50,7 +50,7 @@ rainfallPlot(
   detectChangePoints = TRUE,
   region = "chr8:98,000,000-98,500,000",
   annotationTracks = list(genes = genes),
-  height = 540
+  height = 450
 )
 ```
 
@@ -72,7 +72,7 @@ gisticChromPlot(
   gistic,
   region = "chr21:39,000,000-41,000,000",
   annotationTracks = list(genes = genes),
-  height = 540
+  height = 450
 )
 ```
 

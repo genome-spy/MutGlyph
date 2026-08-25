@@ -4,27 +4,30 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
     list(
       type = "arrow",
       style = "arrow-block",
-      color = "#555555",
-      filled = TRUE,
+      stroke = "#555555",
+      fill = "#cccccc",
+      strokeWidth = 1,
       yOffset = 5,
-      minSize = 2,
+      size = 7,
       tooltip = list(handler = "default")
     )
   } else {
     list(
       type = "rect",
-      color = "#777777",
-      opacity = 0.8,
-      minHeight = 2,
+      stroke = "#555555",
+      fill = "#cccccc",
+      strokeWidth = 1,
+      yOffset = 8,
+      y2Offset = 2,
       tooltip = list(handler = "default")
     )
   }
   body_encoding <- mutglyph_annotation_interval_encoding(stranded)
   list(
     name = paste0("annotation-", dataset_name),
-    title = list(text = track_name, anchor = "start", fontSize = 11),
+    #title = list(text = track_name, anchor = "start", fontSize = 11),
     width = "container",
-    height = list(step = 18),
+    height = list(step = 22),
     # This mirrors the MCCA gene track: strand-preferred lanes keep the two
     # reading directions visually stable, while the third lane is a fallback.
     # The index scale is discrete, so GenomeSpy can use the step height.
@@ -88,7 +91,8 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
               asMidpoint = "label_position",
               score = "score",
               width = "label_width",
-              lane = "lane"
+              lane = "lane",
+              padding = 4
             )
           )
         ),
@@ -185,8 +189,6 @@ mutglyph_annotation_tooltip <- function() {
     list(field = "label", title = "Label"),
     list(field = "identifier", title = "Identifier"),
     list(field = "seqnames", title = "Chromosome"),
-    list(field = "start", type = "quantitative", title = "Start", format = ",d"),
-    list(field = "end", type = "quantitative", title = "End", format = ",d"),
     list(field = "strand", title = "Strand"),
     list(field = "score", type = "quantitative", title = "Score", format = ",d")
   )

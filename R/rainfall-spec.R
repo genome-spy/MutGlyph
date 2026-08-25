@@ -119,7 +119,9 @@ rainfall_spec <- function(data,
     },
     width = "container",
     height = "container",
-    spacing = 4,
+    # Leave a clear visual separation between the main panel and annotation
+    # tracks without changing the internal layout of the rainfall layers.
+    spacing = 10,
     resolve = list(
       scale = list(x = "shared", y = "independent"),
       # The outer concat owns independent axis layout. Annotation children

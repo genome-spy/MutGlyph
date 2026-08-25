@@ -43,6 +43,31 @@ necessary. If further progress requires a fundamental design decision, pause
 the implementation and resolve that decision explicitly before adding more
 code.
 
+## Testing
+
+Tests should protect public behavior and documented invariants, not restate the
+implementation. Tests that assert exact nested-spec layout, list positions,
+internal helper names, transform order, or incidental styling without those
+details being part of the contract are effectively useless: they duplicate the
+implementation and reject valid refactors without finding user-facing bugs.
+
+Prefer tests through exported functions and semantic assertions. For generated
+GenomeSpy specifications, check user-visible composition such as which views
+exist, how axes and scales are shared, and whether annotations are placed in
+the intended relationship to the main plot. Locate relevant components by
+meaning rather than fixed list positions when practical. Keep focused unit
+tests for pure normalization and preparation rules, and use integration tests
+for the final widget behavior. Do not use string searches in a bundled runtime
+as a substitute for exercising the behavior it is meant to provide.
+
+## Release notes
+
+`NEWS.md` is release history. Add entries under the release they belong to;
+do not insert unreleased feature work into an existing version's section. Keep
+unreleased changes in the pull request description or a separately marked
+unreleased section, and update `NEWS.md` when preparing the corresponding
+release.
+
 ## Compatibility and public API
 
 ### Naming and semantics

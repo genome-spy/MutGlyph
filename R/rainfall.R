@@ -25,6 +25,9 @@
 #'   whitespace in coordinates are accepted. The endpoints may span
 #'   chromosomes, for example `"chr3:43393228-chr4:8534670"`. The plot remains
 #'   zoomable.
+#' @param annotationTracks Optional named list of `GRanges` or data-frame
+#'   interval tracks to show below the rainfall panel. Scores prioritize
+#'   labels; the built-in [mutglyph_gene_annotations()] resource is one option.
 #' @param elementId Optional element ID.
 #'
 #' @details
@@ -61,7 +64,8 @@ rainfallPlot <- function(maf,
                          fontSize = 1.2,
                          pointSize = 0.4,
                          region = NULL,
-                         elementId = NULL) {
+                         elementId = NULL,
+                         annotationTracks = NULL) {
   mutglyph_flag(savePlot, "savePlot")
   mutglyph_flag(showTitle, "showTitle")
   if (savePlot) {
@@ -72,6 +76,8 @@ rainfallPlot <- function(maf,
   }
   mutglyph_positive_number(fontSize, "fontSize")
   mutglyph_positive_number(pointSize, "pointSize")
+  ref.build <- mutglyph_annotation_assembly(ref.build)
+  annotation_tracks <- mutglyph_normalize_annotation_tracks(annotationTracks, ref.build)
   data <- rainfall_data(
     maf,
     tsb = tsb,
@@ -85,7 +91,8 @@ rainfallPlot <- function(maf,
       fontSize = fontSize,
       pointSize = pointSize,
       showTitle = showTitle,
-      region = region
+      region = region,
+      annotation_tracks = annotation_tracks
     ),
     width = width,
     height = height,

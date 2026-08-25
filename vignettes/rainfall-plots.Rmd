@@ -71,3 +71,8 @@ rainfallPlot(
   height = 360
 )
 ```
+
+## Add genomic context
+
+See the [gene annotation tracks](gene-annotations.html) guide for the bundled
+scored gene-body track and custom `annotationTracks` examples.

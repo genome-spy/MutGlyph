@@ -29,9 +29,13 @@ Imports:
     jsonlite,
     maftools
 Suggests:
+    GenomeInfoDb,
+    GenomicRanges,
+    IRanges,
     knitr,
     R.utils,
     rmarkdown,
+    S4Vectors,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

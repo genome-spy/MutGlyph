@@ -6,7 +6,8 @@ gistic_chrom_spec <- function(data,
                               txtSize = 0.8,
                               cytobandTxtSize = 0.6,
                               chromosomeTrack = c("strip", "axis"),
-                              region = NULL) {
+                              region = NULL,
+                              annotation_tracks = NULL) {
   chromosomeTrack <- match.arg(chromosomeTrack)
   profiles <- list(
     gistic_profile_view(
@@ -40,7 +41,7 @@ gistic_chrom_spec <- function(data,
     )
   }
 
-  list(
+  default_spec <- list(
     `$schema` = "https://cdn.jsdelivr.net/npm/@genome-spy/core/dist/schema.json",
     name = "mutglyph-gistic-chrom-plot",
     description = "GISTIC amplification and deletion scores across the genome.",
@@ -85,6 +86,48 @@ gistic_chrom_spec <- function(data,
       mark = list(tooltip = FALSE)
     )
   )
+  if (is.null(annotation_tracks) || !length(annotation_tracks)) {
+    return(default_spec)
+  }
+
+  dataset_names <- paste0("annotation_track_", seq_along(annotation_tracks))
+  annotation_views <- unname(Map(
+    function(track, track_name, dataset_name) {
+      mutglyph_annotation_view(track_name, dataset_name, track)
+    },
+    annotation_tracks,
+    names(annotation_tracks),
+    dataset_names
+  ))
+  default_spec$description <- paste0(
+    default_spec$description,
+    " with genomic annotation context."
+  )
+  default_spec$datasets <- c(
+    default_spec$datasets,
+    stats::setNames(annotation_tracks, dataset_names)
+  )
+  main_view <- list(
+    name = "gistic-panel",
+    width = "container",
+    height = "container",
+    spacing = default_spec$spacing,
+    resolve = list(
+      scale = list(x = "shared", y = "independent"),
+      axis = list(x = "shared")
+    ),
+    vconcat = default_spec$vconcat,
+    config = default_spec$config
+  )
+  default_spec$resolve$axis$x <- "independent"
+  # The outer gap separates the main GISTIC panel from annotation tracks;
+  # main_view retains the profile stack's original internal spacing.
+  default_spec$spacing <- 15
+  # Keep GISTIC grid styling inside the main panel. Leaving it on the outer
+  # concat makes the inherited grid appear in annotation lanes as well.
+  default_spec$config <- NULL
+  default_spec$vconcat <- c(list(main_view), annotation_views)
+  default_spec
 }
 
 gistic_profile_view <- function(event_type,

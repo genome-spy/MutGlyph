@@ -1,0 +1,46 @@
+{
+  "prepared_at": "2026-08-24",
+  "taxon": 9606,
+  "coordinate_convention": "1-based closed",
+  "chromosomes": ["chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX", "chrY", "chrM"],
+  "score": "number of unique GeneID-PubMed pairs in NCBI generifs_basic",
+  "sources": {
+    "refGene_hg18": {
+      "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg18/database/refGene.txt.gz",
+      "sha256_uncompressed": "e9cd5c0f84060a4a042784c87ec7d79b38786a2ebcd8d86211301309ce4e8c76"
+    },
+    "refGene_hg19": {
+      "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz",
+      "sha256_uncompressed": "1c361d4ed4566c6f05a097c6c4a9fd0e67c72ef07ad018dff7cbcaa761209a02"
+    },
+    "refGene_hg38": {
+      "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz",
+      "sha256_uncompressed": "7a475ea2f4410a99ffd234dd3fef534306de5f78f6257692544ad83bd2529e97"
+    },
+    "ncbiRefSeqLink": {
+      "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeqLink.txt.gz",
+      "sha256_uncompressed": "1edcdeab41198b809fd31387582afde1d67ecbfea141c61a10276f3507b2f371",
+      "note": "The hg19 link snapshot is the pinned common accession-to-GeneID mapping for all three coordinate assemblies because UCSC does not publish this table for hg18."
+    },
+    "gene_info": {
+      "url": "https://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz",
+      "sha256_uncompressed": "ee7cbd3895a9d276b9d26a1ce4ad394051b212e7e7f75b8b663e7660dc7d79e1"
+    },
+    "generifs_basic": {
+      "url": "https://ftp.ncbi.nlm.nih.gov/gene/GeneRIF/generifs_basic.gz",
+      "sha256_uncompressed": "c5a4fa12b5bd083c145fb9d226ba3341987fb37595d26832143e9355782e3a66"
+    }
+  },
+  "artifacts": {
+    "hg18": {"rows": 27491, "sha256": "14dda58687bc173b1cfcc0928d649adefa9f14be0abf77ebca71a16f1c735bd4"},
+    "hg19": {"rows": 27558, "sha256": "a891d114d954002d5861d7669da48b88f0a101ab049389b8cd467f256ab2aee6"},
+    "hg38": {"rows": 27549, "sha256": "b3eb0296d45a71a3dc4b00016c753c0bbc59076560f986ccc1d6eb348ca98d2c"}
+  },
+  "decisions": [
+    "RefSeq version suffixes are stripped before accession joins.",
+    "RefGene 0-based half-open txStart/txEnd are converted to 1-based closed intervals.",
+    "Transcripts are collapsed to one inclusive body per GeneID.",
+    "Genes with conflicting chromosome or strand records are excluded and must be reviewed when refreshing data.",
+    "Raw downloads and caches remain outside the package."
+  ]
+}

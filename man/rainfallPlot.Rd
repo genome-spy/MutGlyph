@@ -17,7 +17,8 @@ rainfallPlot(
   fontSize = 1.2,
   pointSize = 0.4,
   region = NULL,
-  elementId = NULL
+  elementId = NULL,
+  annotationTracks = NULL
 )
 }
 \arguments{
@@ -54,6 +55,10 @@ chromosomes, for example \code{"chr3:43393228-chr4:8534670"}. The plot remains
 zoomable.}
 
 \item{elementId}{Optional element ID.}
+
+\item{annotationTracks}{Optional named list of \code{GRanges} or data-frame
+interval tracks to show below the rainfall panel. Scores prioritize
+labels; the built-in \code{\link[=mutglyph_gene_annotations]{mutglyph_gene_annotations()}} resource is one option.}
 }
 \value{
 A MutGlyph htmlwidget.

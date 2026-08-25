@@ -89,6 +89,54 @@ test_that("rainfall plot accepts an initial genomic region", {
   expect_true(spec$scales$x$zoom)
 })
 
+test_that("rainfall plot accepts arbitrary scored annotation tracks", {
+  genes <- data.frame(
+    seqnames = c("chr8", "chr8"),
+    start = c(98000000, 98200000),
+    end = c(98001000, 98202000),
+    label = c("GENE1", "GENE2"),
+    identifier = c("1", "2"),
+    strand = c("+", "-"),
+    score = c(10, 1)
+  )
+  spec <- rainfallPlot(
+    brca_maf(),
+    region = "chr8:98,000,000-98,500,000",
+    annotationTracks = list(genes = genes)
+  )$x$spec
+
+  annotation_view <- Filter(
+    function(view) identical(view$resolve$axis$x, "excluded"),
+    spec$vconcat
+  )[[1L]]
+  annotation_body <- Filter(
+    function(layer) identical(layer$mark$type, "arrow"),
+    annotation_view$layer
+  )[[1L]]
+  main_view <- Filter(
+    function(view) identical(view$name, "rainfall-panel"),
+    spec$vconcat
+  )[[1L]]
+  expect_named(
+    spec$datasets,
+    c("mutations", "kataegis", "annotation_track_1")
+  )
+  expect_length(spec$vconcat, 2)
+  expect_identical(spec$spacing, 15)
+  expect_identical(main_view$name, "rainfall-panel")
+  expect_identical(annotation_view$resolve$axis$x, "excluded")
+  expect_identical(annotation_body$data$name, "annotation_track_1")
+  expect_identical(annotation_body$mark$type, "arrow")
+  expect_identical(annotation_body$mark$style, "arrow-block")
+  expect_null(annotation_body$encoding$x$axis)
+  expect_null(annotation_view$layer[[2]]$encoding$x$axis)
+  expect_identical(annotation_body$encoding$direction$field, "strand")
+  expect_identical(spec$resolve$scale$x, "shared")
+  expect_identical(spec$resolve$scale$y, "independent")
+  expect_identical(spec$resolve$axis$x, "independent")
+  expect_identical(main_view$resolve$axis$x, "shared")
+})
+
 test_that("rainfall display arguments validate", {
   maf <- brca_maf()
 

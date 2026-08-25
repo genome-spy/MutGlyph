@@ -61,6 +61,8 @@ image export, and downloading the generated GenomeSpy specification.
   bars, colors, selection, and GISTIC calls.
 - [Map mutations onto proteins](lollipop-plots.html) using MAF objects or
   ordinary data frames and composable domain annotations.
+- [Add scored gene annotation tracks](gene-annotations.html) to rainfall and
+  GISTIC plots, or supply custom genomic interval tracks.
 - [Explore mutation clustering](rainfall-plots.html) with rainfall plots and
   optional kataegis detection.
 - [Browse GISTIC copy-number landscapes](gistic-plots.html) with mirrored

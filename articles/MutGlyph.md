@@ -108,14 +108,18 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] cli_3.6.6          knitr_1.51         rlang_1.3.0        xfun_0.60         
-#>  [5] otel_0.2.0         textshaping_1.0.5  jsonlite_2.0.0     data.table_1.18.4 
-#>  [9] htmltools_0.5.9    ragg_1.5.2         sass_0.4.10        rmarkdown_2.31    
-#> [13] grid_4.6.1         evaluate_1.0.5     jquerylib_0.1.4    fastmap_1.2.0     
-#> [17] yaml_2.3.12        lifecycle_1.0.5    maftools_2.28.0    DNAcopy_1.86.0    
-#> [21] compiler_4.6.1     fs_2.1.0           RColorBrewer_1.1-3 htmlwidgets_1.6.4 
-#> [25] MutGlyph_0.1.0     R.oo_1.27.1        R.utils_2.13.0     lattice_0.22-9    
-#> [29] systemfonts_1.3.2  digest_0.6.39      R6_2.6.1           splines_4.6.1     
-#> [33] R.methodsS3_1.8.2  Matrix_1.7-5       bslib_0.12.0       tools_4.6.1       
-#> [37] survival_3.8-6     pkgdown_2.2.1      cachem_1.1.0       desc_1.4.3
+#>  [1] cli_3.6.6           knitr_1.51          rlang_1.3.0        
+#>  [4] xfun_0.60           otel_0.2.0          textshaping_1.0.5  
+#>  [7] jsonlite_2.0.0      data.table_1.18.6.1 htmltools_0.5.9    
+#> [10] ragg_1.5.2          sass_0.4.10         rmarkdown_2.31     
+#> [13] grid_4.6.1          evaluate_1.0.5      jquerylib_0.1.4    
+#> [16] fastmap_1.2.0       yaml_2.3.12         lifecycle_1.0.5    
+#> [19] maftools_2.28.0     DNAcopy_1.86.0      compiler_4.6.1     
+#> [22] fs_2.1.0            RColorBrewer_1.1-3  htmlwidgets_1.6.4  
+#> [25] MutGlyph_0.1.0      R.oo_1.27.1         R.utils_2.13.0     
+#> [28] lattice_0.22-9      systemfonts_1.3.2   digest_0.6.39      
+#> [31] R6_2.6.1            splines_4.6.1       R.methodsS3_1.8.2  
+#> [34] Matrix_1.7-5        bslib_0.12.0        tools_4.6.1        
+#> [37] survival_3.8-6      pkgdown_2.2.1       cachem_1.1.0       
+#> [40] desc_1.4.3
 ```

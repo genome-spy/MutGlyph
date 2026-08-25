@@ -108,13 +108,8 @@ lollipopPlot2(
 )
 ```
 
-Both stem sets extend to the center of the protein track, where the
-protein is intended to cover their ends. The joins currently look
-somewhat ugly because the bundled GenomeSpy 0.84 cannot z-order complete
-children of a vertical concatenation: the later lower cohort draws its
-stems over the protein. A future GenomeSpy version with broader `zindex`
-support will render the intended layering cleanly without changing the
-plot geometry.
+Both stem sets extend to the center of the protein track, and GenomeSpy
+renders the protein above their overlapping ends.
 
 ## Annotate selected mutations
 

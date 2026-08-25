@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^AGENTS\.md$
+^\.codex$
 ^\.Rproj\.user$
 ^\.playwright-cli$
 ^\.gitignore$

@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/genome-spy/MutGlyph/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/genome-spy/MutGlyph/blob/v0.2.0/DESCRIPTION)
 
 Lavikka K (2026). *MutGlyph: Interactive Cancer Genomics Plots*. R
 package version 0.2.0, <https://github.com/genome-spy/MutGlyph>.

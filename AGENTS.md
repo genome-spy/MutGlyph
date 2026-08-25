@@ -60,6 +60,14 @@ tests for pure normalization and preparation rules, and use integration tests
 for the final widget behavior. Do not use string searches in a bundled runtime
 as a substitute for exercising the behavior it is meant to provide.
 
+## Release notes
+
+`NEWS.md` is release history. Add entries under the release they belong to;
+do not insert unreleased feature work into an existing version's section. Keep
+unreleased changes in the pull request description or a separately marked
+unreleased section, and update `NEWS.md` when preparing the corresponding
+release.
+
 ## Compatibility and public API
 
 ### Naming and semantics

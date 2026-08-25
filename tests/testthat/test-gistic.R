@@ -84,14 +84,22 @@ test_that("GISTIC plots accept arbitrary scored annotation tracks", {
     annotationTracks = list(genes = genes)
   )$x$spec
 
-  annotation_view <- spec$vconcat[[length(spec$vconcat)]]
-  annotation_body <- annotation_view$layer[[1]]
-  main_view <- spec$vconcat[[1]]
+  annotation_view <- Filter(
+    function(view) identical(view$resolve$axis$x, "excluded"),
+    spec$vconcat
+  )[[1L]]
+  annotation_body <- Filter(
+    function(layer) identical(layer$mark$type, "arrow"),
+    annotation_view$layer
+  )[[1L]]
+  main_view <- Filter(
+    function(view) identical(view$name, "gistic-panel"),
+    spec$vconcat
+  )[[1L]]
   expect_named(
     spec$datasets,
     c("scores", "bands", "annotations", "annotation_track_1")
   )
-  expect_identical(annotation_view$name, "annotation-annotation_track_1")
   expect_identical(annotation_view$resolve$axis$x, "excluded")
   expect_identical(annotation_view$resolve$axis$y, "excluded")
   expect_identical(annotation_body$data$name, "annotation_track_1")

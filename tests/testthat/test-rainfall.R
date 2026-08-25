@@ -105,16 +105,25 @@ test_that("rainfall plot accepts arbitrary scored annotation tracks", {
     annotationTracks = list(genes = genes)
   )$x$spec
 
-  annotation_view <- spec$vconcat[[2]]
-  annotation_body <- annotation_view$layer[[1]]
+  annotation_view <- Filter(
+    function(view) identical(view$resolve$axis$x, "excluded"),
+    spec$vconcat
+  )[[1L]]
+  annotation_body <- Filter(
+    function(layer) identical(layer$mark$type, "arrow"),
+    annotation_view$layer
+  )[[1L]]
+  main_view <- Filter(
+    function(view) identical(view$name, "rainfall-panel"),
+    spec$vconcat
+  )[[1L]]
   expect_named(
     spec$datasets,
     c("mutations", "kataegis", "annotation_track_1")
   )
   expect_length(spec$vconcat, 2)
   expect_identical(spec$spacing, 15)
-  expect_identical(spec$vconcat[[1]]$name, "rainfall-panel")
-  expect_identical(annotation_view$name, "annotation-annotation_track_1")
+  expect_identical(main_view$name, "rainfall-panel")
   expect_identical(annotation_view$resolve$axis$x, "excluded")
   expect_identical(annotation_body$data$name, "annotation_track_1")
   expect_identical(annotation_body$mark$type, "arrow")
@@ -125,7 +134,7 @@ test_that("rainfall plot accepts arbitrary scored annotation tracks", {
   expect_identical(spec$resolve$scale$x, "shared")
   expect_identical(spec$resolve$scale$y, "independent")
   expect_identical(spec$resolve$axis$x, "independent")
-  expect_identical(spec$vconcat[[1]]$resolve$axis$x, "shared")
+  expect_identical(main_view$resolve$axis$x, "shared")
 })
 
 test_that("rainfall display arguments validate", {

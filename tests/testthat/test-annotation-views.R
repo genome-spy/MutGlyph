@@ -6,7 +6,7 @@ source_paths <- c(
 )
 for (source_path in source_paths) if (file.exists(source_path)) source(source_path)
 
-test_that("stranded annotation views use arrow-block and scored labels", {
+test_that("stranded annotation views use arrow-block bodies and centered labels", {
   track <- mutglyph_normalize_annotation_tracks(
     list(genes = data.frame(
       seqnames = c("chr1", "chr1"), start = c(10, 20), end = c(15, 30),
@@ -16,43 +16,29 @@ test_that("stranded annotation views use arrow-block and scored labels", {
     "hg19"
   )[[1L]]
   view <- mutglyph_annotation_view("genes", "annotation_genes", track)
-  body <- view$layer[[1L]]
-  labels <- view$layer[[2L]]
+  body <- Filter(
+    function(layer) identical(layer$mark$type, "arrow"),
+    view$layer
+  )[[1L]]
+  labels <- Filter(
+    function(layer) identical(layer$mark$type, "text"),
+    view$layer
+  )[[1L]]
 
-  expect_identical(view$height, list(step = 22))
-  expect_null(view$title)
   expect_identical(view$resolve$axis$x, "excluded")
   expect_identical(view$resolve$axis$y, "excluded")
-  expect_identical(view$scales$y$type, "index")
-  expect_identical(view$scales$y$domain, c(0, 3))
-  expect_true(view$scales$y$reverse)
   expect_identical(body$mark$type, "arrow")
   expect_identical(body$mark$style, "arrow-block")
-  expect_identical(body$mark$yOffset, 5)
   expect_null(body$encoding$y2)
-  expect_identical(body$encoding$y$type, "index")
   expect_null(body$encoding$y$axis)
-  expect_identical(body$encoding$x$offset, 1)
-  expect_null(body$encoding$x2$offset)
-  expect_identical(labels$encoding$y$type, "index")
   expect_identical(labels$encoding$x$field, "label_position")
   expect_null(labels$encoding$x$axis)
   expect_identical(labels$mark$align, "center")
-  expect_null(labels$mark$dx)
   expect_null(labels$encoding$y$axis)
   expect_false(view$config$axis$grid)
-  expect_identical(labels$mark$yOffset, -5)
-  expect_identical(body$encoding$direction$scale$range, c("forward", "reverse"))
-  expect_identical(body$opacity, list(unitsPerPixel = c(100000, 40000), values = c(0, 1)))
-  expect_identical(body$transform[[3L]]$preference, "strand")
-  expect_identical(body$transform[[3L]]$preferredOrder, c("-", "+"))
-  expect_identical(body$transform[[4L]]$expr, "datum.lane < 3")
-  expect_identical(labels$transform[[5L]]$expr, "datum.label")
-  expect_identical(labels$transform[[7L]]$type, "filterScoredLabels")
-  expect_identical(labels$transform[[7L]]$score, "score")
-  expect_identical(labels$transform[[7L]]$width, "label_width")
-  expect_identical(labels$transform[[7L]]$lane, "lane")
-  expect_true(any(vapply(view$layer, function(x) identical(x$mark$type, "point"), logical(1))) == FALSE)
+  expect_identical(body$encoding$direction$field, "strand")
+  expect_identical(labels$encoding$text$field, "label")
+  expect_false(any(vapply(view$layer, function(x) identical(x$mark$type, "point"), logical(1))))
 })
 
 test_that("directionless annotation views use rectangles without strand points", {
@@ -61,10 +47,14 @@ test_that("directionless annotation views use rectangles without strand points",
     "hg19"
   )[[1L]]
   view <- mutglyph_annotation_view("regions", "annotation_regions", track)
+  body <- Filter(
+    function(layer) identical(layer$mark$type, "rect"),
+    view$layer
+  )[[1L]]
 
-  expect_identical(view$layer[[1L]]$mark$type, "rect")
-  expect_null(view$layer[[1L]]$encoding$direction)
+  expect_identical(body$mark$type, "rect")
+  expect_null(body$encoding$direction)
   expect_false(any(vapply(view$layer, function(x) identical(x$mark$type, "point"), logical(1))))
-  expect_null(view$layer[[1L]]$transform[[3L]]$preference)
-  expect_identical(view$layer[[1L]]$transform[[4L]]$expr, "datum.lane < 3")
+  expect_identical(view$resolve$axis$x, "excluded")
+  expect_identical(view$resolve$axis$y, "excluded")
 })

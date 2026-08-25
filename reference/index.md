@@ -18,6 +18,11 @@
 - [`as_json()`](https://genomespy.app/MutGlyph/reference/as_json.md) :
   Retrieve a MutGlyph GenomeSpy specification
 
+## Genomic annotations
+
+- [`mutglyph_gene_annotations()`](https://genomespy.app/MutGlyph/reference/mutglyph_gene_annotations.md)
+  : Load MutGlyph's scored gene-body annotation track
+
 ## Protein annotation
 
 - [`mutglyph_interpro_domains()`](https://genomespy.app/MutGlyph/reference/mutglyph_interpro_domains.md)

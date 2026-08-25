@@ -22,7 +22,8 @@ rainfallPlot(
   fontSize = 1.2,
   pointSize = 0.4,
   region = NULL,
-  elementId = NULL
+  elementId = NULL,
+  annotationTracks = NULL
 )
 ```
 
@@ -84,6 +85,13 @@ rainfallPlot(
 - elementId:
 
   Optional element ID.
+
+- annotationTracks:
+
+  Optional named list of `GRanges` or data-frame interval tracks to show
+  below the rainfall panel. Scores prioritize labels; the built-in
+  [`mutglyph_gene_annotations()`](https://genomespy.app/MutGlyph/reference/mutglyph_gene_annotations.md)
+  resource is one option.
 
 ## Value
 

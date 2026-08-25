@@ -48,6 +48,10 @@ generated GenomeSpy specification.
   proteins](https://genomespy.app/MutGlyph/articles/lollipop-plots.md)
   using MAF objects or ordinary data frames and composable domain
   annotations.
+- [Add scored gene annotation
+  tracks](https://genomespy.app/MutGlyph/articles/gene-annotations.md)
+  to rainfall and GISTIC plots, or supply custom genomic interval
+  tracks.
 - [Explore mutation
   clustering](https://genomespy.app/MutGlyph/articles/rainfall-plots.md)
   with rainfall plots and optional kataegis detection.

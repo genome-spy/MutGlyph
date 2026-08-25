@@ -60,3 +60,10 @@ rainfallPlot(
   height = 360
 )
 ```
+
+## Add genomic context
+
+See the [gene annotation
+tracks](https://genomespy.app/MutGlyph/articles/gene-annotations.md)
+guide for the bundled scored gene-body track and custom
+`annotationTracks` examples.

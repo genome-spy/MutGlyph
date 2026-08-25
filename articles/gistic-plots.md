@@ -83,6 +83,13 @@ provide peak-level q-values and sample and gene counts. Only these
 compact score and summary fields are embedded; the large sample-level
 lesion matrix is omitted from the HTML widget.
 
+## Add a scored gene-body track
+
+See the [gene annotation
+tracks](https://genomespy.app/MutGlyph/articles/gene-annotations.md)
+guide for the bundled scored gene-body track and custom
+`annotationTracks` examples.
+
 ## Use a genomic axis at close zoom levels
 
 The chromosome strip gives useful whole-genome context but becomes less

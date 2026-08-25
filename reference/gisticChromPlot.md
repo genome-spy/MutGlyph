@@ -23,7 +23,8 @@ gisticChromPlot(
   annotations = NULL,
   width = NULL,
   height = NULL,
-  elementId = NULL
+  elementId = NULL,
+  annotationTracks = NULL
 )
 ```
 
@@ -104,6 +105,13 @@ gisticChromPlot(
 - elementId:
 
   Optional element ID.
+
+- annotationTracks:
+
+  Optional named list of `GRanges` or data-frame interval tracks to show
+  below the GISTIC profiles. Scores prioritize labels; the built-in
+  [`mutglyph_gene_annotations()`](https://genomespy.app/MutGlyph/reference/mutglyph_gene_annotations.md)
+  resource is one option.
 
 ## Value
 

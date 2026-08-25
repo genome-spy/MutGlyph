@@ -193,6 +193,11 @@ correctness, licensing, maintenance, and scientific use.
 - [`as_json()`](https://genomespy.app/MutGlyph/reference/as_json.md) :
   Retrieve a MutGlyph GenomeSpy specification
 
+## Genomic annotations
+
+- [`mutglyph_gene_annotations()`](https://genomespy.app/MutGlyph/reference/mutglyph_gene_annotations.md)
+  : Load MutGlyph's scored gene-body annotation track
+
 ## Protein annotation
 
 - [`mutglyph_interpro_domains()`](https://genomespy.app/MutGlyph/reference/mutglyph_interpro_domains.md)
@@ -242,3 +247,9 @@ correctness, licensing, maintenance, and scientific use.
   Explore GISTIC amplification and deletion peaks with an interactive,
   zoomable copy-number landscape in R, including significance and
   annotations.
+
+- [Gene annotation tracks for genomic plots in
+  R](https://genomespy.app/MutGlyph/articles/gene-annotations.md):
+
+  Add scored, strand-aware gene-body annotations to interactive rainfall
+  and GISTIC plots with MutGlyph.

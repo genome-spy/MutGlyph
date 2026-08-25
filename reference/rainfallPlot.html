@@ -27,6 +27,7 @@ function an almost drop-in interactive replacement."><meta property="og:image" c
     <li><a class="dropdown-item" href="../articles/lollipop-plots.html">Lollipop plots</a></li>
     <li><a class="dropdown-item" href="../articles/rainfall-plots.html">Rainfall and kataegis</a></li>
     <li><a class="dropdown-item" href="../articles/gistic-plots.html">GISTIC landscapes</a></li>
+    <li><a class="dropdown-item" href="../articles/gene-annotations.html">Gene annotation tracks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">All articles</a></li>
   </ul></li>
@@ -68,7 +69,8 @@ function an almost drop-in interactive replacement.</p>
 <span>  fontSize <span class="op">=</span> <span class="fl">1.2</span>,</span>
 <span>  pointSize <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  elementId <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  elementId <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  annotationTracks <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -132,6 +134,12 @@ zoomable.</p></dd>
 
 <dt id="arg-elementid">elementId<a class="anchor" aria-label="anchor" href="#arg-elementid"></a></dt>
 <dd><p>Optional element ID.</p></dd>
+
+
+<dt id="arg-annotationtracks">annotationTracks<a class="anchor" aria-label="anchor" href="#arg-annotationtracks"></a></dt>
+<dd><p>Optional named list of <code>GRanges</code> or data-frame
+interval tracks to show below the rainfall panel. Scores prioritize
+labels; the built-in <code><a href="mutglyph_gene_annotations.html">mutglyph_gene_annotations()</a></code> resource is one option.</p></dd>
 
 </dl></div>
     <div class="section level2">

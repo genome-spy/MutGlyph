@@ -37,3 +37,9 @@
   Explore GISTIC amplification and deletion peaks with an interactive,
   zoomable copy-number landscape in R, including significance and
   annotations.
+
+- [Gene annotation tracks for genomic plots in
+  R](https://genomespy.app/MutGlyph/articles/gene-annotations.md):
+
+  Add scored, strand-aware gene-body annotations to interactive rainfall
+  and GISTIC plots with MutGlyph.

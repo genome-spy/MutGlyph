@@ -22,12 +22,12 @@ navbar:
         href: articles/oncoplots.html
       - text: Lollipop plots
         href: articles/lollipop-plots.html
-      - text: Gene annotation tracks
-        href: articles/gene-annotations.html
       - text: Rainfall and kataegis
         href: articles/rainfall-plots.html
       - text: GISTIC landscapes
         href: articles/gistic-plots.html
+      - text: Gene annotation tracks
+        href: articles/gene-annotations.html
       - text: -------
       - text: All articles
         href: articles/index.html
@@ -63,6 +63,6 @@ articles:
   contents:
   - oncoplots
   - lollipop-plots
-  - gene-annotations
   - rainfall-plots
   - gistic-plots
+  - gene-annotations

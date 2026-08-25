@@ -122,7 +122,7 @@ gistic_chrom_spec <- function(data,
   default_spec$resolve$axis$x <- "independent"
   # The outer gap separates the main GISTIC panel from annotation tracks;
   # main_view retains the profile stack's original internal spacing.
-  default_spec$spacing <- 10
+  default_spec$spacing <- 15
   # Keep GISTIC grid styling inside the main panel. Leaving it on the outer
   # concat makes the inherited grid appear in annotation lanes as well.
   default_spec$config <- NULL

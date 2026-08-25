@@ -112,7 +112,7 @@ test_that("rainfall plot accepts arbitrary scored annotation tracks", {
     c("mutations", "kataegis", "annotation_track_1")
   )
   expect_length(spec$vconcat, 2)
-  expect_identical(spec$spacing, 10)
+  expect_identical(spec$spacing, 15)
   expect_identical(spec$vconcat[[1]]$name, "rainfall-panel")
   expect_identical(annotation_view$name, "annotation-annotation_track_1")
   expect_identical(annotation_view$resolve$axis$x, "excluded")

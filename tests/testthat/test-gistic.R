@@ -106,7 +106,7 @@ test_that("GISTIC plots accept arbitrary scored annotation tracks", {
   expect_identical(spec$resolve$scale$x, "shared")
   expect_identical(spec$resolve$scale$y, "independent")
   expect_identical(spec$resolve$axis$x, "independent")
-  expect_identical(spec$spacing, 10)
+  expect_identical(spec$spacing, 15)
   expect_identical(main_view$name, "gistic-panel")
   expect_identical(main_view$spacing, 3)
   expect_identical(main_view$resolve$axis$x, "shared")

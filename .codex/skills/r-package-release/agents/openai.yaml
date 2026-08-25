@@ -1,0 +1,3 @@
+interface:
+  display_name: "R Package Release"
+  short_description: "Draft and publish R package releases"

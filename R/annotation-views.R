@@ -78,6 +78,9 @@ mutglyph_annotation_view <- function(track_name, dataset_name, track) {
         transform = c(
           mutglyph_annotation_body_transforms(stranded),
           list(
+            # Labels are optional for custom tracks. Filter missing or empty
+            # labels before measureText, which expects a string value.
+            list(type = "filter", expr = "datum.label"),
             list(
               type = "measureText",
               field = "label",
@@ -171,7 +174,12 @@ mutglyph_annotation_body_transforms <- function(stranded = FALSE) {
 
 mutglyph_annotation_interval_encoding <- function(stranded) {
   encoding <- list(
-    x = list(chrom = "seqnames", pos = "start", type = "locus", axis = NULL),
+    # R-facing annotation intervals are 1-based and closed; GenomeSpy's locus
+    # coordinates are zero-based and half-open, so only the start is offset.
+    x = list(
+      chrom = "seqnames", pos = "start", type = "locus", offset = 1,
+      axis = NULL
+    ),
     x2 = list(chrom = "seqnames", pos = "end"),
     # Arrow marks must remain horizontal: a y2 channel makes the interval a
     # diagonal arrow, which GenomeSpy cannot render with arrow-block sizing.

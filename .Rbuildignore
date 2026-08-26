@@ -6,6 +6,7 @@
 ^\.gitignore$
 ^\.github$
 ^_pkgdown\.yml$
+^pkgdown$
 ^docs$
 ^LICENSE\.md$
 ^plans$

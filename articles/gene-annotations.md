@@ -91,13 +91,10 @@ rainfallPlot(
 Coordinates must use the same assembly as the plot. MutGlyph checks
 assembly metadata on `GRanges` inputs before rendering.
 
-## How the annotation track is rendered
+## Understand the annotation track
 
-Gene bodies are shown with strand-aware `arrow-block` marks. Symbols
-appear above their bodies. The view uses at most three priority lanes,
-keeping the `-` and `+` strands stable and using the remaining lane as a
-fallback. Exons are omitted so the track stays compact in embedded
-RMarkdown widgets.
+Gene bodies indicate strand direction, with symbols shown above them.
+The track uses at most three rows and does not show exon structure.
 
 ## Packaged gene annotations
 

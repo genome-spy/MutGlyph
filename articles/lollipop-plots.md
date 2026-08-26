@@ -108,9 +108,6 @@ lollipopPlot2(
 )
 ```
 
-Both stem sets extend to the center of the protein track, and GenomeSpy
-renders the protein above their overlapping ends.
-
 ## Annotate selected mutations
 
 `labelPos` accepts amino-acid positions or `"all"`. As in maftools,
@@ -157,8 +154,8 @@ lollipopPlot(
 Both mutation-event and distinct-sample counts remain available in
 tooltips and in the generated specification. The mutation input can also
 be a regular data frame containing `position` and optional `mutation`,
-`variant_class`, `sample`, and `count` columns, so custom and
-pre-aggregated analyses use the same renderer.
+`variant_class`, `sample`, and `count` columns, allowing custom and
+pre-aggregated analyses to use the same plotting function.
 
 ## Compose custom mutation and domain data
 

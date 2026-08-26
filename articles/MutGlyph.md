@@ -34,10 +34,10 @@ MutGlyph::oncoplot(maf = laml, top = 10, height = 500)
 
 The columns share one sample scale. Scroll or pinch over the plot to
 zoom and pan, and hover over marks for details. Sample labels can be
-enabled even for a dense cohort: ranged text keeps them hidden until the
-columns are wide enough. Hover over the widget to reveal controls for
-fullscreen viewing, PNG or SVG image export, and downloading the
-generated GenomeSpy specification.
+enabled even for a dense cohort; they appear once the columns are wide
+enough to read. Hover over the widget to reveal controls for fullscreen
+viewing, PNG or SVG image export, and downloading the generated
+GenomeSpy specification.
 
 ## Continue with the plot guides
 

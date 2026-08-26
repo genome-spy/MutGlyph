@@ -83,7 +83,7 @@ and hover over mutations, clinical tracks, or summary bars for details.
 
 With `showTumorSampleBarcodes = TRUE`, TCGA barcodes appear after
 zooming in far enough for the columns to provide readable horizontal
-space. Ranged text keeps them hidden in the dense whole-cohort view.
+space. They remain hidden in the dense whole-cohort view.
 
 Mutation-class colors are partial overrides, so a plot can emphasize a
 few classes without redefining the whole palette.

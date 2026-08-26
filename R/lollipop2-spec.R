@@ -108,14 +108,14 @@ lollipop2_cohort_view <- function(cohort,
         type = "rule",
         size = 1,
         # Match the regular lollipop: keep the stem outside the translucent
-        # point and extend its baseline end to the protein-track center.
+        # point, extend it vertically, and retain horizontal zoom clipping.
         yOffset = if (bottom) -point_radius else point_radius,
         y2Offset = if (bottom) {
           -lollipop2_protein_height / 2
         } else {
           lollipop2_protein_height / 2
         },
-        clip = "never",
+        clip = "x",
         tooltip = NULL
       ),
       encoding = list(y2 = list(datum = 0, type = "quantitative"))

@@ -165,11 +165,11 @@ lollipop_basic_view <- function(data,
           # stem half a diameter below the point center keeps it out of the
           # translucent point fill.
           yOffset = sqrt(lollipop_basic_point_area * pointSize^2) / 2,
-          # Extend into the following view up to the protein center. The
-          # protein view is drawn above this view, hiding the excess stem.
+          # Extend into the following view up to the protein center while
+          # retaining horizontal clipping for mutations outside the zoom.
           y2Offset = lollipop_protein_height / 2 +
             lollipop_protein_padding_top,
-          clip = "never",
+          clip = "x",
           tooltip = NULL
         ),
         encoding = list(y2 = list(value = 0))

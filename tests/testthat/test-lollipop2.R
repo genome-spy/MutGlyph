@@ -61,8 +61,8 @@ test_that("lollipopPlot2 mirrors two cohorts around one protein model", {
     spec$vconcat[[3]]$layer[[1]]$mark$y2Offset,
     -lollipop2_protein_height / 2
   )
-  expect_identical(spec$vconcat[[1]]$layer[[1]]$mark$clip, "never")
-  expect_identical(spec$vconcat[[3]]$layer[[1]]$mark$clip, "never")
+  expect_identical(spec$vconcat[[1]]$layer[[1]]$mark$clip, "x")
+  expect_identical(spec$vconcat[[3]]$layer[[1]]$mark$clip, "x")
   expect_null(spec$vconcat[[1]]$zindex)
   expect_identical(spec$vconcat[[2]]$zindex, 1)
   expect_null(spec$vconcat[[3]]$zindex)

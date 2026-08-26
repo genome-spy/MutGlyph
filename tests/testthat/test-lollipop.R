@@ -41,7 +41,7 @@ test_that("basic lollipop uses true-position vertical stems", {
     stem$mark$y2Offset,
     spec$vconcat[[2]]$height / 2 + spec$vconcat[[2]]$padding$top
   )
-  expect_identical(stem$mark$clip, "never")
+  expect_identical(stem$mark$clip, "x")
   expect_null(stem$mark$color)
   expect_identical(point$mark$type, "point")
   expect_equal(point$mark$size, 52 * 1.5^2)

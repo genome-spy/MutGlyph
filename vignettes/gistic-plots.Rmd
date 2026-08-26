@@ -52,10 +52,9 @@ alteration frequencies.
 
 The two profiles use the same G-score domain, making amplification and
 deletion magnitudes directly comparable. Intervals passing `fdrCutOff` are
-drawn with the amplification or deletion color; other intervals use an opaque
-context color. Drawing every interval exactly once avoids alpha-blending
-artifacts where narrow rectangles overlap. By default, the five significant
-cytobands with the lowest q-values are labelled.
+drawn with the amplification or deletion color; other intervals use
+`nonSignificantColor`. By default, the five significant cytobands with the
+lowest q-values are labelled.
 
 ## Choose bands and styling
 
@@ -92,9 +91,7 @@ gisticChromPlot(
 
 Hovering over a score interval reports its genomic coordinates, G-score,
 q-value, mean amplitude, and alteration frequency. Cytoband labels provide
-peak-level q-values and sample and gene counts. Only these compact score and
-summary fields are embedded; the large sample-level lesion matrix is omitted
-from the HTML widget.
+peak-level q-values and sample and gene counts.
 
 ## Add a scored gene-body track
 

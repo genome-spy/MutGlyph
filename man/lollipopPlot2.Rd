@@ -87,9 +87,6 @@ protein model and mutations from \code{m2} below it.
 \details{
 Both cohorts use one protein coordinate system and independently scaled
 recurrence axes. One cohort may contain no mutations for the selected gene.
-
-Both stem sets extend to the center of the shared protein track, and the
-protein track is rendered above them at the overlap.
 }
 \examples{
 if (interactive()) {

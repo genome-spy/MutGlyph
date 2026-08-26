@@ -68,6 +68,21 @@ unreleased changes in the pull request description or a separately marked
 unreleased section, and update `NEWS.md` when preparing the corresponding
 release.
 
+## User-facing documentation
+
+Keep user-facing documentation focused on information needed to use the
+package, interpret its output, or understand its current public behavior. A
+detail is not documentation-worthy merely because it was discovered or
+considered during implementation; include it only when it is relevant to a
+plausible user decision or workflow.
+
+State visible behavior directly. Do not explain renderer mechanics, internal
+layering, serialization choices, workarounds, or other implementation rationale
+unless users need the information to use the feature correctly. Do not explain
+historical behavior or justify current behavior by comparing it with a former
+implementation or appearance. Historical changes belong in release notes, not
+current guides or function reference pages.
+
 ## Compatibility and public API
 
 ### Naming and semantics

@@ -35,9 +35,6 @@
 #' Both cohorts use one protein coordinate system and independently scaled
 #' recurrence axes. One cohort may contain no mutations for the selected gene.
 #'
-#' Both stem sets extend to the center of the shared protein track, and the
-#' protein track is rendered above them at the overlap.
-#'
 #' @return A MutGlyph htmlwidget.
 #' @seealso [lollipopPlot()], [maftools::lollipopPlot2()]
 #'

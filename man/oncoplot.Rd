@@ -120,10 +120,10 @@ mutation cells and summary bars for details, or use the widget's \strong{Save as
 SVG} button to export the currently visible composition.
 
 Categorical and numeric clinical annotations use independent color scales.
-Sample labels use ranged text and appear only when their bands are wide
-enough; zooming in reveals labels hidden in a dense overview. Custom summary
-bars accept one numeric metric keyed by sample or gene, and use the metric's
-column name as the axis title.
+Sample labels appear only when their bands are wide enough; zooming in reveals
+labels hidden in a dense overview. Custom summary bars accept one numeric
+metric keyed by sample or gene, and use the metric's column name as the axis
+title.
 }
 \examples{
 if (interactive()) {

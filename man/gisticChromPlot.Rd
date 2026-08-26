@@ -27,8 +27,8 @@ gisticChromPlot(
 \item{gistic}{A maftools \code{GISTIC} object created by
 \code{\link[maftools:readGistic]{maftools::readGistic()}}.}
 
-\item{fdrCutOff}{GISTIC q-value cutoff in \verb{(0, 1]} used to assign the two
-opaque score colors.}
+\item{fdrCutOff}{GISTIC q-value cutoff in \verb{(0, 1]} used to identify
+significant intervals.}
 
 \item{markBands}{Cytobands to label, \code{"all"} for every significant band, or
 \code{NULL} for the five bands with the lowest q-values.}
@@ -59,9 +59,8 @@ zoomable.}
 \item{nonSignificantColor}{One color applied to both event types, or two
 colors for amplification and deletion intervals that do not pass
 \code{fdrCutOff}. An unnamed vector is interpreted in that order; a named vector
-must contain \code{Amp} and \code{Del}. With the default \code{color}, the defaults are
-opaque pale red and blue resembling the former translucent colors. If
-\code{color} is customized, the fallback is \code{"lightgray"} for both.}
+must contain \code{Amp} and \code{Del}. With the default \code{color}, pale red and blue
+are used. If \code{color} is customized, the fallback is \code{"lightgray"} for both.}
 
 \item{annotations}{Optional data frame of custom genomic labels with columns
 \code{chromosome}, \code{start}, \code{end}, \code{label}, and \code{event_type}. Event type must be
@@ -86,14 +85,9 @@ scores grow downward, and a zoom-aware chromosome strip separates them.
 }
 \details{
 The common G-score domain makes amplification and deletion magnitudes
-directly comparable. Every score interval is drawn once with an opaque
-color: \code{color} for intervals passing \code{fdrCutOff} and
-\code{nonSignificantColor} for the remaining context. This avoids alpha blending
-where narrow rectangles overlap. Tooltips include score, q-value, frequency,
-amplitude, and genomic coordinates.
-
-Only compact score and cytoband-summary fields are embedded in the widget;
-the large per-sample lesion matrix in the GISTIC object is not serialized.
+directly comparable. Intervals passing \code{fdrCutOff} use \code{color}, and the
+remaining intervals use \code{nonSignificantColor}. Tooltips include score,
+q-value, frequency, amplitude, and genomic coordinates.
 }
 \examples{
 if (interactive()) {

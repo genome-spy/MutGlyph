@@ -6,8 +6,8 @@
 #'
 #' @param gistic A maftools `GISTIC` object created by
 #'   [maftools::readGistic()].
-#' @param fdrCutOff GISTIC q-value cutoff in `(0, 1]` used to assign the two
-#'   opaque score colors.
+#' @param fdrCutOff GISTIC q-value cutoff in `(0, 1]` used to identify
+#'   significant intervals.
 #' @param markBands Cytobands to label, `"all"` for every significant band, or
 #'   `NULL` for the five bands with the lowest q-values.
 #' @param color Two colors for amplification and deletion. An unnamed vector is
@@ -29,9 +29,8 @@
 #' @param nonSignificantColor One color applied to both event types, or two
 #'   colors for amplification and deletion intervals that do not pass
 #'   `fdrCutOff`. An unnamed vector is interpreted in that order; a named vector
-#'   must contain `Amp` and `Del`. With the default `color`, the defaults are
-#'   opaque pale red and blue resembling the former translucent colors. If
-#'   `color` is customized, the fallback is `"lightgray"` for both.
+#'   must contain `Amp` and `Del`. With the default `color`, pale red and blue
+#'   are used. If `color` is customized, the fallback is `"lightgray"` for both.
 #' @param annotations Optional data frame of custom genomic labels with columns
 #'   `chromosome`, `start`, `end`, `label`, and `event_type`. Event type must be
 #'   `"Amp"` or `"Del"`. Labels are anchored to the highest overlapping
@@ -44,14 +43,9 @@
 #'
 #' @details
 #' The common G-score domain makes amplification and deletion magnitudes
-#' directly comparable. Every score interval is drawn once with an opaque
-#' color: `color` for intervals passing `fdrCutOff` and
-#' `nonSignificantColor` for the remaining context. This avoids alpha blending
-#' where narrow rectangles overlap. Tooltips include score, q-value, frequency,
-#' amplitude, and genomic coordinates.
-#'
-#' Only compact score and cytoband-summary fields are embedded in the widget;
-#' the large per-sample lesion matrix in the GISTIC object is not serialized.
+#' directly comparable. Intervals passing `fdrCutOff` use `color`, and the
+#' remaining intervals use `nonSignificantColor`. Tooltips include score,
+#' q-value, frequency, amplitude, and genomic coordinates.
 #'
 #' @return A MutGlyph htmlwidget.
 #' @seealso [oncoplot()], [maftools::readGistic()], and [as_json()].

@@ -24,7 +24,10 @@ move from a whole-genome overview into candidate kataegis loci, while GISTIC
 landscapes can zoom from chromosome-wide copy-number patterns into individual
 amplification or deletion peaks.
 
-![An interactive MutGlyph oncoplot of the maftools LAML example data](man/figures/oncoplot.png)
+![Screenshot of a MutGlyph oncoplot of the maftools LAML example data](man/figures/oncoplot.png)
+
+Explore the interactive version on the
+[Get started](https://genomespy.app/MutGlyph/articles/MutGlyph.html) page.
 
 ## Installation
 
